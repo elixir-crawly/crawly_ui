@@ -1,0 +1,8 @@
+<div class="Hero">
+    <h1 class="Hero__title">Web Crawling Dashboard.</h1>
+    <p class="Hero__description">A centralized panel which allows you to start/stop your spiders and debugging your crawls in realtime.</p>
+    <p class="Hero__description">Looks like you have not scheduled any jobs yet. Why don't you give it a try, by scheduling a Crawly Job?</p>
+    <a class="Link" rel="" target="" href="/#getting-started">
+        <button class="Button">Schedule</button>
+    </a>
+</div>

@@ -1,0 +1,15 @@
+<h1>Pick the node</h1>
+<form action="/schedule/spider" method="GET">
+  <div class="row">
+    <div class="column">
+       <label for="inputState">Node</label>
+       <select id="dynamic_select" name="node" class="form-control">
+          <%= for node <- @nodes do %>
+          <option> <%= node %> </option>
+          <% end %>
+       </select>
+       <div class="column"><button type="submit">Next</button></div>
+    </div>
+  </div>
+</form>
+

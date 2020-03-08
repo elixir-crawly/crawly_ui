@@ -1,0 +1,35 @@
+version: "3"
+services:
+  ui:
+    container_name: crawlyui.com
+    command:  iex --cookie 123 --name ui@crawlyui.com -S mix phx.server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PG_USERNAME: postgres
+      PG_PASSWORD: example
+      PG_DATABASE: crawlyui
+      PG_HOST: crawlyuidb
+    ports:
+      - 4000:4000
+
+  postgres:
+    image: postgres:11.4-alpine
+    container_name: crawlyuidb
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: example
+      PGPASSWORD: example
+      POSTGRES_USER: postgres
+
+  worker:
+    container_name: worker.com
+    command:  iex --cookie 123 --name worker@worker.com -S mix
+    build:
+      context: "examples"
+      dockerfile: Dockerfile
+    environment:
+      UI_NODE: "ui@crawlyui.com"
+

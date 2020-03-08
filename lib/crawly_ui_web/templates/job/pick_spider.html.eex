@@ -1,0 +1,19 @@
+<h1>Pick spider</h1>
+<%= if @error != nil do %>
+    <div><%= inspect(@error) %></div>
+<% end %>
+<form action="/schedule/finish" method="GET">
+  <div class="row">
+    <div class="column">
+        <input name="node" type="hidden" value="<%= @node %>">
+       <label for="inputState">Spider</label>
+       <select name="spider" class="form-control">
+          <%= for spider <- @spiders do %>
+          <option> <%= spider %> </option>
+          <% end %>
+       </select>
+       <div class="column"><button type="submit">Schedule</button></div>
+    </div>
+  </div>
+</form>
+

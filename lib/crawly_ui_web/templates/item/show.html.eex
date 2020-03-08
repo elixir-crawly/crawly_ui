@@ -1,0 +1,19 @@
+<h1>Item </h1>
+<ul>
+    <div class="row">
+        <div class="column column-25" style="overflow: scroll; background-color: #ccc;">
+            <div><span><a href='/jobs/<%= @next_item.job_id %>/items/<%= @next_item.id %>'> Next Item </a></span> | <span> <a href="/jobs/<%= @item.job_id %>/items/"> Go to items </a></span></div>
+            <%= for {field_name, field_value} <- @item.data do %>
+            <b><%= field_name %></b>:
+            <br />
+            <%= raw render_field_value(field_name, field_value) %>
+            <hr />
+            <% end %>
+        </div>
+
+        <div class="column column-80">
+            <iframe id="iframe" width="1000px" height="600px" src="<%= Map.get(@item.data, "url") %>" style="border:none;"></iframe>
+        <div>
+
+    </div>
+</ul>

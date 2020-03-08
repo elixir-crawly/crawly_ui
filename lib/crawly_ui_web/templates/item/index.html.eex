@@ -1,0 +1,33 @@
+<h1>Items</h1>
+
+<!-- The form -->
+<form class="row" action=".">
+  <%= if @search do %>
+    <div class="column"><input type="text" placeholder="<%= @search %>" name="search"></div>
+  <% else %>
+    <div class="column"><input type="text" placeholder="Search" name="search"></div>
+  <% end %>
+   <button type="submit"><i class="fa fa-search"></i></button>
+</form>
+
+
+<%= for item <- @items do %>
+<table class="w3-table-all card">
+ <tbody><tr>
+  <th>Item</th>
+  <th>Discovery time: <%= item.inserted_at %> <%= raw maybe_render_preview(item) %></th>
+ </tr>
+
+ <%= for {field_name, field_value} <- item.data do %>
+ <tr>
+   <td class="w"><b><%= field_name %></b></td>
+   <td class="c"><%= raw render_field_value(field_name, field_value) %></td>
+ </tr>
+ <% end %>
+
+</tbody>
+
+</table>
+<% end %>
+
+<%= pagination_links @page %>

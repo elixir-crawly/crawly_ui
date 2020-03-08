@@ -1,0 +1,46 @@
+<%= if Enum.empty?(@jobs) do %>
+<div class="Hero">
+    <h1 class="Hero__title">Welcome to Crawly UI</h1>
+    <p class="Hero__description">A centralized panel which allows you to start/stop and debug your spiders.</p>
+    <p class="Hero__description">Looks like you have not scheduled any jobs yet. Why don't you give it a try, by scheduling a Crawly Job?</p>
+    <a class="Link" href="/schedule">
+        <button class="Button">Schedule</button>
+    </a>
+</div>
+<% else %>
+<h1>Jobs</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Spider</th>
+      <th>Node</th>
+      <th>Items</th>
+
+      <th>State</th>
+
+      <th>Start Time</th>
+      <th>Run time</th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for job <- @jobs do %>
+    <tr>
+      <td><%= job.spider %></td>
+      <td><%= job.node %></td>
+      <td>
+         <a href="/jobs/<%= job.id %>/items/"><%= get_items_count(job) %></a>
+      </td>
+
+      <td><%= job.state %></td>
+      <td><%= job.inserted_at %></td>
+      <td><%= get_runtime(job) %> min</td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= pagination_links @page %>
+<% end %>
+
+
+

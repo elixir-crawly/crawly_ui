@@ -1,0 +1,14 @@
+<h1>Show Job</h1>
+
+<ul>
+  <li>
+    <strong>Spider:</strong>
+    <%= @job.spider %>
+  </li>
+
+  <li>
+    <strong>State:</strong>
+    <%= @job.state %>
+  </li>
+</ul>
+
