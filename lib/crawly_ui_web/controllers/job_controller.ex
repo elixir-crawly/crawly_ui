@@ -28,7 +28,10 @@ defmodule CrawlyUIWeb.JobController do
         |> redirect(to: "/")
 
       error ->
-        render(conn, "pick_spider.html", node: node, spiders: [Esl, ErlangOrg], error: error)
+        conn
+        |> put_flash(:error, "#{inspect(error)}")
+        |> redirect(to: "/schedule")
+
     end
   end
 end
