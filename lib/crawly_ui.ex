@@ -21,6 +21,7 @@ defmodule CrawlyUI do
       end
 
     {:ok, _item} = Manager.create_item(%{job_id: job.id, data: item})
+    :ok
   end
 
   def list_spiders(node) do

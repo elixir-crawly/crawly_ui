@@ -9,7 +9,8 @@ ui_node = System.get_env("UI_NODE") || "ui@127.0.0.1"
 ui_node = ui_node |> String.to_atom()
 
 config :crawly,
-       closespider_timeout: 1,
+       closespider_timeout: -1,
+       closespider_itemcount: 100_000,
        concurrent_requests_per_domain: 2,
        middlewares: [
          Crawly.Middlewares.DomainFilter,

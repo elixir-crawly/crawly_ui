@@ -237,7 +237,7 @@ defmodule CrawlyUI.Manager do
   def create_item(attrs \\ %{}) do
     %Item{}
     |> Item.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert([returning: false])
   end
 
   @doc """

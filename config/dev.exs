@@ -7,7 +7,8 @@ config :crawly_ui, CrawlyUI.Repo,
   database: System.get_env("PG_DATABASE") || "crawly_ui_devv",
   hostname: System.get_env("PG_HOST") || "localhost",
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  timeout: 60_000
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
