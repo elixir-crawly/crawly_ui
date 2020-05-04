@@ -9,7 +9,7 @@ services:
     environment:
       MIX_ENV: prod
       SECRET_KEY_BASE: "TEST"
-      DATABASE_URL: "ecto://postgres:example@crawlyuidb/crawlyui"
+      DATABASE_URL: ${DB_URL:-ecto://postgres:example@crawlyuidb/crawlyui}
     ports:
       - 4000:4000
 
