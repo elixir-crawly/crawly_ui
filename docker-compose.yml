@@ -7,10 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      PG_USERNAME: postgres
-      PG_PASSWORD: example
-      PG_DATABASE: crawlyui
-      PG_HOST: crawlyuidb
+      MIX_ENV: prod
+      SECRET_KEY_BASE: "TEST"
+      DATABASE_URL: "ecto://postgres:example@crawlyuidb/crawlyui"
     ports:
       - 4000:4000
 
