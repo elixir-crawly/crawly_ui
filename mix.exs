@@ -5,12 +5,19 @@ defmodule CrawlyUI.MixProject do
     [
       app: :crawly_ui,
       version: "0.1.0",
-      elixir: "~> 1.5",
-      elixirc_paths: elixirc_paths(Mix.env()),
+      elixir: "~> 1.9",
+#      elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [
+        ec: [
+          include_erts: false,
+          applications: [runtime_tools: :permanent],
+          steps: [:assemble, :tar]
+        ]
+      ]
     ]
   end
 

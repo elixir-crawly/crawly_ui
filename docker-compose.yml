@@ -2,13 +2,14 @@ version: "3"
 services:
   ui:
     container_name: crawlyui.com
-    command:  iex --cookie 123 --name ui@crawlyui.com -S mix phx.server
+    command: /crawlyui/bin/ec daemon
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       MIX_ENV: prod
       SECRET_KEY_BASE: "TEST"
+
       DATABASE_URL: ${DB_URL:-ecto://postgres:example@crawlyuidb/crawlyui}
     ports:
       - 4000:4000

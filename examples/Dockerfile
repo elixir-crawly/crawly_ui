@@ -1,4 +1,4 @@
-FROM elixir:1.8.2-alpine
+FROM elixir:1.10.3-alpine
 
 RUN apk update && apk upgrade \
                && apk add bash nodejs nodejs-npm git \

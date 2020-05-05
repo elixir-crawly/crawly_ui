@@ -1,4 +1,4 @@
-FROM elixir:1.8.2-alpine
+FROM elixir:1.10.3-alpine
 
 RUN apk update && apk upgrade \
                && apk add bash nodejs nodejs-npm git \
@@ -6,7 +6,8 @@ RUN apk update && apk upgrade \
 
 # Add local node module binaries to PATH
 ENV PATH=./node_modules/.bin:$PATH
-
+ENV DATABASE_URL=ecto://PG_USERNAME:PG_PASSWORD@PG_HOST/localhost
+ENV SECRET_KEY_BASE=teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest
 
 ADD . /crawlyui
 WORKDIR /crawlyui
@@ -14,5 +15,17 @@ WORKDIR /crawlyui
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && MIX_ENV=dev mix compile \
-    && cd assets && npm install -D && cd ..
+    && MIX_ENV=prod mix compile \
+    && cd assets && npm install -D && cd .. \
+    && npm run deploy --prefix ./assets \
+    && mix phx.digest \
+    && MIX_ENV=prod mix release ec
+
+FROM elixir:1.10.3-alpine
+COPY --from=0 /crawlyui/_build/prod/rel/ec/ /crawlyui
+
+RUN apk update && apk upgrade && apk add bash
+WORKDIR /crawlyui
+
+EXPOSE 4000
+CMD /crawlyui/ec/bin/ec start
