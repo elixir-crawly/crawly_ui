@@ -6,8 +6,6 @@ RUN apk update && apk upgrade \
 
 # Add local node module binaries to PATH
 ENV PATH=./node_modules/.bin:$PATH
-ENV DATABASE_URL=ecto://PG_USERNAME:PG_PASSWORD@PG_HOST/localhost
-ENV SECRET_KEY_BASE=teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest
 
 ADD . /crawlyui
 WORKDIR /crawlyui

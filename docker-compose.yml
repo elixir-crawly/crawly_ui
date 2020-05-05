@@ -2,17 +2,18 @@ version: "3"
 services:
   ui:
     container_name: crawlyui.com
-    command: /crawlyui/bin/ec daemon
+    command: /crawlyui/bin/ec start
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       MIX_ENV: prod
-      SECRET_KEY_BASE: "TEST"
-
-      DATABASE_URL: ${DB_URL:-ecto://postgres:example@crawlyuidb/crawlyui}
+      SECRET_KEY_BASE: "UDWLdQ4flBCR2W7j1ECKj4VZUtop6st4+OBoCXjJMIn0TPDO++xyxbzOR1qN7pK7"
+      RELEASE_COOKIE: "123"
+      NODE_NAME: "ui@crawlyui.com"
+      DATABASE_URL: $DATABASE_URL
     ports:
-      - 4000:4000
+      - 80:4000
 
   postgres:
     image: postgres:11.4-alpine
@@ -25,6 +26,8 @@ services:
       POSTGRES_USER: postgres
 
   worker:
+    stdin_open: true
+    tty: true
     container_name: worker.com
     command:  iex --cookie 123 --name worker@worker.com -S mix
     build:
