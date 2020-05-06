@@ -211,12 +211,10 @@ defmodule CrawlyUI.Manager do
   def get_item!(id), do: Repo.get!(Item, id)
 
   def most_recent_item(job_id) do
-    from(i in Item, where: i.job_id == ^job_id, order_by: [desc: :inserted_at])
-    |> Repo.all()
-    |> List.first()
+    from(i in Item, where: i.job_id == ^job_id, order_by: [desc: :inserted_at], limit: 1)
+    |> Repo.one()
   end
-
-
+  
   def next_item(item) do
     from(i in Item, where: i.job_id == ^item.job_id, order_by: fragment("RANDOM()"), limit: 1)
     |> Repo.one()
