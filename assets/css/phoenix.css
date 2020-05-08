@@ -183,3 +183,14 @@ table.w3-table-all {
   text-align: left;
   overflow: scroll;
 }
+
+
+iframe {
+    position: fixed;
+    top: 150px;
+    left: 600px;
+}
+
+.left{
+    float: left;
+}

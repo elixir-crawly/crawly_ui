@@ -1,6 +1,7 @@
-<h1>Item </h1>
+<h4 class="left">Item viewer. Please note it might require <a href="https://chrome.google.com/webstore/detail/ignore-x-frame-headers/gleekbfjekiniecknbkamfmkohkpodhe">Ignore X-Frame headers extension</a></h4>
 <ul>
     <div class="row">
+
         <div class="column column-25" style="overflow: scroll; background-color: #ccc;">
             <div><span><a href='/jobs/<%= @next_item.job_id %>/items/<%= @next_item.id %>'> Next Item </a></span> | <span> <a href="/jobs/<%= @item.job_id %>/items/"> Go to items </a></span></div>
             <%= for {field_name, field_value} <- @item.data do %>
@@ -12,7 +13,9 @@
         </div>
 
         <div class="column column-80">
-            <iframe id="iframe" width="1000px" height="600px" src="<%= Map.get(@item.data, "url") %>" style="border:none;"></iframe>
+            <div class="tooltip">
+                <iframe title="Campus Tour" id="iframe" width="1000px" height="2000px" src="<%= Map.get(@item.data, "url") %>" style="border:none;"></iframe>
+            </div>
         <div>
 
     </div>
