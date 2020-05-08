@@ -30,6 +30,17 @@ We think that web scraping is a process! It involves development, debugging, QA
 and finally maintenance. And that's what we're trying to achieve with CrawlyUI 
 project.
 
+## Trying it
+You could run it locally using the following commands
+
+1. docker-compose build
+2. docker-compose up -d postgres
+3. docker-compose run ui bash -c "/crawlyui/bin/ec eval \"CrawlyUI.ReleaseTasks.migrate\""
+4. docker-compose up ui worker
+
+This should bring the Crawly UI, Crawly worker and postgres database for you.
+Now you can access the server from localhost:80
+
 ## Gallery    
 
 1. Main page. Schedule jobs here!

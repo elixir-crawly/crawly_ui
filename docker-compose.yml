@@ -11,7 +11,9 @@ services:
       SECRET_KEY_BASE: "UDWLdQ4flBCR2W7j1ECKj4VZUtop6st4+OBoCXjJMIn0TPDO++xyxbzOR1qN7pK7"
       RELEASE_COOKIE: "123"
       NODE_NAME: "ui@crawlyui.com"
-      DATABASE_URL: $DATABASE_URL
+      POOL_SIZE: 10
+      DATABASE_URL: ${DATABASE_URL:-ecto://postgres:example@crawlyuidb/crawlyui}
+
     ports:
       - 80:4000
 
@@ -24,6 +26,7 @@ services:
       POSTGRES_PASSWORD: example
       PGPASSWORD: example
       POSTGRES_USER: postgres
+      POSTGRES_DB: crawlyui
 
   worker:
     stdin_open: true
