@@ -31,10 +31,6 @@ defmodule CrawlyUI.MixProject do
     ]
   end
 
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
-
   # Specifies your project dependencies.
   #
   # Type `mix help deps` for examples and options.
@@ -52,7 +48,8 @@ defmodule CrawlyUI.MixProject do
       {:scrivener_html, "~> 1.8.1"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:quantum, "~> 3.0-rc"}
+      {:quantum, "~> 3.0-rc"},
+      {:timex, "~> 3.5"}
     ]
   end
 

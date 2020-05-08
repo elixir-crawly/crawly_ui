@@ -19,6 +19,7 @@
       <th>State</th>
 
       <th>Start Time</th>
+      <th>Crawl Speed</th>
       <th>Run time</th>
     </tr>
   </thead>
@@ -33,7 +34,8 @@
 
       <td><%= job.state %></td>
       <td><%= job.inserted_at %></td>
-      <td><%= get_runtime(job) %> min</td>
+      <td><%= get_crawl_speed(job) %></td>
+      <td><%= get_runtime(job) %></td>
     </tr>
 <% end %>
   </tbody>

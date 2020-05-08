@@ -9,12 +9,16 @@ defmodule CrawlyUI.Manager do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
+  @job_abandoned_timeout 60 * 30
+
   def update_job_status() do
-    running_jobs = from(j in Job, where: j.state == ^"running" ) |> Repo.all()
+    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
         true ->
           update_job(job, %{state: "abandoned"})
+
         false ->
           :ok
       end
@@ -24,9 +28,12 @@ defmodule CrawlyUI.Manager do
   def is_job_abandoned(job) do
     case most_recent_item(job.id) do
       nil ->
-        NaiveDateTime.diff(NaiveDateTime.utc_now(), job.inserted_at, :second) > 300
+        NaiveDateTime.diff(NaiveDateTime.utc_now(), job.inserted_at, :second) >
+          @job_abandoned_timeout
+
       item ->
-        NaiveDateTime.diff(NaiveDateTime.utc_now(), item.inserted_at, :second) > 300
+        NaiveDateTime.diff(NaiveDateTime.utc_now(), item.inserted_at, :second) >
+          @job_abandoned_timeout
     end
   end
 
@@ -137,9 +144,21 @@ defmodule CrawlyUI.Manager do
     case most_recent_item(job.id) do
       nil ->
         0.0
+
       item ->
         NaiveDateTime.diff(item.inserted_at, start, :second) / 60
     end
+  end
+
+  def crawl_speed(job) do
+    start_time = Timex.now()
+    end_time = Timex.shift(start_time, minutes: -1)
+
+    Repo.one(
+      from i in "items",
+        where: i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
+        select: count("*")
+    )
   end
 
   @doc """
@@ -235,7 +254,7 @@ defmodule CrawlyUI.Manager do
   def create_item(attrs \\ %{}) do
     %Item{}
     |> Item.changeset(attrs)
-    |> Repo.insert([returning: false])
+    |> Repo.insert(returning: false)
   end
 
   @doc """

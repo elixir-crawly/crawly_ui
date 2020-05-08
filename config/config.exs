@@ -33,8 +33,8 @@ config :scrivener_html,
 
 config :crawly_ui, CrawlyUI.Scheduler,
        jobs: [
-         # Every 5 minutes
-         {"*/5 * * * *",      {CrawlyUI.Manager, :update_job_status, []}},
+         # Every hour
+         {"* */1 * * *",      {CrawlyUI.Manager, :update_job_status, []}},
        ]
 
 # Import environment specific config. This must remain at the bottom
