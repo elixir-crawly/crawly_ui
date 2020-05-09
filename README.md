@@ -67,7 +67,6 @@ You can test the full chain (crawly-ui, crawly and sample spiders) locally with:
 
 The interface will be available on localhost:4000 for your tests. 
 
-
 # Item previews
 
 If your item has URL field you will get a nice preview capabilities, with the 
@@ -77,3 +76,13 @@ NOTE:
 
 Iframes are blocked almost by every large website. However you can easily overcome it by
 using Ignore X-Frame headers browser extension.
+
+# Roadmap
+
+- [ ] Make tests to have 80% tests coverage
+- [ ] Get logs from Crawly
+- [ ] Allow to stop given spiders
+- [ ] Parametrize spider parameters
+- [ ] Export items (CSV, JSON)
+- [ ] Make better search (search query language like in Kibana)
+- [ ] UI based spider generation
