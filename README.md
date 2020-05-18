@@ -85,4 +85,4 @@ using Ignore X-Frame headers browser extension.
 - [ ] Parametrize spider parameters
 - [ ] Export items (CSV, JSON)
 - [ ] Make better search (search query language like in Kibana)
-- [ ] UI based spider generation
+- [ ] UI based spider generatio

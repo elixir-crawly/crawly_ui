@@ -20,7 +20,7 @@ config :crawly,
        pipelines: [
          {Crawly.Pipelines.Validate, fields: [:url, :title, :id, :price, :image]},
          {Crawly.Pipelines.DuplicatesFilter, item_id: :id},
-         {Crawly.Pipelines.SendToUI, ui_node: ui_node},
+         {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui_node},
          Crawly.Pipelines.JSONEncoder,
          {Crawly.Pipelines.WriteToFile, extension: "json", folder: "/tmp"}
        ]

@@ -23,7 +23,7 @@ defmodule Shops.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:crawly, git: "https://github.com/oltarasenko/crawly", branch: "crawly_next"},
+      {:crawly, "~> 0.10.0"},
       {:floki, "~> 0.26.0"},
       {:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}
     ]
