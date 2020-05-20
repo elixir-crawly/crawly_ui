@@ -35,6 +35,11 @@ config :crawly_ui, CrawlyUI.Scheduler,
        jobs: [
          # Every hour
          {"* */1 * * *",      {CrawlyUI.Manager, :update_job_status, []}},
+
+         # Every minute
+         {"*/1 * * * *",      {CrawlyUI.Manager, :update_item_counts, []}},
+         {"*/1 * * * *",      {CrawlyUI.Manager, :update_crawl_speeds, []}},
+         {"*/1 * * * *",      {CrawlyUI.Manager, :update_run_times, []}},
        ]
 
 # Import environment specific config. This must remain at the bottom

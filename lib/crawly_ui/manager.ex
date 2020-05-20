@@ -174,6 +174,50 @@ defmodule CrawlyUI.Manager do
     Repo.one(from i in "items", where: i.job_id == ^job.id, select: count("*"))
   end
 
+  @doc """
+  Update item counts for all running jobs
+  """
+  def update_item_counts() do
+
+    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+    Enum.each(running_jobs, fn job ->
+      cnt = count_items(job)
+      {:ok, _} = update_job(job, %{items_count: cnt})
+    end)
+  end
+
+  @doc """
+  Update crawl speed for all active jobs
+  """
+  def update_crawl_speeds() do
+    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+
+    start_time = Timex.now()
+    end_time = Timex.shift(start_time, minutes: -1)
+
+    Enum.each(running_jobs, fn job ->
+      cnt = Repo.one(
+        from i in "items",
+        where: i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
+        select: count("*")
+      )
+
+      {:ok, _} = update_job(job, %{crawl_speed: cnt})
+    end)
+  end
+
+  @doc """
+  Update run times for all active jobs
+  """
+  def update_run_times() do
+    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+
+    Enum.each(running_jobs, fn job ->
+      cnt = run_time(job) |> trunc()
+      {:ok, _} = update_job(job, %{run_time: cnt})
+    end)
+  end
+
   def get_job_by_tag(tag) do
     Repo.one(from j in Job, where: j.tag == ^tag)
   end

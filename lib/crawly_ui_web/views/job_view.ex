@@ -5,7 +5,9 @@ defmodule CrawlyUIWeb.JobView do
   alias CrawlyUI.Manager.Job
 
   def get_runtime(job) do
-    case CrawlyUI.Manager.run_time(job) do
+    case job.run_time do
+      nil ->
+        "0 min"
       result when result > 60 ->
         time_in_hours = (result / 60) |> Float.round(2)
         "#{time_in_hours} hours"
@@ -16,12 +18,11 @@ defmodule CrawlyUIWeb.JobView do
     end
   end
 
-  def get_crawl_speed(%Job{state: state} = job) do
+  def get_crawl_speed(%Job{state: state, crawl_speed: speed} = job) do
     case state do
-      "running" -> "#{CrawlyUI.Manager.crawl_speed(job)} items/min"
+      "running" -> "#{speed} items/min"
       _ -> "-"
     end
-
   end
 
   def get_items_count(job) do
