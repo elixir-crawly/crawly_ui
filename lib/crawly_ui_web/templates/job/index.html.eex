@@ -20,7 +20,7 @@
 
       <th>Start Time</th>
       <th>Crawl Speed</th>
-      <th>Run time</th>
+      <th>Crawl time</th>
     </tr>
   </thead>
   <tbody>
@@ -29,13 +29,13 @@
       <td><%= job.spider %></td>
       <td><%= job.node %></td>
       <td>
-         <a href="/jobs/<%= job.id %>/items/"><%= get_items_count(job) %></a>
+         <a href="/jobs/<%= job.id %>/items/"><%= job.items_count %></a>
       </td>
 
       <td><%= job.state %></td>
       <td><%= job.inserted_at %></td>
-      <td><%= get_crawl_speed(job) %></td>
-      <td><%= get_runtime(job) %></td>
+      <td><%= get_crawl_speed(job) || "-" %></td>
+      <td><%= get_runtime(job) || "-" %></td>
     </tr>
 <% end %>
   </tbody>
