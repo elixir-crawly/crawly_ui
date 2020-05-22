@@ -28,16 +28,17 @@ config :phoenix, :json_library, Jason
 
 # Configuration for scrivener_html
 config :scrivener_html,
-       routes_helper: CrawlyUIWeb.Router.Helpers,
-       view_style: :bootstrap
+  routes_helper: CrawlyUIWeb.Router.Helpers,
+  view_style: :bootstrap
 
 config :crawly_ui, CrawlyUI.Scheduler,
-       jobs: [
-         # Every hour
-         {"* */1 * * *",      {CrawlyUI.Manager, :update_job_status, []}},
+  jobs: [
+    # Every hour
+    {"* */1 * * *", {CrawlyUI.Manager, :update_job_status, []}},
 
-         # Every minute
-         {"*/4 * * * *",      {CrawlyUI.Manager, :update_running_jobs, []}}
+    # Every minute
+    {"*/4 * * * *", {CrawlyUI.Manager, :update_running_jobs, []}}
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
