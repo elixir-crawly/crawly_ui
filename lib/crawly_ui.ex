@@ -8,24 +8,22 @@ defmodule CrawlyUI do
   """
 
   alias CrawlyUI.Manager
+  require Logger
 
-  def store_item(spider_name, item, job_tag, node) do
-    job =
-      case Manager.get_job_by_tag(job_tag) do
-        nil ->
-          {:ok, job} = Manager.create_job(%{spider: spider_name, tag: job_tag, state: "running", node: node})
-          job
+  def store_item(_spider_name, item, job_tag, _node) do
+    case Manager.get_job_by_tag(job_tag) do
+      nil ->
+        Logger.error("Job was not found: #{job_tag}")
+        {:error, :job_not_found}
 
-        job ->
-          job
-      end
-
-    {:ok, _item} = Manager.create_item(%{job_id: job.id, data: item})
-    :ok
+      job ->
+        {:ok, _item} = Manager.create_item(%{job_id: job.id, data: item})
+        Manager.update_job(job, %{state: "running"})
+        :ok
+    end
   end
 
   def list_spiders(node) do
     :rpc.call(node, Crawly, :list_spiders, [])
   end
-
 end

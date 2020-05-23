@@ -19,10 +19,12 @@ defmodule CrawlyUIWeb.JobController do
   end
 
   def schedule(conn, %{"node" => node, "spider" => spider}) do
-    spider = String.to_atom(spider)
-    node = String.to_atom(node)
-    case :rpc.call(node, Crawly.Engine, :start_spider, [spider]) do
+    spider_atom = String.to_atom(spider)
+    node_atom = String.to_atom(node)
+    uuid = Ecto.UUID.generate()
+    case :rpc.call(node_atom, Crawly.Engine, :start_spider, [spider_atom, uuid]) do
       :ok ->
+        {:ok, _} = Manager.create_job(%{spider: spider, tag: uuid, state: "new", node: node})
         conn
         |> put_flash(:info, "Spider scheduled successfully. It might take a bit of time before items will appear here...")
         |> redirect(to: "/")
