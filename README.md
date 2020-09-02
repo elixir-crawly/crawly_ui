@@ -69,8 +69,18 @@ can operate as many nodes as you want (or as many as erlang distribution can han
 ### Configure your Crawly
 
 1. Add SendToUI pipeline to the list of your item pipelines (before encoder pipelines)
-`{Crawly.Pipelines.Experimental.SendToUI, ui_node: :<crawlyui-node-name>}`,
-example: `{Crawly.Pipelines.Experimental.SendToUI, ui_node: ui@127.0.0.1}`
+`{Crawly.Pipelines.Experimental.SendToUI, ui_node: :<crawlyui-node-name>}`, example:
+
+``` elixir
+config :crawly,
+  pipelines: [
+     {Crawly.Pipelines.Validate, fields: [:id]},
+     {Crawly.Pipelines.DuplicatesFilter, item_id: :id},
+     {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui@127.0.0.1},
+     Crawly.Pipelines.JSONEncoder,
+     {Crawly.Pipelines.WriteToFile, folder: "/tmp", extension: "jl"}
+  ]
+```
 
 2. Organize erlang cluster so Crawly nodes can find CrawlyUI node, in this case we use
 [erlang-node-discovery](https://github.com/oltarasenko/erlang-node-discovery) application for this task,
@@ -78,15 +88,21 @@ however any other alternative would also work. For setting up erlang-node-discov
 
 - add the following code dependency to deps section of mix.exs
 `{:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}`
-- add the following lines to the config.exs: `config :erlang_node_discovery,
-hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [ {:ui, 4000} ] `
+- add the following lines to the config.exs:
 
-### Start your Crawly node:
+``` elixir
+config :erlang_node_discovery,
+hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [{:ui, 4000}]
+```
+
+### Start your Crawly node
 Start an iex session in your Crawly implementation directory with `--cookie`
 (which should be same with your CrawlyUI session), you can also define a node name with option `--name`
 and it will be your Crawly node name that shows up on the UI, example:
 
-`iex --name worker@worker.com --cookie 123 -S mix`
+``` bash
+$ iex --name worker@worker.com --cookie 123 -S mix
+```
 
 ## CrawlyUI
 
@@ -104,9 +120,11 @@ $ docker-compose up -d postgres
 Start an iex session in CrawlyUI directory with `--name <crawlyui-node-name>`
 and `--cookie` that is the same with the crawly session, example:
 
-`iex --name ui@127.0.0.1 --cookie 123 -S mix phx.server`
+``` bash
+$ iex --name ui@127.0.0.1 --cookie 123 -S mix phx.server
+```
 
-The interface will be available on [](localhost:4000) for your tests.
+The interface will be available on [localhost:4000]() for your tests.
 
 # Item previews
 
