@@ -72,6 +72,7 @@ can operate as many nodes as you want (or as many as erlang distribution can han
 `{Crawly.Pipelines.Experimental.SendToUI, ui_node: :<crawlyui-node-name>}`, example:
 
 ``` elixir
+# config/config.exs
 config :crawly,
   pipelines: [
      {Crawly.Pipelines.Validate, fields: [:id]},
@@ -86,13 +87,21 @@ config :crawly,
 [erlang-node-discovery](https://github.com/oltarasenko/erlang-node-discovery) application for this task,
 however any other alternative would also work. For setting up erlang-node-discovery:
 
-- add the following code dependency to deps section of mix.exs
-`{:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}`
-- add the following lines to the config.exs:
+- add erlang-node-discovery as dependencies:
 
 ``` elixir
-config :erlang_node_discovery,
-hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [{:ui, 4000}]
+  # mix.exs
+  defp deps do
+    [
+      {:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}
+    ]
+```
+
+- add the following to the configuration:
+
+``` elixir
+  # config/config.exs
+  config :erlang_node_discovery, hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [{:ui, 4000}]
 ```
 
 ### Start your Crawly node
