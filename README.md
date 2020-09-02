@@ -36,13 +36,13 @@ project.
 ## Trying it
 You could run it locally using the following commands
 
-1. docker-compose build
-2. docker-compose up -d postgres
-3. docker-compose run ui bash -c "/crawlyui/bin/ec eval \"CrawlyUI.ReleaseTasks.migrate\""
-4. docker-compose up ui worker
+1. `docker-compose build`
+2. `docker-compose up -d postgres`
+3. `docker-compose run ui bash -c "/crawlyui/bin/ec eval \"CrawlyUI.ReleaseTasks.migrate\""`
+4. `docker-compose up ui worker`
 
-This should bring the Crawly UI, Crawly worker and postgres database for you.
-Now you can access the server from localhost:80
+This should bring the Crawly UI, Crawly worker (with Crawly Jobs in example folder)
+and postgres database for you. Now you can access the server from localhost:80
 
 ## Gallery
 
@@ -62,13 +62,51 @@ CrawlyUI is a phoenix application, which is responsible for working with Crawly
 nodes. All nodes are connected to CrawlyUI using the erlang distribution. CrawlyUI
 can operate as many nodes as you want (or as many as erlang distribution can handle ~100)
 
-# Testing it locally
+# Testing it locally (with your own Crawly jobs)
 
-You can test the full chain (crawly-ui, crawly and sample spiders) locally with:
-`docker-compose build`
-`docker-compose up`
+## Your own Crawly Implementation
 
-The interface will be available on localhost:4000 for your tests.
+### Configure your Crawly
+
+1. Add SendToUI pipeline to the list of your item pipelines (before encoder pipelines)
+`{Crawly.Pipelines.Experimental.SendToUI, ui_node: :<crawlyui-node-name>}`,
+example: `{Crawly.Pipelines.Experimental.SendToUI, ui_node: ui@127.0.0.1}`
+
+2. Organize erlang cluster so Crawly nodes can find CrawlyUI node, in this case we use
+[erlang-node-discovery](https://github.com/oltarasenko/erlang-node-discovery) application for this task,
+however any other alternative would also work. For setting up erlang-node-discovery:
+
+- add the following code dependency to deps section of mix.exs
+`{:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}`
+- add the following lines to the config.exs: `config :erlang_node_discovery,
+hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [ {:ui, 4000} ] `
+
+### Start your Crawly node:
+Start an iex session in your Crawly implementation directory with `--cookie`
+(which should be same with your CrawlyUI session), you can also define a node name with option `--name`
+and it will be your Crawly node name that shows up on the UI, example:
+
+`iex --name worker@worker.com --cookie 123 -S mix`
+
+## CrawlyUI
+
+### Start the database
+
+Start postgres with the command
+
+``` bash
+$ docker-compose build
+$ docker-compose up -d postgres
+```
+
+### Start CrawlyUI session
+
+Start an iex session in CrawlyUI directory with `--name <crawlyui-node-name>`
+and `--cookie` that is the same with the crawly session, example:
+
+`iex --name ui@127.0.0.1 --cookie 123 -S mix phx.server`
+
+The interface will be available on [](localhost:4000) for your tests.
 
 # Item previews
 
@@ -88,4 +126,4 @@ using Ignore X-Frame headers browser extension.
 - [ ] Parametrize spider parameters
 - [ ] Export items (CSV, JSON)
 - [ ] Make better search (search query language like in Kibana)
-- [ ] UI based spider generatio
+- [ ] UI based spider generation
