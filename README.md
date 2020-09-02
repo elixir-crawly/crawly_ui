@@ -62,14 +62,14 @@ CrawlyUI is a phoenix application, which is responsible for working with Crawly
 nodes. All nodes are connected to CrawlyUI using the erlang distribution. CrawlyUI
 can operate as many nodes as you want (or as many as erlang distribution can handle ~100)
 
-# Testing it locally (with your own Crawly jobs)
+# Testing it on localhost (with your own Crawly jobs)
 
 ## Your own Crawly Implementation
 
 ### Configure your Crawly
 
 1. Add SendToUI pipeline to the list of your item pipelines (before encoder pipelines)
-`{Crawly.Pipelines.Experimental.SendToUI, ui_node: :<crawlyui-node-name>}`, example:
+`{Crawly.Pipelines.Experimental.SendToUI, ui_node: :"<crawlyui-node-name>@127.0.0.1"}`, example:
 
 ``` elixir
 # config/config.exs
@@ -77,15 +77,16 @@ config :crawly,
   pipelines: [
      {Crawly.Pipelines.Validate, fields: [:id]},
      {Crawly.Pipelines.DuplicatesFilter, item_id: :id},
-     {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui@127.0.0.1},
+     {Crawly.Pipelines.Experimental.SendToUI, ui_node: :"ui@127.0.0.1"},
      Crawly.Pipelines.JSONEncoder,
      {Crawly.Pipelines.WriteToFile, folder: "/tmp", extension: "jl"}
   ]
 ```
 
 2. Organize erlang cluster so Crawly nodes can find CrawlyUI node, in this case we use
-[erlang-node-discovery](https://github.com/oltarasenko/erlang-node-discovery) application for this task,
-however any other alternative would also work. For setting up erlang-node-discovery:
+[erlang-node-discovery](https://github.com/oltarasenko/erlang-node-discovery) application
+for this task, however any other alternative would also work. For setting up
+erlang-node-discovery:
 
 - add erlang-node-discovery as dependencies:
 
@@ -101,13 +102,16 @@ however any other alternative would also work. For setting up erlang-node-discov
 
 ``` elixir
   # config/config.exs
-  config :erlang_node_discovery, hosts: ["127.0.0.1", "crawlyui.com"], node_ports: [{:ui, 4000}]
+  config :erlang_node_discovery, hosts: ["127.0.0.1"], node_ports: [{<crawlyui-node-name>, 4000}]
 ```
+
+where `<crawlyui-node-name>` needs to match with the `SendToUi` pipeline (it would be `{:ui, 4000}`
+to match with the example)
 
 ### Start your Crawly node
 Start an iex session in your Crawly implementation directory with `--cookie`
-(which should be same with your CrawlyUI session), you can also define a node name with option `--name`
-and it will be your Crawly node name that shows up on the UI, example:
+(which should be same with your CrawlyUI session), you can also define a node name
+with option `--name` and it will be your Crawly node name that shows up on the UI, example:
 
 ``` bash
 $ iex --name worker@worker.com --cookie 123 -S mix
@@ -126,7 +130,7 @@ $ docker-compose up -d postgres
 
 ### Start CrawlyUI session
 
-Start an iex session in CrawlyUI directory with `--name <crawlyui-node-name>`
+Start an iex session in CrawlyUI directory with `--name <crawlyui-node-name>@127.0.0.1`
 and `--cookie` that is the same with the crawly session, example:
 
 ``` bash
@@ -134,6 +138,17 @@ $ iex --name ui@127.0.0.1 --cookie 123 -S mix phx.server
 ```
 
 The interface will be available on [localhost:4000]() for your tests.
+
+## Note
+If the crawly node does not show up on [http://localhost:4000/schedule](), try on your Crawly iex
+session ping the CrawlyUI node with `Node.ping/1`, example:
+
+```bash
+iex (worker@worker.com) 1> Node.ping(:"ui@127.0.0.1")
+> :pong
+```
+
+If you get `:pong` back, refresh the page and the crawly node will be there
 
 # Item previews
 
