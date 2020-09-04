@@ -38,12 +38,12 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns the list of jobs.
+  Returns the list of jobs. For config, see [Scrivener documentation](https://hexdocs.pm/scrivener_list/readme.html#installation)
 
   ## Examples
 
-      iex> list_jobs()
-      [%Job{}, ...]
+      iex> list_jobs(%{page_number: 1, page_size: 10})
+      %Scrivener.Page{entries: [%Job{}, ...]}
 
   """
   def list_jobs(params) do
@@ -192,11 +192,13 @@ defmodule CrawlyUI.Manager do
     end_time = Timex.shift(start_time, minutes: -1)
 
     Enum.each(jobs, fn job ->
-      cnt = Repo.one(
-        from i in "items",
-        where: i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
-        select: count("*")
-      )
+      cnt =
+        Repo.one(
+          from i in "items",
+            where:
+              i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
+            select: count("*")
+        )
 
       {:ok, _} = update_job(job, %{crawl_speed: cnt})
     end)
@@ -231,11 +233,11 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns the list of items.
+  Returns the list of items for a specific job that match the search string (if provided).
 
   ## Examples
 
-      iex> list_items()
+      iex> list_items(1, %{"search" => "id:1"})
       [%Item{}, ...]
 
   """
@@ -250,7 +252,7 @@ defmodule CrawlyUI.Manager do
           case String.contains?(search, ":") do
             true ->
               [key, value] = String.split(search, ":")
-              value = "%#{String.strip(value)}%"
+              value = "%#{String.trim(value)}%"
 
               Item
               |> where([i], i.job_id == ^job_id)
