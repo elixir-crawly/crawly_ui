@@ -11,6 +11,9 @@ cache:
     - _build
     - deps
 
+services:
+  - postgresql
+
 env:
   - MIX_ENV=test
 
