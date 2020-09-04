@@ -1,0 +1,17 @@
+language: elixir
+
+elixir:
+  - 1.7.0
+
+otp_release:
+  - 20.3
+
+cache:
+  directories:
+    - _build
+    - deps
+
+env:
+  - MIX_ENV=test
+
+script: mix coveralls.travis

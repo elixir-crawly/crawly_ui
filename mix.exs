@@ -7,6 +7,7 @@ defmodule CrawlyUI.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
@@ -52,7 +53,8 @@ defmodule CrawlyUI.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:quantum, "~> 3.0-rc"},
-      {:timex, "~> 3.5"}
+      {:timex, "~> 3.5"},
+      {:excoveralls, "~> 0.10", only: :test}
     ]
   end
 
