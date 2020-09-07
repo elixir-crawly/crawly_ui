@@ -7,8 +7,6 @@ defmodule CrawlyUi.ManagerTest do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
-  @job_abandoned_timeout 60 * 30 + 10
-
   describe "update_job_status/0" do
     test "updates job state to abandoned" do
       %{id: job_id_1} = insert_job()
@@ -393,33 +391,5 @@ defmodule CrawlyUi.ManagerTest do
     item = insert_item(job_id)
 
     assert %Ecto.Changeset{} = Manager.change_item(item)
-  end
-
-  ## Private function for inserting up jobs and items
-  defp insert_job(params \\ %{}) do
-    params =
-      Map.merge(%{spider: "Crawly", state: "running", tag: "test", node: "crawly@test"}, params)
-
-    Repo.insert!(struct(Job, params))
-  end
-
-  defp insert_item(job_id, inserted_at \\ nil, data \\ %{}) do
-    inserted_at =
-      case inserted_at do
-        nil -> inserted_at_valid()
-        _ -> inserted_at
-      end
-
-    Repo.insert!(%Item{job_id: job_id, inserted_at: inserted_at, data: data})
-  end
-
-  defp inserted_at_valid(), do: inserted_at(0)
-
-  defp inserted_at_expired, do: inserted_at(@job_abandoned_timeout)
-
-  defp inserted_at(shift) do
-    NaiveDateTime.utc_now()
-    |> NaiveDateTime.add(shift * -1, :second)
-    |> NaiveDateTime.truncate(:second)
   end
 end

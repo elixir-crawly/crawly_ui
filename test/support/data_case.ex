@@ -24,6 +24,7 @@ defmodule CrawlyUI.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import CrawlyUI.Manager
+      import CrawlyUI.DataCase
     end
   end
 
@@ -51,5 +52,37 @@ defmodule CrawlyUI.DataCase do
         opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
       end)
     end)
+  end
+
+  def insert_job(params \\ %{}) do
+    params =
+      Map.merge(%{spider: "Crawly", state: "running", tag: "test", node: "crawly@test"}, params)
+
+    CrawlyUI.Repo.insert!(struct(CrawlyUI.Manager.Job, params))
+  end
+
+  def insert_item(job_id, inserted_at \\ nil, data \\ %{}) do
+    inserted_at =
+      case inserted_at do
+        nil -> inserted_at_valid()
+        _ -> inserted_at
+      end
+
+    CrawlyUI.Repo.insert!(%CrawlyUI.Manager.Item{
+      job_id: job_id,
+      inserted_at: inserted_at,
+      data: data
+    })
+  end
+
+  def inserted_at_valid(), do: inserted_at(0)
+
+  @job_abandoned_timeout 60 * 30 + 10
+  def inserted_at_expired, do: inserted_at(@job_abandoned_timeout)
+
+  def inserted_at(shift) do
+    NaiveDateTime.utc_now()
+    |> NaiveDateTime.add(shift * -1, :second)
+    |> NaiveDateTime.truncate(:second)
   end
 end
