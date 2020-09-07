@@ -54,7 +54,8 @@ defmodule CrawlyUI.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:quantum, "~> 3.0-rc"},
       {:timex, "~> 3.5"},
-      {:excoveralls, "~> 0.10", only: :test}
+      {:excoveralls, "~> 0.10", only: :test},
+      {:mock, "~> 0.3.0", only: :test}
     ]
   end
 
