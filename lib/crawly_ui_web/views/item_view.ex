@@ -1,6 +1,5 @@
 defmodule CrawlyUIWeb.ItemView do
   use CrawlyUIWeb, :view
-  import Scrivener.HTML
 
   def render_field_value(name, value) when is_list(value) do
     Enum.reduce(value, [], fn v, acc -> [render_field_value(name, v)] ++ acc end)

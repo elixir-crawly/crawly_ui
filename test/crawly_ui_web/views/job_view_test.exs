@@ -23,13 +23,13 @@ defmodule CrawlyUIWeb.JobViewTest do
   end
 
   test "show runtime as 0 min when runtime is not updated" do
-   job = insert_job(%{inserted_at: inserted_at(6*60)})
+    job = insert_job(%{inserted_at: inserted_at(6 * 60)})
 
     insert_item(job.id, inserted_at(50))
     insert_item(job.id, inserted_at(10))
 
-    page = CrawlyUI.Manager.list_jobs(%{})
-    params = [jobs: page.entries, page: page, search: nil]
+    jobs = CrawlyUI.Manager.list_jobs(%{})
+    params = [jobs: jobs, search: nil]
 
     assert render_to_string(CrawlyUIWeb.JobView, "index.html", params) =~ "<td>0 min</td>"
   end
@@ -42,8 +42,8 @@ defmodule CrawlyUIWeb.JobViewTest do
 
     CrawlyUI.Manager.update_all_jobs()
 
-    page = CrawlyUI.Manager.list_jobs(%{})
+    jobs = CrawlyUI.Manager.list_jobs(%{})
 
-    [jobs: page.entries, page: page, search: nil]
+    [jobs: jobs, search: nil]
   end
 end

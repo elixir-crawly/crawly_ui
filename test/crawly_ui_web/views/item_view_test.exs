@@ -3,7 +3,6 @@ defmodule CrawlyUIWeb.ItemViewTest do
   use CrawlyUIWeb.ConnCase
 
   import Phoenix.View
-  import Ecto.Query
 
   describe "render jobs/:job_id/items/index.html" do
     test "shows list items" do
@@ -23,11 +22,9 @@ defmodule CrawlyUIWeb.ItemViewTest do
           "list" => ["data_1", "data_2"]
         })
 
-      query = from i in CrawlyUI.Manager.Item, where: i.job_id == ^job_id
-      items = CrawlyUI.Repo.all(query)
-      page = CrawlyUI.Repo.paginate(query, %{})
+      items = CrawlyUI.Manager.list_items(job_id, %{})
 
-      params = [items: items, page: page, search: nil]
+      params = [items: items, search: nil]
 
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "index.html", params)
 
@@ -119,13 +116,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
     %{id: job_id} = insert_job()
     insert_item(job_id, nil, data)
 
-    query =
-      from i in CrawlyUI.Manager.Item,
-        where: i.job_id == ^job_id
-
-    items = CrawlyUI.Repo.all(query)
-
-    page = CrawlyUI.Repo.paginate(query, %{})
-    [items: items, page: page, search: search]
+    items = CrawlyUI.Manager.list_items(job_id, %{})
+    [items: items, search: search]
   end
 end

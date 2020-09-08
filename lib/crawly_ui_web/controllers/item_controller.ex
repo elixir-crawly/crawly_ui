@@ -4,7 +4,7 @@ defmodule CrawlyUIWeb.ItemController do
   alias CrawlyUI.Manager
 
   def index(conn, %{"job_id" => id} = params) do
-    page = Manager.list_items(id, params)
+    items = Manager.list_items(id, params)
 
     search =
       case Map.get(params, "search") do
@@ -18,7 +18,7 @@ defmodule CrawlyUIWeb.ItemController do
           search
       end
 
-    render(conn, "index.html", items: page.entries, page: page, search: search)
+    render(conn, "index.html", items: items, search: search)
   end
 
   def show(conn, %{"id" => id} = _params) do
