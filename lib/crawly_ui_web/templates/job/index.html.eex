@@ -40,9 +40,4 @@
 <% end %>
   </tbody>
 </table>
-
-<%= pagination_links @page %>
 <% end %>
-
-
-

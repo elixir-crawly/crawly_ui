@@ -1,6 +1,5 @@
 defmodule CrawlyUIWeb.JobView do
   use CrawlyUIWeb, :view
-  import Scrivener.HTML
 
   alias CrawlyUI.Manager.Job
 

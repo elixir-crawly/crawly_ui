@@ -14,7 +14,8 @@ defmodule CrawlyUI.Application do
       CrawlyUIWeb.Endpoint,
       # Starts a worker by calling: CrawlyUI.Worker.start_link(arg)
       # {CrawlyUI.Worker, arg},
-      CrawlyUI.Scheduler
+      CrawlyUI.Scheduler,
+      {Phoenix.PubSub, name: CrawlyUI.PubSub}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

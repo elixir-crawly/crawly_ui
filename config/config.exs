@@ -15,8 +15,8 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "NvJbkg8LD2bwbr4pT6v7UoaiqcaHIwIkCath+ECqQGN36U9CnCD5o3K8geVuKAmF",
   render_errors: [view: CrawlyUIWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: CrawlyUI.PubSub, adapter: Phoenix.PubSub.PG2],
-  live_view: [signing_salt: "FEQCdMDy"]
+  pubsub_server: CrawlyUI.PubSub,
+  live_view: [signing_salt: "mKlOeOvv3fK8OTEEYjXqPaFqBXoVvRcC"]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -26,10 +26,10 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Configuration for scrivener_html
-config :scrivener_html,
-  routes_helper: CrawlyUIWeb.Router.Helpers,
-  view_style: :bootstrap
+# # Configuration for scrivener_html
+# config :scrivener_html,
+#   routes_helper: CrawlyUIWeb.Router.Helpers,
+# view_style: :bootstrap
 
 config :crawly_ui, CrawlyUI.Scheduler,
   jobs: [
