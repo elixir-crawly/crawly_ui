@@ -10,7 +10,7 @@ defmodule CrawlyUIWeb.JobController do
 
     jobs =
       Manager.list_jobs()
-      |> Enum.map(&Map.take(&1, [:id, :spider, :node, :inserted_at]))
+      |> Enum.map(&%{id: &1.id})
 
     live_render(conn, CrawlyUIWeb.JobLive, session: %{"jobs" => jobs})
   end

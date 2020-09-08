@@ -13,6 +13,7 @@ defmodule CrawlyUIWeb.JobLive do
     jobs =
       for %{id: job_id} <- jobs do
         job = Manager.get_job!(job_id)
+
         state = get_state(job)
         run_time = get_runtime(job)
         crawl_speed = get_crawl_speed(job)
@@ -22,7 +23,7 @@ defmodule CrawlyUIWeb.JobLive do
           run_time: run_time,
           crawl_speed: crawl_speed,
           items_count: items_count,
-          satte: state
+          state: state
         })
       end
 
@@ -79,7 +80,17 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   defp get_state(job) do
-    Manager.job_state(job)
+    case Manager.job_state(job) do
+      "running" = state ->
+        if Manager.is_job_abandoned(job) do
+          "abandoned"
+        else
+          state
+        end
+
+      state ->
+        state
+    end
   end
 
   defp get_runtime(job) do
