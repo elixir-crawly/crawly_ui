@@ -24,18 +24,18 @@
     </tr>
   </thead>
   <tbody>
-<%= for job <- @jobs do %>
+<%= for live_job <- @jobs do %>
     <tr>
-      <td><%= job.spider %></td>
-      <td><%= job.node %></td>
+      <td><%= live_job.spider %></td>
+      <td><%= live_job.node %></td>
       <td>
-         <a href="/jobs/<%= job.id %>/items/"><%= job.items_count %></a>
+         <a href="/jobs/<%= live_job.id %>/items/"><%= live_job.items_count %></a>
       </td>
 
-      <td><%= job.state %></td>
-      <td><%= job.inserted_at %></td>
-      <td><%= get_crawl_speed(job) || "-" %></td>
-      <td><%= get_runtime(job) || "-" %></td>
+      <td><%= live_job.state %></td>
+      <td><%= live_job.inserted_at %></td>
+      <td><%= live_job.crawl_speed || "-" %></td>
+      <td><%= live_job.run_time || "-" %></td>
     </tr>
 <% end %>
   </tbody>

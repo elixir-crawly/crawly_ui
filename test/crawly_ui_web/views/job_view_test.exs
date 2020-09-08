@@ -28,7 +28,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     insert_item(job.id, inserted_at(50))
     insert_item(job.id, inserted_at(10))
 
-    jobs = CrawlyUI.Manager.list_jobs(%{})
+    jobs = CrawlyUI.Manager.list_jobs()
     params = [jobs: jobs, search: nil]
 
     assert render_to_string(CrawlyUIWeb.JobView, "index.html", params) =~ "<td>0 min</td>"
@@ -42,7 +42,7 @@ defmodule CrawlyUIWeb.JobViewTest do
 
     CrawlyUI.Manager.update_all_jobs()
 
-    jobs = CrawlyUI.Manager.list_jobs(%{})
+    jobs = CrawlyUI.Manager.list_jobs()
 
     [jobs: jobs, search: nil]
   end

@@ -70,12 +70,12 @@ defmodule CrawlyUi.ManagerTest do
     end
   end
 
-  test "list_jobs/1 lists all jobs" do
+  test "list_jobs/0 lists all jobs" do
     # job with inserted at shift by 1, 2, 3 seconds so the order is fixed
     [job_1, job_2, job_3] =
       Enum.map([1, 2, 3], fn x -> insert_job(%{inserted_at: inserted_at(x)}) end)
 
-    assert [^job_1, ^job_2, ^job_3] = Manager.list_jobs(%{})
+    assert [^job_1, ^job_2, ^job_3] = Manager.list_jobs()
   end
 
   test "get_job/1 returns a job" do
