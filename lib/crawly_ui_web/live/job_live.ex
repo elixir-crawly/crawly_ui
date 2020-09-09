@@ -7,14 +7,8 @@ defmodule CrawlyUIWeb.JobLive do
     CrawlyUIWeb.JobView.render("index.html", assigns)
   end
 
-  def mount(_param, %{"jobs" => jobs}, socket) do
-    live_update(socket, :update_job, 1000)
-
-    {:ok, assign(socket, jobs: jobs)}
-  end
-
   def mount(_params, _session, socket) do
-    live_update(socket, :update_job, 1000)
+    live_update(socket, :update_job, 100)
     jobs = Manager.list_jobs()
     {:ok, assign(socket, jobs: jobs)}
   end
@@ -24,12 +18,11 @@ defmodule CrawlyUIWeb.JobLive do
 
     # If any of the jobs are running or in new state then we should keep updating
     # every 100ms else, refresh every second
+    Manager.update_job_status()
+    Manager.update_running_jobs()
 
     if need_update?(live_jobs) do
       live_update(socket, :update_job, 100)
-
-      Manager.update_job_status()
-      Manager.update_running_jobs()
     else
       live_update(socket, :update_job, 1000)
     end

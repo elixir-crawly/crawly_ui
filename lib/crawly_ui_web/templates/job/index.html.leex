@@ -33,8 +33,8 @@
 
       <td><%= live_job.state %></td>
       <td><%= live_job.inserted_at %></td>
-      <td><%= live_job.crawl_speed || "-" %></td>
-      <td><%= live_job.run_time || "-" %></td>
+      <td><%= live_job.crawl_speed || "-" %> items/min</td>
+      <td><%= live_job.run_time || "-" %> min</td>
     </tr>
 <% end %>
   </tbody>

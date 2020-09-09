@@ -7,6 +7,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
   def mount(_param, %{"nodes" => nodes}, socket) do
     if connected?(socket), do: Process.send_after(self(), :pick_node, 100)
+
     {:ok, assign(socket, template: "pick_node.html", nodes: nodes)}
   end
 
@@ -35,6 +36,11 @@ defmodule CrawlyUIWeb.ScheduleLive do
     {:noreply, assign(socket, spiders: spiders)}
   end
 
+  def handle_event("spider_picked", %{"node" => node}, socket) do
+    {:noreply,
+     redirect(socket, to: CrawlyUIWeb.Router.Helpers.job_path(socket, :pick_spider, node: node))}
+  end
+
   def handle_event("schedule_spider", %{"spider" => spider}, socket) do
     node_atom = socket.assigns.node
     spider_atom = String.to_atom(spider)
@@ -48,19 +54,20 @@ defmodule CrawlyUIWeb.ScheduleLive do
         {:ok, _} =
           CrawlyUI.Manager.create_job(%{spider: spider, tag: uuid, state: "new", node: node})
 
-        socket
-        |> put_flash(
-          :info,
+        info =
           "Spider scheduled successfully. It might take a bit of time before items will appear here..."
-        )
 
-        {:noreply, redirect(socket, to: "/")}
+        {:noreply,
+         socket
+         |> put_flash(
+           :info,
+           info
+         )
+         |> push_redirect(to: "/")}
 
       error ->
-        socket
-        |> put_flash(:error, "#{inspect(error)}")
-
-        {:noreply, push_redirect(socket, to: "/schedule")}
+        {:noreply,
+         socket |> put_flash(:error, "#{inspect(error)}") |> push_redirect(to: "/schedule")}
     end
   end
 end
