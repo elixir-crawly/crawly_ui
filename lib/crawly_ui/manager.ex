@@ -131,11 +131,6 @@ defmodule CrawlyUI.Manager do
     Job.changeset(job, %{})
   end
 
-  def job_state(job) do
-    %{state: state} = Repo.get(Job, job.id)
-    state
-  end
-
   @doc """
   Returns run time of the given job
 
