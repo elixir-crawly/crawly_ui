@@ -8,15 +8,16 @@ defmodule CrawlyUIWeb.JobController do
     # jobs = Manager.list_jobs(params)
     # render(conn, "index.html", jobs: jobs)
 
-    jobs =
-      Manager.list_jobs()
-      |> Enum.map(&%{id: &1.id})
-
-    live_render(conn, CrawlyUIWeb.JobLive, session: %{"jobs" => jobs})
+    jobs = Manager.list_jobs()
+    live_render(conn, CrawlyUIWeb.JobLive, session: %{"template" => "index.html", "jobs" => jobs})
   end
 
   def pick_node(conn, _params) do
-    render(conn, "pick_node.html", nodes: Node.list(), error: nil)
+    live_render(conn, CrawlyUIWeb.JobLive,
+      session: %{"template" => "pick_node.html", "nodes" => Node.list()}
+    )
+
+    # render(conn, "pick_node.html", nodes: Node.list(), error: nil)
   end
 
   def pick_spider(conn, %{"node" => node}) do
