@@ -48,8 +48,6 @@ defmodule CrawlyUI.MixProject do
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      # {:scrivener_ecto, "~> 2.3"},
-      # {:scrivener_html, "~> 1.8.1"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:quantum, "~> 3.0-rc"},

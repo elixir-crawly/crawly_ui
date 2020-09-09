@@ -26,11 +26,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# # Configuration for scrivener_html
-# config :scrivener_html,
-#   routes_helper: CrawlyUIWeb.Router.Helpers,
-# view_style: :bootstrap
-
 config :crawly_ui, CrawlyUI.Scheduler,
   jobs: [
     # Every hour
