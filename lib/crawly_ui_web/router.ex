@@ -22,7 +22,6 @@ defmodule CrawlyUIWeb.Router do
     get "/schedule", JobController, :pick_node
 
     get "/schedule/spider", JobController, :pick_spider
-    get "/schedule/finish", JobController, :schedule
 
     get "/jobs/:job_id/items", ItemController, :index
     get "/jobs/:job_id/items/:id", ItemController, :show
