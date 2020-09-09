@@ -2,7 +2,7 @@
 <%= if @error != nil do %>
     <div><%= inspect(@error) %></div>
 <% end %>
-<form action="/schedule/finish" method="GET">
+<form phx-submit="schedule_spider">
   <div class="row">
     <div class="column">
         <input name="node" type="hidden" value="<%= @node %>">
@@ -12,8 +12,7 @@
           <option> <%= spider %> </option>
           <% end %>
        </select>
-       <div class="column"><button type="submit">Schedule</button></div>
+       <div class="column"><%= submit "Schedule" %></div>
     </div>
   </div>
 </form>
-

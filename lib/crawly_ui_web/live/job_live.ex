@@ -3,19 +3,20 @@ defmodule CrawlyUIWeb.JobLive do
 
   alias CrawlyUI.Manager
 
-  def render(%{template: template} = assigns) do
-    CrawlyUIWeb.JobView.render(template, assigns)
+  def render(assigns) do
+    CrawlyUIWeb.JobView.render("index.html", assigns)
   end
 
-  def mount(_param, %{"template" => "index.html" = template, "jobs" => jobs}, socket) do
+  def mount(_param, %{"jobs" => jobs}, socket) do
     live_update(socket, :update_job, 1000)
 
-    {:ok, assign(socket, template: template, jobs: jobs)}
+    {:ok, assign(socket, jobs: jobs)}
   end
 
-  def mount(_param, %{"template" => "pick_node.html" = template, "nodes" => nodes}, socket) do
-    live_update(socket, :pick_node, 1000)
-    {:ok, assign(socket, template: template, nodes: nodes)}
+  def mount(_params, _session, socket) do
+    live_update(socket, :update_job, 1000)
+    jobs = Manager.list_jobs()
+    {:ok, assign(socket, jobs: jobs)}
   end
 
   def handle_info(:update_job, socket) do
@@ -36,10 +37,8 @@ defmodule CrawlyUIWeb.JobLive do
     {:noreply, assign(socket, jobs: Manager.list_jobs())}
   end
 
-  def handle_info(:pick_node, socket) do
-    live_update(socket, :pick_node, 1000)
-    nodes = Node.list()
-    {:noreply, assign(socket, nodes: nodes)}
+  def handle_event("schedule", _, socket) do
+    {:noreply, push_redirect(socket, to: "/schedule")}
   end
 
   defp live_update(socket, state, time) do
