@@ -27,27 +27,4 @@ defmodule CrawlyUIWeb.JobControllerTest do
       assert html_response(conn, 200) =~ "Spider"
     end
   end
-
-  test "schedule starts a spider and redirect index", %{conn: conn} do
-    with_mock :rpc, [:unstick], call: fn _, Crawly.Engine, :start_spider, _ -> :ok end do
-      conn =
-        get(conn, Routes.job_path(conn, :schedule), node: "spider@test", spider: "Crawly.Test")
-
-      assert conn.status == 302
-
-      assert get_flash(conn, :info) ==
-               "Spider scheduled successfully. It might take a bit of time before items will appear here..."
-    end
-  end
-
-  test "schedule fails", %{conn: conn} do
-    with_mock :rpc, [:unstick],
-      call: fn _, Crawly.Engine, :start_spider, _ -> {:error, "Failed to start spider"} end do
-      conn =
-        get(conn, Routes.job_path(conn, :schedule), node: "spider@test", spider: "Crawly.Test")
-
-      assert conn.status == 302
-      assert get_flash(conn, :error) == "{:error, \"Failed to start spider\"}"
-    end
-  end
 end

@@ -2,11 +2,8 @@ defmodule CrawlyUIWeb.JobController do
   use CrawlyUIWeb, :controller
   import Phoenix.LiveView.Controller
 
-  alias CrawlyUI.Manager
-
   def index(conn, _params) do
-    jobs = Manager.list_jobs()
-    live_render(conn, CrawlyUIWeb.JobLive, session: %{"jobs" => jobs})
+    live_render(conn, CrawlyUIWeb.JobLive)
   end
 
   def pick_node(conn, _params) do
