@@ -41,7 +41,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert render(view) =~
              "<td>new</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"
 
-    Process.sleep(50)
+    Process.sleep(60)
 
     # render after every 100ms
 

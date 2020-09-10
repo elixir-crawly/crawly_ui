@@ -54,20 +54,19 @@ defmodule CrawlyUIWeb.ScheduleLive do
         {:ok, _} =
           CrawlyUI.Manager.create_job(%{spider: spider, tag: uuid, state: "new", node: node})
 
-        info =
-          "Spider scheduled successfully. It might take a bit of time before items will appear here..."
-
         {:noreply,
          socket
          |> put_flash(
            :info,
-           info
+           "Spider scheduled successfully. It might take a bit of time before items will appear here..."
          )
-         |> push_redirect(to: "/")}
+         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
 
       error ->
         {:noreply,
-         socket |> put_flash(:error, "#{inspect(error)}") |> push_redirect(to: "/schedule")}
+         socket
+         |> put_flash(:error, "#{inspect(error)}")
+         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :pick_node))}
     end
   end
 end
