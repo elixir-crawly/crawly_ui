@@ -71,13 +71,11 @@ defmodule CrawlyUi.ManagerTest do
   end
 
   test "list_jobs/1 lists all jobs" do
-    params = %{page_number: 1, page_size: 10}
-
     # job with inserted at shift by 1, 2, 3 seconds so the order is fixed
     [job_1, job_2, job_3] =
       Enum.map([1, 2, 3], fn x -> insert_job(%{inserted_at: inserted_at(x)}) end)
 
-    assert %Scrivener.Page{entries: [^job_1, ^job_2, ^job_3]} = Manager.list_jobs(params)
+    assert [^job_1, ^job_2, ^job_3] = Manager.list_jobs(%{})
   end
 
   test "get_job/1 returns a job" do
@@ -289,27 +287,26 @@ defmodule CrawlyUi.ManagerTest do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       items = Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x)) end)
 
-      assert %Scrivener.Page{entries: ^items} = Manager.list_items(job.id, %{})
+      assert items == Manager.list_items(job.id, %{})
     end
 
     test "lists all items of a job when search string doesn't contain :" do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       items = Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x), %{"id" => x}) end)
 
-      assert %Scrivener.Page{entries: ^items} = Manager.list_items(job.id, %{"search" => "id"})
+      assert items == Manager.list_items(job.id, %{"search" => "id"})
     end
 
     test "list items matches the valid search string" do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x), %{"id" => x}) end)
 
-      assert %Scrivener.Page{entries: [%Item{data: %{"id" => 1}}]} =
-               Manager.list_items(job.id, %{"search" => "id:1"})
+      assert [%Item{data: %{"id" => 1}}] = Manager.list_items(job.id, %{"search" => "id:1"})
     end
 
-    test "list items when there jon has no item" do
+    test "list items when there job has no item" do
       job = insert_job()
-      assert %Scrivener.Page{entries: []} = Manager.list_items(job.id, %{"search" => "id:1"})
+      assert [] == Manager.list_items(job.id, %{"search" => "id:1"})
     end
   end
 

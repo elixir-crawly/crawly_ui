@@ -29,5 +29,3 @@
 
 </table>
 <% end %>
-
-<%= pagination_links @page %>

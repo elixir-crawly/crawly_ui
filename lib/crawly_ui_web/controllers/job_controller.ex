@@ -4,8 +4,8 @@ defmodule CrawlyUIWeb.JobController do
   alias CrawlyUI.Manager
 
   def index(conn, params) do
-    page = Manager.list_jobs(params)
-    render(conn, "index.html", jobs: page.entries, page: page)
+    jobs = Manager.list_jobs(params)
+    render(conn, "index.html", jobs: jobs)
   end
 
   def pick_node(conn, _params) do
@@ -22,18 +22,22 @@ defmodule CrawlyUIWeb.JobController do
     spider_atom = String.to_atom(spider)
     node_atom = String.to_atom(node)
     uuid = Ecto.UUID.generate()
+
     case :rpc.call(node_atom, Crawly.Engine, :start_spider, [spider_atom, uuid]) do
       :ok ->
         {:ok, _} = Manager.create_job(%{spider: spider, tag: uuid, state: "new", node: node})
+
         conn
-        |> put_flash(:info, "Spider scheduled successfully. It might take a bit of time before items will appear here...")
+        |> put_flash(
+          :info,
+          "Spider scheduled successfully. It might take a bit of time before items will appear here..."
+        )
         |> redirect(to: "/")
 
       error ->
         conn
         |> put_flash(:error, "#{inspect(error)}")
         |> redirect(to: "/schedule")
-
     end
   end
 end

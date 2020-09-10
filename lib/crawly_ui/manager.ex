@@ -38,16 +38,16 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns the list of jobs. For config, see [Scrivener documentation](https://hexdocs.pm/scrivener_list/readme.html#installation)
+  Returns the list of jobs
 
   ## Examples
 
-      iex> list_jobs(%{page_number: 1, page_size: 10})
-      %Scrivener.Page{entries: [%Job{}, ...]}
+      iex> list_jobs()
+      [%Job{}, ...]}
 
   """
-  def list_jobs(params) do
-    from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.paginate(params)
+  def list_jobs(_params) do
+    from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
   end
 
   @doc """
@@ -264,7 +264,7 @@ defmodule CrawlyUI.Manager do
           end
       end
 
-    query |> order_by(desc: :inserted_at) |> Repo.paginate(params)
+    query |> order_by(desc: :inserted_at) |> Repo.all()
   end
 
   @doc """
