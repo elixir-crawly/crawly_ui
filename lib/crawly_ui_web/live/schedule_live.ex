@@ -1,24 +1,23 @@
 defmodule CrawlyUIWeb.ScheduleLive do
-  use Phoenix.LiveView
+  use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
 
   def render(%{template: template} = assigns) do
     CrawlyUIWeb.JobView.render(template, assigns)
   end
 
-  def mount(_param, %{"nodes" => nodes}, socket) do
-    if connected?(socket), do: Process.send_after(self(), :pick_node, 100)
-
-    {:ok, assign(socket, template: "pick_node.html", nodes: nodes)}
-  end
-
-  def mount(_param, %{"node" => node, "error" => error}, socket) do
+  def mount(%{"node" => node}, _session, socket) do
     if connected?(socket), do: Process.send_after(self(), :pick_spider, 1000)
 
     node = String.to_atom(node)
     spiders = :rpc.call(node, Crawly, :list_spiders, [])
 
-    {:ok,
-     assign(socket, template: "pick_spider.html", node: node, spiders: spiders, error: error)}
+    {:ok, assign(socket, template: "pick_spider.html", node: node, spiders: spiders, error: nil)}
+  end
+
+  def mount(_param, _session, socket) do
+    nodes = Node.list()
+    if connected?(socket), do: Process.send_after(self(), :pick_node, 100)
+    {:ok, assign(socket, template: "pick_node.html", nodes: nodes)}
   end
 
   def handle_info(:pick_node, socket) do
@@ -38,7 +37,9 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
   def handle_event("spider_picked", %{"node" => node}, socket) do
     {:noreply,
-     redirect(socket, to: CrawlyUIWeb.Router.Helpers.job_path(socket, :pick_spider, node: node))}
+     redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.schedule_path(socket, :pick_spider, node: node)
+     )}
   end
 
   def handle_event("schedule_spider", %{"spider" => spider}, socket) do
@@ -60,13 +61,13 @@ defmodule CrawlyUIWeb.ScheduleLive do
            :info,
            "Spider scheduled successfully. It might take a bit of time before items will appear here..."
          )
-         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
+         |> push_redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
 
       error ->
         {:noreply,
          socket
          |> put_flash(:error, "#{inspect(error)}")
-         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :pick_node))}
+         |> push_redirect(to: CrawlyUIWeb.Router.Helpers.schedule_path(socket, :pick_node))}
     end
   end
 end
