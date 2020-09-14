@@ -23,7 +23,7 @@ defmodule CrawlyUIWeb.Router do
 
     live "/schedule/spider", ScheduleLive, :pick_spider
 
-    get "/jobs/:job_id/items", ItemController, :index
-    get "/jobs/:job_id/items/:id", ItemController, :show
+    live "/jobs/:job_id/items", ItemLive, :index
+    live "/jobs/:job_id/items/:id", ItemLive, :show
   end
 end

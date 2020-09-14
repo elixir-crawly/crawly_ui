@@ -24,7 +24,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
 
       items = CrawlyUI.Manager.list_items(job_id, %{})
 
-      params = [items: items, search: nil]
+      params = [job_id: job_id, items: items, search: nil]
 
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "index.html", params)
 
@@ -39,9 +39,9 @@ defmodule CrawlyUIWeb.ItemViewTest do
                "<td class=\"c\"><a target='blank' href='http://example_1.com'>http://example_1.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_1.inserted_at} [<a href='/jobs/#{job_id}/items/#{
-                 item_1.id
-               }'> Preview </a>]</th>"
+               "<th>Discovery time: #{item_1.inserted_at}\n  <a phx-click=\"show_item\" phx-value-job=#{
+                 job_id
+               } phx-value-item=#{item_1.id}> Preview </a>"
 
       assert rendered_string =~
                "<td class=\"w\"><b>field_1</b></td>\n   <td class=\"c\">data_2</td>"
@@ -50,9 +50,9 @@ defmodule CrawlyUIWeb.ItemViewTest do
                "<td class=\"c\"><a target='blank' href='https://example_2.com'>https://example_2.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_2.inserted_at} [<a href='/jobs/#{job_id}/items/#{
-                 item_2.id
-               }'> Preview </a>]</th>"
+               "<th>Discovery time: #{item_2.inserted_at}\n  <a phx-click=\"show_item\" phx-value-job=#{
+                 job_id
+               } phx-value-item=#{item_2.id}> Preview </a>"
 
       # test render list
       assert rendered_string =~ "<td class=\"c\">data_2data_1</td>"
@@ -91,14 +91,15 @@ defmodule CrawlyUIWeb.ItemViewTest do
           "image" => "image_2_src"
         })
 
-      params = [item: item, next_item: next_item]
+      params = [job_id: job_id, item: item, next_item: next_item]
 
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "show.html", params)
 
       assert rendered_string =~
-               "<a href='/jobs/#{next_item.job_id}/items/#{next_item.id}'> Next Item </a>"
+               "<a phx-click=\"show_item\" phx-value-job=#{job_id} phx-value-item=#{next_item.id}> Next Item </a>"
 
-      assert rendered_string =~ "<a href=\"/jobs/#{item.job_id}/items/\"> Go to items </a>"
+      assert rendered_string =~
+               "<a phx-click=\"job_items\" phx-value-job=#{job_id}> Go to items </a>"
 
       assert rendered_string =~
                "<b>field_1</b>:\n            <br />\ndata_1"
@@ -117,6 +118,6 @@ defmodule CrawlyUIWeb.ItemViewTest do
     insert_item(job_id, nil, data)
 
     items = CrawlyUI.Manager.list_items(job_id, %{})
-    [items: items, search: search]
+    [job_id: job_id, items: items, search: search]
   end
 end

@@ -1,7 +1,7 @@
 <h1>Items</h1>
 
 <!-- The form -->
-<form class="row" action=".">
+<form phx-submit="search">
   <%= if @search do %>
     <div class="column"><input type="text" placeholder="<%= @search %>" name="search"></div>
   <% else %>
@@ -15,7 +15,12 @@
 <table class="w3-table-all card">
  <tbody><tr>
   <th>Item</th>
-  <th>Discovery time: <%= item.inserted_at %> <%= raw maybe_render_preview(item) %></th>
+  <th>Discovery time: <%= item.inserted_at %>
+    <%= case Map.get(item.data, "url") do  %>
+      <% nil -> %> <%= "" %>
+      <%_url -> %>  <a phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= item.id %>> Preview </a>
+    <% end %>
+  </th>
  </tr>
 
  <%= for {field_name, field_value} <- item.data do %>
