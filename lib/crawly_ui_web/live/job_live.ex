@@ -34,6 +34,13 @@ defmodule CrawlyUIWeb.JobLive do
     {:noreply, push_redirect(socket, to: "/schedule")}
   end
 
+  def handle_event("job_items", %{"id" => job_id}, socket) do
+    job_id = String.to_integer(job_id)
+
+    {:noreply,
+     push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id))}
+  end
+
   defp live_update(socket, state, time) do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end

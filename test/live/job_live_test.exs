@@ -22,6 +22,12 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert_redirect(view, "/schedule")
   end
 
+  test "redirect when click on job's items", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+    render_click(view, :job_items, %{"id" => "1"})
+    assert_redirect(view, "/jobs/1/items")
+  end
+
   test "update view after 100ms when jobs is updated to running", %{conn: conn} do
     job = insert_job(%{inserted_at: inserted_at(6 * 60), state: "new"})
     insert_job(%{state: "abandoned"})

@@ -28,7 +28,7 @@
       <td><%= live_job.spider %></td>
       <td><%= live_job.node %></td>
       <td>
-         <a href="/jobs/<%= live_job.id %>/items/"><%= live_job.items_count %></a>
+         <a phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
       </td>
 
       <td><%= live_job.state %></td>
