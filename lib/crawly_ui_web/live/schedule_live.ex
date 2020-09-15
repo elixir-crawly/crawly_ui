@@ -61,13 +61,13 @@ defmodule CrawlyUIWeb.ScheduleLive do
            :info,
            "Spider scheduled successfully. It might take a bit of time before items will appear here..."
          )
-         |> push_redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
+         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
 
       error ->
         {:noreply,
          socket
          |> put_flash(:error, "#{inspect(error)}")
-         |> push_redirect(to: CrawlyUIWeb.Router.Helpers.schedule_path(socket, :pick_node))}
+         |> redirect(to: CrawlyUIWeb.Router.Helpers.schedule_path(socket, :pick_node))}
     end
   end
 end
