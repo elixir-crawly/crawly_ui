@@ -45,7 +45,9 @@
                </header>
                <main class="Main">
                    <section class="Section container">
-                   <%= @inner_content %>
+                    <p><%= live_flash(@flash, :info) %></p>
+                    <p><%= live_flash(@flash, :error) %></p>
+                    <%= @inner_content %>
                    </section>
                </main>
                 <footer class="Footer">

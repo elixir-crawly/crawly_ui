@@ -1,5 +1,5 @@
 defmodule CrawlyUIWeb.JobLive do
-  use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
+  use Phoenix.LiveView
 
   alias CrawlyUI.Manager
 

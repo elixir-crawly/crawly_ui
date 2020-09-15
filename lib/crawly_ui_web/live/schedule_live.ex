@@ -1,5 +1,5 @@
 defmodule CrawlyUIWeb.ScheduleLive do
-  use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
+  use Phoenix.LiveView
 
   def render(%{template: template} = assigns) do
     CrawlyUIWeb.JobView.render(template, assigns)
