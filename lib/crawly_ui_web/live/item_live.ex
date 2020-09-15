@@ -31,13 +31,10 @@ defmodule CrawlyUIWeb.ItemLive do
     items = Manager.list_items(job_id, %{"search" => search})
 
     # If job is still running, we will update the item view
-    Manager.get_job!(job_id)
-    |> case do
-      %{state: state} when state == "running" or state == "new" ->
-        live_update(socket, :update_items, 1000)
+    %{state: state} = Manager.get_job!(job_id)
 
-      _ ->
-        :ok
+    if state == "running" or state == "new" do
+      live_update(socket, :update_items, 1000)
     end
 
     {:noreply, assign(socket, items: items)}
