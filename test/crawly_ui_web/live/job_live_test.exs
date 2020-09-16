@@ -77,7 +77,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
   end
 
   test "go to page", %{conn: conn} do
-    job_1 = insert_job()
+    job_1 = insert_job(%{inserted_at: inserted_at(6 * 60)})
     job_2 = insert_job()
 
     Application.put_env(:crawly_ui, :page_size, 1)
@@ -94,5 +94,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     assert render(new_view) =~ "<td>#{job_1.inserted_at}</td>"
     refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
+
+    Application.put_env(:crawly_ui, :page_size, 10)
   end
 end

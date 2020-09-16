@@ -146,5 +146,7 @@ defmodule CrawlyUIWeb.ItemLiveTest do
 
     refute render(new_view) =~ "Discovery time: #{item_2.inserted_at}"
     assert render(new_view) =~ "Discovery time: #{item_1.inserted_at}"
+
+    Application.put_env(:crawly_ui, :page_size, 10)
   end
 end
