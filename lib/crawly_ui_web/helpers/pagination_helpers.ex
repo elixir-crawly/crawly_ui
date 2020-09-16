@@ -17,13 +17,15 @@ defmodule CrawlyUIWeb.PaginationHelpers do
   def render_goto_next(page, data) do
     number_of_pages = number_of_pages(data)
 
-    if page != number_of_pages do
+    if page != number_of_pages and number_of_pages > 1 do
       "<a phx-click=\"goto_page\" phx-value-page=#{page + 1}> >> </a>"
     end
   end
 
-  def render_goto_prev(page) do
-    if page > 1 do
+  def render_goto_prev(page, data) do
+    number_of_pages = number_of_pages(data)
+
+    if page > 1 and number_of_pages > 1 do
       "<a phx-click=\"goto_page\" phx-value-page=#{page - 1}> << </a>"
     end
   end

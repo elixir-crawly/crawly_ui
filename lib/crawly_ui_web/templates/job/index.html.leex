@@ -40,7 +40,7 @@
   </tbody>
 </table>
 <nav>
-  <%= raw render_goto_prev(@page) %>
+  <%= raw render_goto_prev(@page, @jobs) %>
   <%= for page <- list_pages(@page, @jobs) do %>
     <%= raw render_pages(@page, page) %>
   <% end %>

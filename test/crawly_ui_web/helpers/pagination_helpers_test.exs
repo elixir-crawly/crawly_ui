@@ -32,16 +32,24 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
     test "do nothing for last page" do
       assert PaginationHelpers.render_goto_next(3, [1, 2, 3]) == nil
     end
+
+    test "when there is less or equal to 1 page" do
+      assert PaginationHelpers.render_goto_next(1, [1]) == nil
+    end
   end
 
   describe "render_goto_prev/1" do
     test "link to previous page" do
-      assert PaginationHelpers.render_goto_prev(2) ==
+      assert PaginationHelpers.render_goto_prev(2, [1, 2, 3]) ==
                "<a phx-click=\"goto_page\" phx-value-page=1> << </a>"
     end
 
     test "do nothing for last page" do
-      assert PaginationHelpers.render_goto_prev(1) == nil
+      assert PaginationHelpers.render_goto_prev(1, [1, 2, 3]) == nil
+    end
+
+    test "when there is less or equal to 1 page" do
+      assert PaginationHelpers.render_goto_prev(1, [1]) == nil
     end
   end
 
@@ -68,10 +76,10 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
     end
 
     test "when current page is less than 6" do
-      list = Enum.to_list(1..20)
+      list = Enum.to_list(1..11)
       data = Enum.map(list, fn x -> "data_#{x}" end)
 
-      assert PaginationHelpers.list_pages(3, data) == [1, 2, 3, 4, 5, 6, "..", 20]
+      assert PaginationHelpers.list_pages(3, data) == [1, 2, 3, 4, 5, 6, "..", 11]
     end
 
     test "when current page is less than the total number of pages - 5" do

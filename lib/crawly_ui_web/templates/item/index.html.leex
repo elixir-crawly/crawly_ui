@@ -32,7 +32,7 @@
 <% end %>
 <nav>
  <nav>
-  <%= raw render_goto_prev(@page) %>
+  <%= raw render_goto_prev(@page, @items) %>
   <%= for page <- list_pages(@page, @items) do %>
     <%= raw render_pages(@page, page) %>
   <% end %>
