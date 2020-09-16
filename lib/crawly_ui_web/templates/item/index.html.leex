@@ -9,28 +9,33 @@
   <% end %>
    <button type="submit"><i class="fa fa-search"></i></button>
 </form>
+<%= for item <- @rows do %>
+  <table class="w3-table-all card">
+  <tbody><tr>
+    <th>Item</th>
+    <th>Discovery time: <%= item.inserted_at %>
+      <%= case Map.get(item.data, "url") do  %>
+        <% nil -> %> <%= "" %>
+        <%_url -> %>  <a phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= item.id %>> Preview </a>
+      <% end %>
+    </th>
+  </tr>
 
-
-<%= for item <- @items do %>
-<table class="w3-table-all card">
- <tbody><tr>
-  <th>Item</th>
-  <th>Discovery time: <%= item.inserted_at %>
-    <%= case Map.get(item.data, "url") do  %>
-      <% nil -> %> <%= "" %>
-      <%_url -> %>  <a phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= item.id %>> Preview </a>
-    <% end %>
-  </th>
- </tr>
-
- <%= for {field_name, field_value} <- item.data do %>
- <tr>
-   <td class="w"><b><%= field_name %></b></td>
-   <td class="c"><%= raw render_field_value(field_name, field_value) %></td>
- </tr>
- <% end %>
-
-</tbody>
-
-</table>
+  <%= for {field_name, field_value} <- item.data do %>
+  <tr>
+    <td class="w"><b><%= field_name %></b></td>
+    <td class="c"><%= raw render_field_value(field_name, field_value) %></td>
+  </tr>
+  <% end %>
+  </tbody>
+  </table>
 <% end %>
+<nav>
+ <nav>
+  <%= raw render_goto_prev(@page) %>
+  <%= for page <- list_pages(@page, @items) do %>
+    <%= raw render_pages(@page, page) %>
+  <% end %>
+   <%= raw render_goto_next(@page, @items) %>
+</nav>
+</nav>

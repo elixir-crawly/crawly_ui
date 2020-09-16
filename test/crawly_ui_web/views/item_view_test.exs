@@ -24,12 +24,12 @@ defmodule CrawlyUIWeb.ItemViewTest do
 
       items = CrawlyUI.Manager.list_items(job_id, %{})
 
-      params = [job_id: job_id, items: items, search: nil]
+      params = [job_id: job_id, items: items, search: nil, rows: items, page: 1]
 
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "index.html", params)
 
       assert rendered_string =~
-               "<td class=\"w\"><b>field_1</b></td>\n   <td class=\"c\">data_1</td>"
+               "<td class=\"w\"><b>field_1</b></td>\n    <td class=\"c\">data_1</td>"
 
       # test render image
       assert rendered_string =~ "<td class=\"c\"><img width='150px' src='image_1_src' /></td>"
@@ -44,7 +44,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
                } phx-value-item=#{item_1.id}> Preview </a>"
 
       assert rendered_string =~
-               "<td class=\"w\"><b>field_1</b></td>\n   <td class=\"c\">data_2</td>"
+               "<td class=\"w\"><b>field_1</b></td>\n    <td class=\"c\">data_2</td>"
 
       assert rendered_string =~
                "<td class=\"c\"><a target='blank' href='https://example_2.com'>https://example_2.com</a></td>"
@@ -118,6 +118,6 @@ defmodule CrawlyUIWeb.ItemViewTest do
     insert_item(job_id, nil, data)
 
     items = CrawlyUI.Manager.list_items(job_id, %{})
-    [job_id: job_id, items: items, search: search]
+    [job_id: job_id, items: items, search: search, rows: items, page: 1]
   end
 end

@@ -23,20 +23,27 @@
     </tr>
   </thead>
   <tbody>
-<%= for live_job <- @jobs do %>
-    <tr>
-      <td><%= live_job.spider %></td>
-      <td><%= live_job.node %></td>
-      <td>
-         <a phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
-      </td>
+    <%= for live_job <- @rows do %>
+        <tr>
+          <td><%= live_job.spider %></td>
+          <td><%= live_job.node %></td>
+          <td>
+            <a phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
+          </td>
 
-      <td><%= live_job.state %></td>
-      <td><%= live_job.inserted_at %></td>
-      <td><%= live_job.crawl_speed || "-" %> items/min</td>
-      <td><%= raw render_run_time(live_job.run_time) %></td>
-    </tr>
-<% end %>
+          <td><%= live_job.state %></td>
+          <td><%= live_job.inserted_at %></td>
+          <td><%= live_job.crawl_speed || "-" %> items/min</td>
+          <td><%= raw render_run_time(live_job.run_time) %></td>
+        </tr>
+    <% end %>
   </tbody>
 </table>
+<nav>
+  <%= raw render_goto_prev(@page) %>
+  <%= for page <- list_pages(@page, @jobs) do %>
+    <%= raw render_pages(@page, page) %>
+  <% end %>
+   <%= raw render_goto_next(@page, @jobs) %>
+</nav>
 <% end %>

@@ -44,6 +44,8 @@ defmodule CrawlyUIWeb do
       import CrawlyUIWeb.Gettext
       alias CrawlyUIWeb.Router.Helpers, as: Routes
       import Phoenix.LiveView.Helpers
+
+      import CrawlyUIWeb.PaginationHelpers
     end
   end
 

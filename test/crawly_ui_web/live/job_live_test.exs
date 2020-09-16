@@ -37,7 +37,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert render(view) =~
              "<td>new</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"
 
-    Process.sleep(50)
+    Process.sleep(20)
 
     insert_item(job.id, inserted_at(50))
     insert_item(job.id, inserted_at(10))
@@ -47,7 +47,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert render(view) =~
              "<td>new</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"
 
-    Process.sleep(60)
+    Process.sleep(100)
 
     # render after every 100ms
 
@@ -74,5 +74,25 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     assert render(view) =~
              "<td>abandoned</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"
+  end
+
+  test "go to page", %{conn: conn} do
+    job_1 = insert_job()
+    job_2 = insert_job()
+
+    Application.put_env(:crawly_ui, :page_size, 1)
+
+    {:ok, view, _html} = live(conn, "/")
+
+    assert render(view) =~ "<td>#{job_2.inserted_at}</td>"
+    refute render(view) =~ "<td>#{job_1.inserted_at}</td>"
+
+    {:ok, new_view, _html} =
+      view
+      |> render_click(:goto_page, %{"page" => "2"})
+      |> follow_redirect(conn, "/?page=2")
+
+    assert render(new_view) =~ "<td>#{job_1.inserted_at}</td>"
+    refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
   end
 end
