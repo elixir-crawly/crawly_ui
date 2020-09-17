@@ -39,4 +39,8 @@
 <% end %>
   </tbody>
 </table>
+  <%= if @live_action == :index do %>
+  <br>
+  <button phx-click=list_all_jobs>All Jobs</button>
+  <% end %>
 <% end %>

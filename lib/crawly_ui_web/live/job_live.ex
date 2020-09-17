@@ -8,8 +8,15 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def mount(_params, _session, socket) do
+    jobs =
+      if socket.assigns.live_action == :index do
+        Manager.list_running_jobs()
+      else
+        Manager.list_jobs()
+      end
+
     live_update(socket, :update_job, 100)
-    jobs = Manager.list_jobs()
+
     {:ok, assign(socket, jobs: jobs)}
   end
 
@@ -21,13 +28,20 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_job_status()
     Manager.update_running_jobs()
 
+    jobs =
+      if socket.assigns.live_action == :index do
+        Manager.list_running_jobs()
+      else
+        Manager.list_jobs()
+      end
+
     if need_update?(live_jobs) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
     end
 
-    {:noreply, assign(socket, jobs: Manager.list_jobs())}
+    {:noreply, assign(socket, jobs: jobs)}
   end
 
   def handle_event("schedule", _, socket) do
@@ -37,6 +51,10 @@ defmodule CrawlyUIWeb.JobLive do
   def handle_event("job_items", %{"id" => job_id}, socket) do
     {:noreply,
      push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id))}
+  end
+
+  def handle_event("list_all_jobs", _, socket) do
+    {:noreply, push_redirect(socket, to: "/all")}
   end
 
   defp live_update(socket, state, time) do

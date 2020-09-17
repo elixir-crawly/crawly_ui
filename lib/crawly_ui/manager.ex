@@ -12,7 +12,7 @@ defmodule CrawlyUI.Manager do
   @job_abandoned_timeout 60 * 30
 
   def update_job_status() do
-    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+    running_jobs = list_running_jobs()
 
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
@@ -46,8 +46,21 @@ defmodule CrawlyUI.Manager do
       [%Job{}, ...]}
 
   """
-  def list_jobs() do
-    from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
+
+  # def list_jobs() do
+  #   from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
+  # end
+
+  def list_jobs(query \\ Job) do
+    query
+    |> order_by(desc: :state, desc: :inserted_at)
+    |> Repo.all()
+  end
+
+  def list_running_jobs() do
+    Job
+    |> where([j], j.state == "running")
+    |> Repo.all()
   end
 
   @doc """
@@ -215,7 +228,7 @@ defmodule CrawlyUI.Manager do
   end
 
   def update_running_jobs() do
-    jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+    jobs = list_running_jobs()
     update_run_times(jobs)
     update_crawl_speeds(jobs)
     update_item_counts(jobs)
