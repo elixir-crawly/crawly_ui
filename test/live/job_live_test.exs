@@ -4,15 +4,29 @@ defmodule CrawlyUIWeb.JobLiveTest do
   use CrawlyUIWeb.ConnCase
   import Phoenix.LiveViewTest
 
-  test "job view uses liveview when there is no job", %{conn: conn} do
+  test "mount job view when there is no job", %{conn: conn} do
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
     assert html =~ "Welcome to Crawly UI"
   end
 
-  test "job view uses liveview when there are jobs", %{conn: conn} do
-    insert_job()
+  test "mount job view when there is no running job", %{conn: conn} do
+    insert_job(%{state: "abandoned"})
+
+    {:ok, view, html} = live(conn, "/")
+    assert CrawlyUIWeb.JobLive = view.module
+    assert html =~ "Welcome to Crawly UI"
+  end
+
+  test "mount job view when there are running jobs", %{conn: conn} do
+    insert_job(%{state: "runing"})
     {:ok, _view, html} = live(conn, "/")
+    assert html =~ "Jobs"
+  end
+
+  test "mount job view for showing all jobs", %{conn: conn} do
+    insert_job(%{state: "abandoned"})
+    {:ok, _view, html} = live(conn, "/all")
     assert html =~ "Jobs"
   end
 
@@ -28,11 +42,47 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert_redirect(view, "/jobs/1/items")
   end
 
-  test "update view after 100ms when jobs is updated to running", %{conn: conn} do
+  test "redirect when on list all jobs", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+    render_click(view, :list_all_jobs)
+    assert_redirect(view, "/all")
+  end
+
+  test "update index view after 100ms when jobs is updated to running", %{conn: conn} do
     job = insert_job(%{inserted_at: inserted_at(6 * 60), state: "new"})
-    insert_job(%{state: "abandoned"})
 
     {:ok, view, _html} = live(conn, "/")
+
+    assert render(view) =~ "Welcome to Crawly UI"
+
+    Process.sleep(50)
+
+    insert_item(job.id, inserted_at(50))
+    insert_item(job.id, inserted_at(10))
+
+    CrawlyUI.Manager.update_job(job, %{state: "running"})
+
+    assert render(view) =~ "Welcome to Crawly UI"
+
+    Process.sleep(70)
+
+    # render after every 100ms
+
+    assert render(view) =~
+             "<td>running</td><td>#{job.inserted_at}</td><td>2 items/min</td><td>5 min</td>"
+
+    insert_item(job.id)
+
+    Process.sleep(100)
+
+    assert render(view) =~
+             "<td>running</td><td>#{job.inserted_at}</td><td>3 items/min</td><td>6 min</td>"
+  end
+
+  test "update all jobs view after 100ms when jobs is updated to running", %{conn: conn} do
+    job = insert_job(%{inserted_at: inserted_at(6 * 60), state: "new"})
+
+    {:ok, view, _html} = live(conn, "/all")
 
     assert render(view) =~
              "<td>new</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"
@@ -65,7 +115,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
   test "view not update if no job is running", %{conn: conn} do
     job = insert_job(%{state: "abandoned"})
 
-    {:ok, view, _html} = live(conn, "/")
+    {:ok, view, _html} = live(conn, "/all")
 
     assert render(view) =~
              "<td>abandoned</td><td>#{job.inserted_at}</td><td>0 items/min</td><td>0 min</td>"

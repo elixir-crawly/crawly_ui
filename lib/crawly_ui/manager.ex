@@ -34,16 +34,17 @@ defmodule CrawlyUI.Manager do
   defp spider_state({:badrpc, _}, _), do: "node down"
 
   defp spider_state(running_spiders, %{node: node, spider: spider, tag: tag}) do
-    {_, spider_tag} = Map.get(running_spiders, spider)
+    spider_atom = String.to_existing_atom(spider)
+
+    {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
 
     # If the spider is still running without fetching anything, we stop it, else it is stopped somehow
     if spider_tag == tag do
-      spider_atom = String.to_existing_atom(spider)
       node_atom = String.to_atom(node)
       :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
     end
 
-    "abanonned"
+    "abandoned"
   end
 
   def is_job_abandoned(%Job{} = job) do

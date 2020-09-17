@@ -7,18 +7,62 @@ defmodule CrawlyUi.ManagerTest do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
+  import Mock
+
   describe "update_job_status/0" do
     test "updates job state to abandoned" do
-      %{id: job_id_1} = insert_job()
-      insert_item(job_id_1, inserted_at_expired())
+      with_mock :rpc, [:unstick],
+        call: fn _, Crawly.Engine, :running_spiders, [] ->
+          %{}
+        end do
+        %{id: job_id_1} = insert_job()
+        insert_item(job_id_1, inserted_at_expired())
 
-      %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
+        %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
 
-      assert %{state: "running"} = Repo.get(Job, job_id_1)
-      assert %{state: "running"} = Repo.get(Job, job_id_2)
-      Manager.update_job_status()
-      assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
-      assert %{state: "abandoned"} = Repo.get(Job, job_id_2)
+        assert %{state: "running"} = Repo.get(Job, job_id_1)
+        assert %{state: "running"} = Repo.get(Job, job_id_2)
+        Manager.update_job_status()
+        assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
+        assert %{state: "abandoned"} = Repo.get(Job, job_id_2)
+      end
+    end
+
+    test "clode spider if it is still running" do
+      with_mock :rpc, [:unstick],
+        call: fn
+          _, Crawly.Engine, :running_spiders, [] ->
+            %{:Crawly => {:some_pid, "test"}}
+
+          _, Crawly.Engine, :stop_spider, [_] ->
+            :ok
+        end do
+        %{id: job_id_1} = insert_job(%{tag: "test", node: "crawly@test", spider: "Crawly"})
+
+        insert_item(job_id_1, inserted_at_expired())
+
+        assert %{state: "running"} = Repo.get(Job, job_id_1)
+
+        Manager.update_job_status()
+        assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
+
+        assert_called(:rpc.call(:crawly@test, Crawly.Engine, :stop_spider, [:Crawly]))
+      end
+    end
+
+    test "updates jon state to node down when calling worker node failed" do
+      with_mock :rpc, [:unstick],
+        call: fn _, Crawly.Engine, :running_spiders, [] ->
+          {:badrpc, :nodedown}
+        end do
+        %{id: job_id_1} = insert_job()
+        insert_item(job_id_1, inserted_at_expired())
+
+        assert %{state: "running"} = Repo.get(Job, job_id_1)
+
+        Manager.update_job_status()
+        assert %{state: "node down"} = Repo.get(Job, job_id_1)
+      end
     end
 
     test "does not update when job is still running" do

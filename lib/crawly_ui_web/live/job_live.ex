@@ -16,8 +16,6 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def handle_info(:update_job, socket) do
-    live_jobs = socket.assigns.jobs
-
     # If any of the jobs are running or in new state then we should keep updating
     # every 100ms else, refresh every second
     Manager.update_job_status()
@@ -25,7 +23,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     jobs = list_jobs(socket.assigns.live_action)
 
-    if need_update?(live_jobs) do
+    if need_update?(jobs) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
