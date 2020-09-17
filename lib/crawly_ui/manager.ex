@@ -17,7 +17,13 @@ defmodule CrawlyUI.Manager do
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
         true ->
-          update_job(job, %{state: "abandoned"})
+          running_spiders =
+            job.node
+            |> String.to_atom()
+            |> :rpc.call(Crawly.Engine, :running_spiders, [])
+
+          state = spider_state(running_spiders, job)
+          update_job(job, %{state: state})
 
         false ->
           :ok
@@ -25,7 +31,22 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
-  def is_job_abandoned(job) do
+  defp spider_state({:badrpc, _}, _), do: "node down"
+
+  defp spider_state(running_spiders, %{node: node, spider: spider, tag: tag}) do
+    {_, spider_tag} = Map.get(running_spiders, spider)
+
+    # If the spider is still running without fetching anything, we stop it, else it is stopped somehow
+    if spider_tag == tag do
+      spider_atom = String.to_existing_atom(spider)
+      node_atom = String.to_atom(node)
+      :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
+    end
+
+    "abanonned"
+  end
+
+  def is_job_abandoned(%Job{} = job) do
     case most_recent_item(job.id) do
       nil ->
         NaiveDateTime.diff(NaiveDateTime.utc_now(), job.inserted_at, :second) >
@@ -60,7 +81,7 @@ defmodule CrawlyUI.Manager do
   def list_running_jobs() do
     Job
     |> where([j], j.state == "running")
-    |> Repo.all()
+    |> list_jobs()
   end
 
   @doc """
@@ -168,9 +189,10 @@ defmodule CrawlyUI.Manager do
     end_time = Timex.shift(start_time, minutes: -1)
 
     Repo.one(
-      from i in "items",
+      from(i in "items",
         where: i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
         select: count("*")
+      )
     )
   end
 
@@ -184,7 +206,7 @@ defmodule CrawlyUI.Manager do
 
   """
   def count_items(job) do
-    Repo.one(from i in "items", where: i.job_id == ^job.id, select: count("*"))
+    Repo.one(from(i in "items", where: i.job_id == ^job.id, select: count("*")))
   end
 
   @doc """
@@ -207,10 +229,11 @@ defmodule CrawlyUI.Manager do
     Enum.each(jobs, fn job ->
       cnt =
         Repo.one(
-          from i in "items",
+          from(i in "items",
             where:
               i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
             select: count("*")
+          )
         )
 
       {:ok, _} = update_job(job, %{crawl_speed: cnt})
@@ -242,7 +265,7 @@ defmodule CrawlyUI.Manager do
   end
 
   def get_job_by_tag(tag) do
-    Repo.one(from j in Job, where: j.tag == ^tag)
+    Repo.one(from(j in Job, where: j.tag == ^tag))
   end
 
   @doc """

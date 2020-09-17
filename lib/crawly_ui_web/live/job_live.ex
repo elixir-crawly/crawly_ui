@@ -8,12 +8,7 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def mount(_params, _session, socket) do
-    jobs =
-      if socket.assigns.live_action == :index do
-        Manager.list_running_jobs()
-      else
-        Manager.list_jobs()
-      end
+    jobs = list_jobs(socket.assigns.live_action)
 
     live_update(socket, :update_job, 100)
 
@@ -28,12 +23,7 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_job_status()
     Manager.update_running_jobs()
 
-    jobs =
-      if socket.assigns.live_action == :index do
-        Manager.list_running_jobs()
-      else
-        Manager.list_jobs()
-      end
+    jobs = list_jobs(socket.assigns.live_action)
 
     if need_update?(live_jobs) do
       live_update(socket, :update_job, 100)
@@ -63,4 +53,7 @@ defmodule CrawlyUIWeb.JobLive do
 
   defp need_update?([]), do: false
   defp need_update?(jobs), do: Enum.any?(jobs, &(&1.state == "running" or &1.state == "new"))
+
+  defp list_jobs(:index), do: Manager.list_running_jobs()
+  defp list_jobs(_), do: Manager.list_jobs()
 end
