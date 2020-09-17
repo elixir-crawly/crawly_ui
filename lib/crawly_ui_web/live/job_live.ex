@@ -1,5 +1,5 @@
 defmodule CrawlyUIWeb.JobLive do
-  use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
+  use Phoenix.LiveView
 
   alias CrawlyUI.Manager
 
@@ -35,8 +35,6 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def handle_event("job_items", %{"id" => job_id}, socket) do
-    job_id = String.to_integer(job_id)
-
     {:noreply,
      push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id))}
   end
