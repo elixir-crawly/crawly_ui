@@ -46,7 +46,7 @@ defmodule CrawlyUI.Manager do
       [%Job{}, ...]}
 
   """
-  def list_jobs(_params) do
+  def list_jobs() do
     from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
   end
 

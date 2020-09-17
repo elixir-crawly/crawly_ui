@@ -17,12 +17,11 @@ defmodule CrawlyUIWeb.Router do
   scope "/", CrawlyUIWeb do
     pipe_through :browser
 
-    get "/", JobController, :index
+    live "/", JobLive, :index
 
-    get "/schedule", JobController, :pick_node
+    live "/schedule", ScheduleLive, :pick_node
 
-    get "/schedule/spider", JobController, :pick_spider
-    get "/schedule/finish", JobController, :schedule
+    live "/schedule/spider", ScheduleLive, :pick_spider
 
     get "/jobs/:job_id/items", ItemController, :index
     get "/jobs/:job_id/items/:id", ItemController, :show

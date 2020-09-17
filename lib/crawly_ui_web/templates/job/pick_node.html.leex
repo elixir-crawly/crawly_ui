@@ -1,5 +1,5 @@
 <h1>Pick the node</h1>
-<form action="/schedule/spider" method="GET">
+<form phx-submit=spider_picked>
   <div class="row">
     <div class="column">
        <label for="inputState">Node</label>
@@ -8,8 +8,7 @@
           <option> <%= node %> </option>
           <% end %>
        </select>
-       <div class="column"><button type="submit">Next</button></div>
+       <div class="column"><%= submit "Next" %></div>
     </div>
   </div>
 </form>
-
