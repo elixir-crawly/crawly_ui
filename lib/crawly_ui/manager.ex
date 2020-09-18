@@ -24,12 +24,13 @@ defmodule CrawlyUI.Manager do
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
         true ->
-          running_spiders =
-            job.node
-            |> String.to_atom()
-            |> :rpc.call(Crawly.Engine, :running_spiders, [])
+          state =
+            case close_spider(job) do
+              {:ok, :stopped} -> "abandoned"
+              {:ok, :already_stopped} -> "stopped"
+              _ -> "node down"
+            end
 
-          state = spider_state(running_spiders, job)
           update_job(job, %{state: state})
 
         false ->
@@ -384,21 +385,31 @@ defmodule CrawlyUI.Manager do
     Item.changeset(item, %{})
   end
 
-  # Private functions
-
-  defp spider_state({:badrpc, _}, _), do: "node down"
-
-  defp spider_state(running_spiders, %{node: node, spider: spider, tag: tag}) do
+  def close_spider(%Job{node: node, spider: spider, tag: tag}) do
     spider_atom = String.to_existing_atom(spider)
+    node_atom = String.to_atom(node)
 
-    {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
+    case :rpc.call(node_atom, Crawly.Engine, :running_spiders, []) do
+      {:badrpc, _} ->
+        {:ok, :node_down}
 
-    # If the spider is still running without fetching anything, we stop it, else it is stopped somehow
-    if spider_tag == tag do
-      node_atom = String.to_atom(node)
-      :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
+      running_spiders when is_map(running_spiders) ->
+        {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
+
+        if spider_tag == tag do
+          stop_spider(node_atom, spider_atom)
+        else
+          {:ok, :already_stopped}
+        end
     end
+  end
 
-    "abandoned"
+  defp stop_spider(node, spider) do
+    case :rpc.call(node, Crawly.Engine, :stop_spider, [spider]) do
+      :ok -> {:ok, :stopped}
+      {:error, :spider_not_running} -> {:ok, :already_stopped}
+      {:badrpc, _} -> {:ok, :nodedown}
+      error -> {:error, error}
+    end
   end
 end

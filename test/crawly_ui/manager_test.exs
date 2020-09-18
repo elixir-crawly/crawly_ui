@@ -10,47 +10,35 @@ defmodule CrawlyUi.ManagerTest do
   import Mock
 
   describe "update_job_status/0" do
-    test "updates job state to abandoned" do
+    test "updates job state" do
       with_mock :rpc, [:unstick],
-        call: fn _, Crawly.Engine, :running_spiders, [] ->
-          %{}
+        call: fn
+          _, Crawly.Engine, :running_spiders, [] ->
+            %{:Crawly => {:some_pid, "test_1"}}
+
+          _, Crawly.Engine, :stop_spider, [_] ->
+            :ok
         end do
-        %{id: job_id_1} = insert_job()
+        # Job with matching tag means it is running and abandonned, otherwise stopped
+
+        %{id: job_id_1} = insert_job(%{tag: "test_1"})
         insert_item(job_id_1, inserted_at_expired())
 
         %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
 
         assert %{state: "running"} = Repo.get(Job, job_id_1)
         assert %{state: "running"} = Repo.get(Job, job_id_2)
-        Manager.update_job_status()
-        assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
-        assert %{state: "abandoned"} = Repo.get(Job, job_id_2)
-      end
-    end
-
-    test "clode spider if it is still running" do
-      with_mock :rpc, [:unstick],
-        call: fn
-          _, Crawly.Engine, :running_spiders, [] ->
-            %{:Crawly => {:some_pid, "test"}}
-
-          _, Crawly.Engine, :stop_spider, [_] ->
-            :ok
-        end do
-        %{id: job_id_1} = insert_job(%{tag: "test", node: "crawly@test", spider: "Crawly"})
-
-        insert_item(job_id_1, inserted_at_expired())
-
-        assert %{state: "running"} = Repo.get(Job, job_id_1)
 
         Manager.update_job_status()
+
         assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
+        assert %{state: "stopped"} = Repo.get(Job, job_id_2)
 
         assert_called(:rpc.call(:crawly@test, Crawly.Engine, :stop_spider, [:Crawly]))
       end
     end
 
-    test "updates jon state to node down when calling worker node failed" do
+    test "updates job state to node down when calling worker node failed" do
       with_mock :rpc, [:unstick],
         call: fn _, Crawly.Engine, :running_spiders, [] ->
           {:badrpc, :nodedown}
@@ -73,7 +61,9 @@ defmodule CrawlyUi.ManagerTest do
 
       assert %{state: "running"} = Repo.get(Job, job_id_1)
       assert %{state: "running"} = Repo.get(Job, job_id_2)
+
       Manager.update_job_status()
+
       assert %{state: "running"} = Repo.get(Job, job_id_1)
       assert %{state: "running"} = Repo.get(Job, job_id_2)
     end
@@ -432,5 +422,42 @@ defmodule CrawlyUi.ManagerTest do
     item = insert_item(job_id)
 
     assert %Ecto.Changeset{} = Manager.change_item(item)
+  end
+
+  test "close_spider/1" do
+    with_mock :rpc, [:unstick],
+      call: fn
+        _, Crawly.Engine, :running_spiders, [] ->
+          %{
+            :Crawly_1 => {:some_pid, "test_1"},
+            :Crawly_2 => {:some_pid, "test_2"},
+            :Crawly_3 => {:some_pid, "test_3"},
+            :Crawly_4 => {:some_pid, "test_4"}
+          }
+
+        _, Crawly.Engine, :stop_spider, [:Crawly_1] ->
+          :ok
+
+        _, Crawly.Engine, :stop_spider, [:Crawly_2] ->
+          {:error, :spider_not_running}
+
+        _, Crawly.Engine, :stop_spider, [:Crawly_3] ->
+          {:error, :some_other_error}
+
+        _, Crawly.Engine, :stop_spider, [:Crawly_4] ->
+          {:badrpc, :nodedown}
+      end do
+      job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
+      job_2 = insert_job(%{spider: "Crawly_2", tag: "test_2"})
+      job_3 = insert_job(%{spider: "Crawly_3", tag: "test_3"})
+      job_4 = insert_job(%{spider: "Crawly_4", tag: "test_4"})
+      job_5 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
+
+      assert Manager.close_spider(job_1) == {:ok, :stopped}
+      assert Manager.close_spider(job_2) == {:ok, :already_stopped}
+      assert Manager.close_spider(job_3) == {:error, {:error, :some_other_error}}
+      assert Manager.close_spider(job_4) == {:ok, :nodedown}
+      assert Manager.close_spider(job_5) == {:ok, :already_stopped}
+    end
   end
 end
