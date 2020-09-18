@@ -397,19 +397,11 @@ defmodule CrawlyUI.Manager do
         {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
 
         if spider_tag == tag do
-          stop_spider(node_atom, spider_atom)
+          :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
+          {:ok, :stopped}
         else
           {:ok, :already_stopped}
         end
-    end
-  end
-
-  defp stop_spider(node, spider) do
-    case :rpc.call(node, Crawly.Engine, :stop_spider, [spider]) do
-      :ok -> {:ok, :stopped}
-      {:error, :spider_not_running} -> {:ok, :already_stopped}
-      {:badrpc, _} -> {:ok, :nodedown}
-      error -> {:error, error}
     end
   end
 end

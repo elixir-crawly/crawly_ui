@@ -429,35 +429,17 @@ defmodule CrawlyUi.ManagerTest do
       call: fn
         _, Crawly.Engine, :running_spiders, [] ->
           %{
-            :Crawly_1 => {:some_pid, "test_1"},
-            :Crawly_2 => {:some_pid, "test_2"},
-            :Crawly_3 => {:some_pid, "test_3"},
-            :Crawly_4 => {:some_pid, "test_4"}
+            :Crawly_1 => {:some_pid, "test_1"}
           }
 
         _, Crawly.Engine, :stop_spider, [:Crawly_1] ->
           :ok
-
-        _, Crawly.Engine, :stop_spider, [:Crawly_2] ->
-          {:error, :spider_not_running}
-
-        _, Crawly.Engine, :stop_spider, [:Crawly_3] ->
-          {:error, :some_other_error}
-
-        _, Crawly.Engine, :stop_spider, [:Crawly_4] ->
-          {:badrpc, :nodedown}
       end do
       job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
-      job_2 = insert_job(%{spider: "Crawly_2", tag: "test_2"})
-      job_3 = insert_job(%{spider: "Crawly_3", tag: "test_3"})
-      job_4 = insert_job(%{spider: "Crawly_4", tag: "test_4"})
-      job_5 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
+      job_2 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
 
       assert Manager.close_spider(job_1) == {:ok, :stopped}
       assert Manager.close_spider(job_2) == {:ok, :already_stopped}
-      assert Manager.close_spider(job_3) == {:error, {:error, :some_other_error}}
-      assert Manager.close_spider(job_4) == {:ok, :nodedown}
-      assert Manager.close_spider(job_5) == {:ok, :already_stopped}
     end
   end
 end
