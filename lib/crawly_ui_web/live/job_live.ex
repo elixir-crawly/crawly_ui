@@ -23,7 +23,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     jobs = list_jobs(socket.assigns.live_action)
 
-    if need_update?(jobs) do
+    if Enum.any?(jobs, &(&1.state == "running")) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
@@ -48,9 +48,6 @@ defmodule CrawlyUIWeb.JobLive do
   defp live_update(socket, state, time) do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
-
-  defp need_update?([]), do: false
-  defp need_update?(jobs), do: Enum.any?(jobs, &(&1.state == "running" or &1.state == "new"))
 
   defp list_jobs(:index), do: Manager.list_running_jobs()
   defp list_jobs(_), do: Manager.list_jobs()
