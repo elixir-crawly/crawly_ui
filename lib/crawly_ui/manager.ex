@@ -11,6 +11,13 @@ defmodule CrawlyUI.Manager do
 
   @job_abandoned_timeout 60 * 30
 
+  @doc """
+  Update all job status if the jobs are determined abandonned.
+
+  If the job is abandonned, try to reach the wokder node to close the spider.
+  If success, job state is put to "abandonned" and tell the worker to close the
+  spider. Otherwise, update job state to node down
+  """
   def update_job_status() do
     running_jobs = list_running_jobs()
 
@@ -31,22 +38,6 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
-  defp spider_state({:badrpc, _}, _), do: "node down"
-
-  defp spider_state(running_spiders, %{node: node, spider: spider, tag: tag}) do
-    spider_atom = String.to_existing_atom(spider)
-
-    {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
-
-    # If the spider is still running without fetching anything, we stop it, else it is stopped somehow
-    if spider_tag == tag do
-      node_atom = String.to_atom(node)
-      :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
-    end
-
-    "abandoned"
-  end
-
   def is_job_abandoned(%Job{} = job) do
     case most_recent_item(job.id) do
       nil ->
@@ -60,19 +51,17 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns the list of jobs
+  Returns the list of jobs with provided query, else returns all jobs
 
   ## Examples
 
       iex> list_jobs()
       [%Job{}, ...]}
 
+      iex> list_jobs(from(j in Job,  where: j.state == "running"))
+      [%Job{}, ...]}
+
   """
-
-  # def list_jobs() do
-  #   from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
-  # end
-
   def list_jobs(query \\ Job) do
     query
     |> order_by(desc: :state, desc: :inserted_at)
@@ -393,5 +382,23 @@ defmodule CrawlyUI.Manager do
   """
   def change_item(%Item{} = item) do
     Item.changeset(item, %{})
+  end
+
+  # Private functions
+
+  defp spider_state({:badrpc, _}, _), do: "node down"
+
+  defp spider_state(running_spiders, %{node: node, spider: spider, tag: tag}) do
+    spider_atom = String.to_existing_atom(spider)
+
+    {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
+
+    # If the spider is still running without fetching anything, we stop it, else it is stopped somehow
+    if spider_tag == tag do
+      node_atom = String.to_atom(node)
+      :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
+    end
+
+    "abandoned"
   end
 end
