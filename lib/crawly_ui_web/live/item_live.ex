@@ -3,6 +3,8 @@ defmodule CrawlyUIWeb.ItemLive do
 
   alias CrawlyUI.Manager
 
+  import CrawlyUIWeb.PaginationHelpers
+
   def render(%{template: template} = assigns) do
     CrawlyUIWeb.ItemView.render(template, assigns)
   end
@@ -21,14 +23,21 @@ defmodule CrawlyUIWeb.ItemLive do
 
     live_update(socket, :update_items, 100)
 
-    {:ok, assign(socket, template: "index.html", items: items, job_id: job_id)}
+    page = Map.get(params, "page", "1") |> String.to_integer()
+
+    rows = paginate(items, page)
+
+    {:ok,
+     assign(socket, template: "index.html", page: page, items: items, job_id: job_id, rows: rows)}
   end
 
   def handle_info(:update_items, socket) do
     job_id = socket.assigns.job_id
     search = socket.assigns.search
+    page = socket.assigns.page
 
     items = Manager.list_items(job_id, %{"search" => search})
+    rows = paginate(items, page)
 
     # If job is still running, we will update the item view
     %{state: state} = Manager.get_job!(job_id)
@@ -37,7 +46,7 @@ defmodule CrawlyUIWeb.ItemLive do
       live_update(socket, :update_items, 1000)
     end
 
-    {:noreply, assign(socket, items: items)}
+    {:noreply, assign(socket, items: items, rows: rows)}
   end
 
   def handle_params(params, _url, socket) do
@@ -56,10 +65,13 @@ defmodule CrawlyUIWeb.ItemLive do
   def handle_event("search", %{"search" => search}, socket) do
     job_id = socket.assigns.job_id
 
-    items = Manager.list_items(socket.assigns.job_id, %{"search" => search})
+    page = socket.assigns.page
+
+    items = Manager.list_items(job_id, %{"search" => search})
+    rows = paginate(items, page)
 
     {:noreply,
-     assign(socket, items: items)
+     assign(socket, items: items, rows: rows)
      |> push_patch(
        to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id, search: search)
      )}
@@ -75,6 +87,15 @@ defmodule CrawlyUIWeb.ItemLive do
   def handle_event("job_items", %{"job" => job_id}, socket) do
     {:noreply,
      push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id))}
+  end
+
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    job_id = socket.assigns.job_id
+
+    {:noreply,
+     push_redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id, page: page)
+     )}
   end
 
   defp live_update(socket, state, time) do
