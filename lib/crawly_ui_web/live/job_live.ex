@@ -3,16 +3,21 @@ defmodule CrawlyUIWeb.JobLive do
 
   alias CrawlyUI.Manager
 
+  import CrawlyUIWeb.PaginationHelpers
+
   def render(assigns) do
     CrawlyUIWeb.JobView.render("index.html", assigns)
   end
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     jobs = list_jobs(socket.assigns.live_action)
 
-    live_update(socket, :update_job, 100)
+    page = Map.get(params, "page", "1") |> String.to_integer()
 
-    {:ok, assign(socket, jobs: jobs)}
+    rows = paginate(jobs, page)
+
+    live_update(socket, :update_job, 100)
+    {:ok, assign(socket, jobs: jobs, page: page, rows: rows)}
   end
 
   def handle_info(:update_job, socket) do
@@ -22,6 +27,8 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_running_jobs()
 
     jobs = list_jobs(socket.assigns.live_action)
+    page = socket.assigns.page
+    rows = paginate(jobs, page)
 
     if Enum.any?(jobs, &(&1.state == "running")) do
       live_update(socket, :update_job, 100)
@@ -29,7 +36,7 @@ defmodule CrawlyUIWeb.JobLive do
       live_update(socket, :update_job, 1000)
     end
 
-    {:noreply, assign(socket, jobs: jobs)}
+    {:noreply, assign(socket, jobs: jobs, rows: rows)}
   end
 
   def handle_event("schedule", _, socket) do
@@ -43,6 +50,11 @@ defmodule CrawlyUIWeb.JobLive do
 
   def handle_event("list_all_jobs", _, socket) do
     {:noreply, push_redirect(socket, to: "/all")}
+  end
+
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    {:noreply,
+     push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index, page: page))}
   end
 
   defp live_update(socket, state, time) do

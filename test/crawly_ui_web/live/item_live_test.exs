@@ -123,4 +123,30 @@ defmodule CrawlyUIWeb.ItemLiveTest do
     render_click(view, :job_items, %{"job" => job_id})
     assert_redirect(view, "/jobs/#{job_id}/items")
   end
+
+  test "redirect go to page", %{
+    conn: conn,
+    job_id: job_id,
+    item_id: item_id
+  } do
+    item_2 = insert_item(job_id)
+    item_1 = CrawlyUI.Manager.get_item!(item_id)
+
+    Application.put_env(:crawly_ui, :page_size, 1)
+
+    {:ok, view, _html} = live(conn, "/jobs/#{job_id}/items")
+
+    assert render(view) =~ "Discovery time: #{item_2.inserted_at}"
+    refute render(view) =~ "Discovery time: #{item_1.inserted_at}"
+
+    {:ok, new_view, _html} =
+      view
+      |> render_click(:goto_page, %{"page" => "2"})
+      |> follow_redirect(conn, "/jobs/#{job_id}/items?page=2")
+
+    refute render(new_view) =~ "Discovery time: #{item_2.inserted_at}"
+    assert render(new_view) =~ "Discovery time: #{item_1.inserted_at}"
+
+    Application.put_env(:crawly_ui, :page_size, 10)
+  end
 end
