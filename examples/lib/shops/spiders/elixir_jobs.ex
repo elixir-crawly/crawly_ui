@@ -16,7 +16,8 @@ defmodule Spiders.ElixirJobs do
     [
       concurrent_requests_per_domain: 2,
       closespider_itemcount: 1000,
-      pipelines: pipelines
+      pipelines: pipelines,
+      closespider_timeout: 1
     ]
   end
 

@@ -18,6 +18,7 @@ defmodule CrawlyUIWeb.Router do
     pipe_through :browser
 
     live "/", JobLive, :index
+    live "/all", JobLive, :show
 
     live "/schedule", ScheduleLive, :pick_node
 

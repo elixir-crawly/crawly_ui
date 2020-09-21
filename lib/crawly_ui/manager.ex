@@ -11,13 +11,27 @@ defmodule CrawlyUI.Manager do
 
   @job_abandoned_timeout 60 * 30
 
+  @doc """
+  Update all job status if the jobs are determined abandonned.
+
+  If the job is abandonned, try to reach the wokder node to close the spider.
+  If success, job state is put to "abandonned" and tell the worker to close the
+  spider. Otherwise, update job state to node down
+  """
   def update_job_status() do
-    running_jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+    running_jobs = list_running_jobs()
 
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
         true ->
-          update_job(job, %{state: "abandoned"})
+          state =
+            case close_spider(job) do
+              {:ok, :stopped} -> "abandoned"
+              {:ok, :already_stopped} -> "stopped"
+              _ -> "node down"
+            end
+
+          update_job(job, %{state: state})
 
         false ->
           :ok
@@ -25,7 +39,7 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
-  def is_job_abandoned(job) do
+  def is_job_abandoned(%Job{} = job) do
     case most_recent_item(job.id) do
       nil ->
         NaiveDateTime.diff(NaiveDateTime.utc_now(), job.inserted_at, :second) >
@@ -38,16 +52,27 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns the list of jobs
+  Returns the list of jobs with provided query, else returns all jobs
 
   ## Examples
 
       iex> list_jobs()
       [%Job{}, ...]}
 
+      iex> list_jobs(from(j in Job,  where: j.state == "running"))
+      [%Job{}, ...]}
+
   """
-  def list_jobs() do
-    from(j in Job, order_by: [desc: :state, desc: :inserted_at]) |> Repo.all()
+  def list_jobs(query \\ Job) do
+    query
+    |> order_by(desc: :state, desc: :inserted_at)
+    |> Repo.all()
+  end
+
+  def list_running_jobs() do
+    Job
+    |> where([j], j.state == "running")
+    |> list_jobs()
   end
 
   @doc """
@@ -155,9 +180,10 @@ defmodule CrawlyUI.Manager do
     end_time = Timex.shift(start_time, minutes: -1)
 
     Repo.one(
-      from i in "items",
+      from(i in "items",
         where: i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
         select: count("*")
+      )
     )
   end
 
@@ -171,7 +197,7 @@ defmodule CrawlyUI.Manager do
 
   """
   def count_items(job) do
-    Repo.one(from i in "items", where: i.job_id == ^job.id, select: count("*"))
+    Repo.one(from(i in "items", where: i.job_id == ^job.id, select: count("*")))
   end
 
   @doc """
@@ -194,10 +220,11 @@ defmodule CrawlyUI.Manager do
     Enum.each(jobs, fn job ->
       cnt =
         Repo.one(
-          from i in "items",
+          from(i in "items",
             where:
               i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
             select: count("*")
+          )
         )
 
       {:ok, _} = update_job(job, %{crawl_speed: cnt})
@@ -215,7 +242,7 @@ defmodule CrawlyUI.Manager do
   end
 
   def update_running_jobs() do
-    jobs = from(j in Job, where: j.state == ^"running") |> Repo.all()
+    jobs = list_running_jobs()
     update_run_times(jobs)
     update_crawl_speeds(jobs)
     update_item_counts(jobs)
@@ -229,7 +256,7 @@ defmodule CrawlyUI.Manager do
   end
 
   def get_job_by_tag(tag) do
-    Repo.one(from j in Job, where: j.tag == ^tag)
+    Repo.one(from(j in Job, where: j.tag == ^tag))
   end
 
   @doc """
@@ -356,5 +383,25 @@ defmodule CrawlyUI.Manager do
   """
   def change_item(%Item{} = item) do
     Item.changeset(item, %{})
+  end
+
+  def close_spider(%Job{node: node, spider: spider, tag: tag}) do
+    spider_atom = String.to_existing_atom(spider)
+    node_atom = String.to_atom(node)
+
+    case :rpc.call(node_atom, Crawly.Engine, :running_spiders, []) do
+      {:badrpc, _} ->
+        {:ok, :node_down}
+
+      running_spiders when is_map(running_spiders) ->
+        {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
+
+        if spider_tag == tag do
+          :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
+          {:ok, :stopped}
+        else
+          {:ok, :already_stopped}
+        end
+    end
   end
 end

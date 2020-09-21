@@ -34,7 +34,7 @@ defmodule CrawlyUIWeb.PaginationHelpers do
     number_of_pages = number_of_pages(data)
 
     cond do
-      number_of_pages == 0 ->
+      number_of_pages <= 1 ->
         []
 
       number_of_pages <= 10 ->

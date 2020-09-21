@@ -1,13 +1,18 @@
-<%= if Enum.empty?(@jobs) do %>
+<%= if Enum.empty?(@jobs) and  @live_action == :index do %>
 <div class="Hero">
     <h1 class="Hero__title">Welcome to Crawly UI</h1>
     <p class="Hero__description">A centralized panel which allows you to start/stop and debug your spiders.</p>
     <p class="Hero__description">Looks like you have not scheduled any jobs yet. Why don't you give it a try, by scheduling a Crawly Job?</p>
     <button phx-click=schedule>Schedule</button>
+    <button phx-click=list_all_jobs>All Past Jobs</button>
     </a>
 </div>
 <% else %>
-<h1>Jobs</h1>
+  <%= if @live_action == :index do %>
+  <h1> Running Jobs</h1>
+  <% else %>
+   <h1>Jobs</h1>
+  <% end %>
 <table>
   <thead>
     <tr>
@@ -46,4 +51,8 @@
   <% end %>
    <%= raw render_goto_next(@page, @jobs) %>
 </nav>
+  <%= if @live_action == :index do %>
+  <br>
+  <button phx-click=list_all_jobs>All Jobs</button>
+  <% end %>
 <% end %>

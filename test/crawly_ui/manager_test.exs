@@ -7,18 +7,50 @@ defmodule CrawlyUi.ManagerTest do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
+  import Mock
+
   describe "update_job_status/0" do
-    test "updates job state to abandoned" do
-      %{id: job_id_1} = insert_job()
-      insert_item(job_id_1, inserted_at_expired())
+    test "updates job state" do
+      with_mock :rpc, [:unstick],
+        call: fn
+          _, Crawly.Engine, :running_spiders, [] ->
+            %{:Crawly => {:some_pid, "test_1"}}
 
-      %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
+          _, Crawly.Engine, :stop_spider, [_] ->
+            :ok
+        end do
+        # Job with matching tag means it is running and abandonned, otherwise stopped
 
-      assert %{state: "running"} = Repo.get(Job, job_id_1)
-      assert %{state: "running"} = Repo.get(Job, job_id_2)
-      Manager.update_job_status()
-      assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
-      assert %{state: "abandoned"} = Repo.get(Job, job_id_2)
+        %{id: job_id_1} = insert_job(%{tag: "test_1"})
+        insert_item(job_id_1, inserted_at_expired())
+
+        %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
+
+        assert %{state: "running"} = Repo.get(Job, job_id_1)
+        assert %{state: "running"} = Repo.get(Job, job_id_2)
+
+        Manager.update_job_status()
+
+        assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
+        assert %{state: "stopped"} = Repo.get(Job, job_id_2)
+
+        assert_called(:rpc.call(:crawly@test, Crawly.Engine, :stop_spider, [:Crawly]))
+      end
+    end
+
+    test "updates job state to node down when calling worker node failed" do
+      with_mock :rpc, [:unstick],
+        call: fn _, Crawly.Engine, :running_spiders, [] ->
+          {:badrpc, :nodedown}
+        end do
+        %{id: job_id_1} = insert_job()
+        insert_item(job_id_1, inserted_at_expired())
+
+        assert %{state: "running"} = Repo.get(Job, job_id_1)
+
+        Manager.update_job_status()
+        assert %{state: "node down"} = Repo.get(Job, job_id_1)
+      end
     end
 
     test "does not update when job is still running" do
@@ -29,7 +61,9 @@ defmodule CrawlyUi.ManagerTest do
 
       assert %{state: "running"} = Repo.get(Job, job_id_1)
       assert %{state: "running"} = Repo.get(Job, job_id_2)
+
       Manager.update_job_status()
+
       assert %{state: "running"} = Repo.get(Job, job_id_1)
       assert %{state: "running"} = Repo.get(Job, job_id_2)
     end
@@ -388,5 +422,24 @@ defmodule CrawlyUi.ManagerTest do
     item = insert_item(job_id)
 
     assert %Ecto.Changeset{} = Manager.change_item(item)
+  end
+
+  test "close_spider/1" do
+    with_mock :rpc, [:unstick],
+      call: fn
+        _, Crawly.Engine, :running_spiders, [] ->
+          %{
+            :Crawly_1 => {:some_pid, "test_1"}
+          }
+
+        _, Crawly.Engine, :stop_spider, [:Crawly_1] ->
+          :ok
+      end do
+      job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
+      job_2 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
+
+      assert Manager.close_spider(job_1) == {:ok, :stopped}
+      assert Manager.close_spider(job_2) == {:ok, :already_stopped}
+    end
   end
 end
