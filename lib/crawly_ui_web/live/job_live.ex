@@ -53,8 +53,12 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def handle_event("goto_page", %{"page" => page}, socket) do
+    live_action = socket.assigns.live_action
+
     {:noreply,
-     push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index, page: page))}
+     push_redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
+     )}
   end
 
   defp live_update(socket, state, time) do
