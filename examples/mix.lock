@@ -2,7 +2,7 @@
   "certifi": {:hex, :certifi, "2.5.1", "867ce347f7c7d78563450a18a6a28a8090331e77fa02380b4a21962a65d36ee5", [:rebar3], [{:parse_trans, "~>3.3", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm", "805abd97539caf89ec6d4732c91e62ba9da0cda51ac462380bbd28ee697a8c42"},
   "cowboy": {:hex, :cowboy, "2.7.0", "91ed100138a764355f43316b1d23d7ff6bdb0de4ea618cb5d8677c93a7a2f115", [:rebar3], [{:cowlib, "~> 2.8.0", [hex: :cowlib, repo: "hexpm", optional: false]}, {:ranch, "~> 1.7.1", [hex: :ranch, repo: "hexpm", optional: false]}], "hexpm", "04fd8c6a39edc6aaa9c26123009200fc61f92a3a94f3178c527b70b767c6e605"},
   "cowlib": {:hex, :cowlib, "2.8.0", "fd0ff1787db84ac415b8211573e9a30a3ebe71b5cbff7f720089972b2319c8a4", [:rebar3], [], "hexpm", "79f954a7021b302186a950a32869dbc185523d99d3e44ce430cd1f3289f41ed4"},
-  "crawly": {:git, "https://github.com/oltarasenko/crawly", "b0633b1c040beab8132ec906f296c4a2c6db8813", [branch: "tag_crawl_attempts"]},
+  "crawly": {:git, "https://github.com/oltarasenko/crawly", "909360157679ad7b6507bba285d385200456cfcb", [branch: "tag_crawl_attempts_revised"]},
   "epipe": {:hex, :epipe, "1.0.0", "9678d912c34b99dad9c20c4582d393d8101adfe96ebbe7af33b42f6619c96688", [:rebar3], [], "hexpm", "8a9d6ef41fa1e97b324726a93460fa712742a85a1957a02fdd9227912ce00ff6"},
   "erlang_node_discovery": {:git, "https://github.com/oltarasenko/erlang-node-discovery", "39ee515ede301260cca2ad913213b83262b1139c", []},
   "floki": {:hex, :floki, "0.26.0", "4df88977e2e357c6720e1b650f613444bfb48c5acfc6a0c646ab007d08ad13bf", [:mix], [{:html_entities, "~> 0.5.0", [hex: :html_entities, repo: "hexpm", optional: false]}], "hexpm", "e7b66ce7feef5518a9cd9fc7b52dd62a64028bd9cb6d6ad282a0f0fc90a4ae52"},

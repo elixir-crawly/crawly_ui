@@ -7,7 +7,8 @@ defmodule Spiders.OregonRegs do
     ui_node = ui_node |> String.to_atom()
 
     pipelines = [
-      {Crawly.Pipelines.Validate, fields: [:url, :type, :number]},
+      {Crawly.Pipelines.Validate, fields: [:url, :number, :chapter_number, :division_number]},
+      {Crawly.Pipelines.DuplicatesFilter, item_id: :number},
       {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui_node},
       Crawly.Pipelines.JSONEncoder,
       {Crawly.Pipelines.WriteToFile, extension: "json", folder: "/tmp"}
@@ -80,6 +81,7 @@ defmodule Spiders.OregonRegs do
 
   defp parse_division_page(document, division_url) do
     document = document |> Floki.find("#content")
+
     chapter_division_info_map = parse_chapter_division_info(document, division_url)
 
     rules =
@@ -141,7 +143,6 @@ defmodule Spiders.OregonRegs do
     meta = parse_meta_data(rule)
 
     %{
-      type: "Rule",
       number: number,
       name: name,
       url: url,
