@@ -15,8 +15,8 @@ defmodule CrawlyUI.Manager do
   Update all job status if the jobs are determined abandonned.
 
   If the job is abandonned, try to reach the wokder node to close the spider.
-  If success, job state is put to "abandonned" and tell the worker to close the
-  spider. Otherwise, update job state to node down
+  If success and spider is running, job state is put to "abandonned" and tell the worker to close the spider. If node is reachable but spider with the same tag is not running, then job stat is put to "stopped". Otherwise, update job state to "node down"
+
   """
   def update_job_status() do
     running_jobs = list_running_jobs()
@@ -39,6 +39,15 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
+  @doc """
+  Returns true if the most recent item of the job was inserted before set time out. Otherwise false.
+
+  ## Examples
+
+      iex> is_job_abandoned(job)
+      true
+
+  """
   def is_job_abandoned(%Job{} = job) do
     case most_recent_item(job.id) do
       nil ->
@@ -175,6 +184,15 @@ defmodule CrawlyUI.Manager do
     end
   end
 
+  @doc """
+  Returns crawl speed time of the given job
+
+  ## Examples
+
+      iex> crawl_speed(job)
+      3
+
+  """
   def crawl_speed(job) do
     start_time = Timex.now()
     end_time = Timex.shift(start_time, minutes: -1)
@@ -241,6 +259,9 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
+  @doc """
+  Update crawl speed, run time and item counts for all active jobs
+  """
   def update_running_jobs() do
     jobs = list_running_jobs()
     update_run_times(jobs)
@@ -248,6 +269,9 @@ defmodule CrawlyUI.Manager do
     update_item_counts(jobs)
   end
 
+  @doc """
+  Update crawl speed, run time and item counts for all jobs
+  """
   def update_all_jobs() do
     jobs = from(j in Job) |> Repo.all()
     update_run_times(jobs)
