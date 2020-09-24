@@ -79,6 +79,8 @@ defmodule CrawlyUIWeb.JobLive do
 
     Manager.update_job(job, %{state: state})
 
+    socket = update_socket(socket)
+
     {:noreply, socket}
   end
 
@@ -86,11 +88,19 @@ defmodule CrawlyUIWeb.JobLive do
     job = job_id |> String.to_integer() |> Manager.get_job!()
 
     job |> Manager.delete_all_job_items()
-    job |> Manager.delete_job()
+    {:ok, _} = job |> Manager.delete_job()
 
+    socket = update_socket(socket)
+
+    {:noreply, socket}
+  end
+
+  defp update_socket(socket) do
     jobs = socket.assigns.live_action |> list_jobs()
+    page = socket.assigns.page
+    rows = paginate(jobs, page)
 
-    {:noreply, assign(socket, jobs: jobs)}
+    assign(socket, jobs: jobs, rows: rows)
   end
 
   defp live_update(socket, state, time) do
