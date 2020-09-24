@@ -15,4 +15,12 @@ defmodule CrawlyUIWeb.JobView do
         "#{time_in_minutes} min"
     end
   end
+
+  def render_button(%{state: "running"} = job) do
+    "<button phx-click=cancel phx-value-job=#{job.id}>Cancel</button>"
+  end
+
+  def render_button(job) do
+    "<button phx-click=delete phx-value-job=#{job.id}>Delete</button>"
+  end
 end
