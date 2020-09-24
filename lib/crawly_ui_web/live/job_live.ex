@@ -2,6 +2,7 @@ defmodule CrawlyUIWeb.JobLive do
   use Phoenix.LiveView
 
   alias CrawlyUI.Manager
+  alias CrawlyUI.SpiderManager
 
   import CrawlyUIWeb.PaginationHelpers
 
@@ -11,12 +12,11 @@ defmodule CrawlyUIWeb.JobLive do
 
   def mount(params, _session, socket) do
     jobs = list_jobs(socket.assigns.live_action)
-
     page = Map.get(params, "page", "1") |> String.to_integer()
-
     rows = paginate(jobs, page)
 
     live_update(socket, :update_job, 100)
+
     {:ok, assign(socket, jobs: jobs, page: page, rows: rows)}
   end
 
@@ -26,17 +26,15 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_job_status()
     Manager.update_running_jobs()
 
-    jobs = list_jobs(socket.assigns.live_action)
-    page = socket.assigns.page
-    rows = paginate(jobs, page)
+    socket = update_socket(socket)
 
-    if Enum.any?(jobs, &(&1.state == "running")) do
+    if Enum.any?(socket.assigns.rows, &(&1.state == "running")) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
     end
 
-    {:noreply, assign(socket, jobs: jobs, rows: rows)}
+    {:noreply, socket}
   end
 
   def handle_event("schedule", _, socket) do
@@ -59,6 +57,47 @@ defmodule CrawlyUIWeb.JobLive do
      push_redirect(socket,
        to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
      )}
+  end
+
+  def handle_event("cancel", %{"job" => job_id}, socket) do
+    job = job_id |> String.to_integer() |> Manager.get_job!()
+
+    state =
+      case SpiderManager.close_job_spider(job) do
+        {:ok, :stopped} ->
+          "cancelled"
+
+        {:error, :nodedown} ->
+          "node down"
+
+        _ ->
+          "stopped"
+      end
+
+    Manager.update_job(job, %{state: state})
+
+    socket = update_socket(socket)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("delete", %{"job" => job_id}, socket) do
+    job = job_id |> String.to_integer() |> Manager.get_job!()
+
+    job |> Manager.delete_all_job_items()
+    {:ok, _} = job |> Manager.delete_job()
+
+    socket = update_socket(socket)
+
+    {:noreply, socket}
+  end
+
+  defp update_socket(socket) do
+    jobs = socket.assigns.live_action |> list_jobs()
+    page = socket.assigns.page
+    rows = paginate(jobs, page)
+
+    assign(socket, jobs: jobs, rows: rows)
   end
 
   defp live_update(socket, state, time) do

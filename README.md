@@ -49,11 +49,14 @@ and postgres database for you. Now you can access the server from localhost:80
 1. Main page. Schedule jobs here!
 ![Main Page](gallery/main_page.png?raw=true)
 
-2. Items browser
+2. All jobs page
+![All Jobs](gallery/all_jobs_page.png?raw=true)
+
+3. Items browser
 ![Items browser](gallery/items_page.png?raw=true)
 ![Items browser search](gallery/item_with_filters.png?raw=true)
 
-3. Items preview
+4. Items preview
 ![Items browser](gallery/item_preview_example.png?raw=true)
 
 ## How it works
@@ -162,7 +165,7 @@ using Ignore X-Frame headers browser extension.
 
 # Roadmap
 
-- [ ] Make tests to have 80% tests coverage
+- [x] Make tests to have 80% tests coverage
 - [ ] Get logs from Crawly
 - [ ] Allow to stop given spiders
 - [ ] Parametrize spider parameters

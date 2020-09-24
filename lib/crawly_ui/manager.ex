@@ -9,14 +9,16 @@ defmodule CrawlyUI.Manager do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
+  alias CrawlyUI.SpiderManager
+
   @job_abandoned_timeout 60 * 30
 
   @doc """
   Update all job status if the jobs are determined abandonned.
 
   If the job is abandonned, try to reach the wokder node to close the spider.
-  If success, job state is put to "abandonned" and tell the worker to close the
-  spider. Otherwise, update job state to node down
+  If success and spider is running, job state is put to "abandonned" and tell the worker to close the spider. If node is reachable but spider with the same tag is not running, then job stat is put to "stopped". Otherwise, update job state to "node down"
+
   """
   def update_job_status() do
     running_jobs = list_running_jobs()
@@ -25,10 +27,10 @@ defmodule CrawlyUI.Manager do
       case is_job_abandoned(job) do
         true ->
           state =
-            case close_spider(job) do
+            case SpiderManager.close_job_spider(job) do
               {:ok, :stopped} -> "abandoned"
-              {:ok, :already_stopped} -> "stopped"
-              _ -> "node down"
+              {:error, :nodedown} -> "node down"
+              _ -> "stopped"
             end
 
           update_job(job, %{state: state})
@@ -39,6 +41,15 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
+  @doc """
+  Returns true if the most recent item of the job was inserted before set time out. Otherwise false.
+
+  ## Examples
+
+      iex> is_job_abandoned(job)
+      true
+
+  """
   def is_job_abandoned(%Job{} = job) do
     case most_recent_item(job.id) do
       nil ->
@@ -144,6 +155,15 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
+  Deletes all items belong to a specific job
+  """
+  def delete_all_job_items(job) do
+    items = list_items(job.id)
+
+    Enum.map(items, &delete_item/1)
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking job changes.
 
   ## Examples
@@ -175,6 +195,15 @@ defmodule CrawlyUI.Manager do
     end
   end
 
+  @doc """
+  Returns crawl speed time of the given job
+
+  ## Examples
+
+      iex> crawl_speed(job)
+      3
+
+  """
   def crawl_speed(job) do
     start_time = Timex.now()
     end_time = Timex.shift(start_time, minutes: -1)
@@ -241,6 +270,9 @@ defmodule CrawlyUI.Manager do
     end)
   end
 
+  @doc """
+  Update crawl speed, run time and item counts for all active jobs
+  """
   def update_running_jobs() do
     jobs = list_running_jobs()
     update_run_times(jobs)
@@ -248,6 +280,9 @@ defmodule CrawlyUI.Manager do
     update_item_counts(jobs)
   end
 
+  @doc """
+  Update crawl speed, run time and item counts for all jobs
+  """
   def update_all_jobs() do
     jobs = from(j in Job) |> Repo.all()
     update_run_times(jobs)
@@ -268,6 +303,8 @@ defmodule CrawlyUI.Manager do
       [%Item{}, ...]
 
   """
+  def list_items(job_id), do: list_items(job_id, %{})
+
   def list_items(job_id, params) do
     query =
       case Map.get(params, "search") do
@@ -383,25 +420,5 @@ defmodule CrawlyUI.Manager do
   """
   def change_item(%Item{} = item) do
     Item.changeset(item, %{})
-  end
-
-  def close_spider(%Job{node: node, spider: spider, tag: tag}) do
-    spider_atom = String.to_existing_atom(spider)
-    node_atom = String.to_atom(node)
-
-    case :rpc.call(node_atom, Crawly.Engine, :running_spiders, []) do
-      {:badrpc, _} ->
-        {:ok, :node_down}
-
-      running_spiders when is_map(running_spiders) ->
-        {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
-
-        if spider_tag == tag do
-          :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
-          {:ok, :stopped}
-        else
-          {:ok, :already_stopped}
-        end
-    end
   end
 end

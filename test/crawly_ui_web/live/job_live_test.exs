@@ -4,6 +4,8 @@ defmodule CrawlyUIWeb.JobLiveTest do
   use CrawlyUIWeb.ConnCase
   import Phoenix.LiveViewTest
 
+  import Mock
+
   test "mount job view when there is no job", %{conn: conn} do
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
@@ -146,5 +148,74 @@ defmodule CrawlyUIWeb.JobLiveTest do
     refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
 
     Application.put_env(:crawly_ui, :page_size, 10)
+  end
+
+  test "cancel running job", %{conn: conn} do
+    job_1 = insert_job(%{state: "running"})
+    job_2 = insert_job(%{state: "running"})
+    job_3 = insert_job(%{state: "running"})
+
+    with_mock CrawlyUI.SpiderManager, [],
+      close_job_spider: fn
+        ^job_1 -> {:ok, :stopped}
+        ^job_2 -> {:error, :spider_not_running}
+        ^job_3 -> {:error, :nodedown}
+      end do
+      {:ok, view, _html} = live(conn, "/")
+
+      assert render(view) =~
+               "<button phx-click=\"cancel\" phx-value-job=\"#{job_1.id}\">Cancel</button></td>"
+
+      assert render(view) =~
+               "<button phx-click=\"cancel\" phx-value-job=\"#{job_2.id}\">Cancel</button></td>"
+
+      assert render(view) =~
+               "<button phx-click=\"cancel\" phx-value-job=\"#{job_3.id}\">Cancel</button></td>"
+
+      render_click(view, :cancel, %{"job" => Integer.to_string(job_1.id)})
+      render_click(view, :cancel, %{"job" => Integer.to_string(job_2.id)})
+      render_click(view, :cancel, %{"job" => Integer.to_string(job_3.id)})
+
+      assert render(view) =~ "Welcome to Crawly UI"
+
+      {:ok, view, _html} = live(conn, "/all")
+
+      assert render(view) =~
+               "<td>cancelled</td><td>#{job_1.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
+
+      assert render(view) =~
+               "<td>stopped</td><td>#{job_2.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
+
+      assert render(view) =~
+               "<td>node down</td><td>#{job_3.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
+    end
+  end
+
+  test "delete job", %{conn: conn} do
+    job_1 = insert_job(%{state: "stopped"})
+    job_2 = insert_job(%{state: "abandonned"})
+
+    insert_item(job_2.id, inserted_at(50))
+    insert_item(job_2.id, inserted_at(10))
+
+    {:ok, view, _html} = live(conn, "/all")
+
+    assert render(view) =~
+             "<button phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete</button></td>"
+
+    assert render(view) =~
+             "<button phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete</button></td>"
+
+    render_click(view, :delete, %{"job" => Integer.to_string(job_1.id)})
+    render_click(view, :delete, %{"job" => Integer.to_string(job_2.id)})
+
+    assert [] == CrawlyUI.Repo.all(CrawlyUI.Manager.Job)
+    assert [] == CrawlyUI.Repo.all(CrawlyUI.Manager.Item, job_id: job_2.id)
+
+    refute render(view) =~
+             "<button phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete</button></td>"
+
+    refute render(view) =~
+             "<button phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete</button></td>"
   end
 end
