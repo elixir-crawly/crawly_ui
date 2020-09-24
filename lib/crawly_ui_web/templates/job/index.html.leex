@@ -41,13 +41,7 @@
           <td><%= live_job.inserted_at %></td>
           <td><%= live_job.crawl_speed || "-" %> items/min</td>
           <td><%= raw render_run_time(live_job.run_time) %></td>
-          <td>
-           <%= if live_job.state == "running" do %>
-             <button phx-click=cancel phx-value-job=<%= live_job.id%>>Cancel</button>
-           <% else %>
-             <button phx-click=delete phx-value-job=<%= live_job.id%>>Delete</button>
-           <% end %>
-           </td>
+          <td> <%= raw render_button(live_job) %></td>
         </tr>
     <% end %>
   </tbody>
