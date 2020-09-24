@@ -41,14 +41,12 @@ defmodule CrawlyUi.SpiderManagerTest do
     end
   end
 
-  describe "close_spider/1" do
+  describe "close_job_spider/1" do
     test "close spider" do
       with_mock :rpc, [:unstick],
         call: fn
-          _, Crawly.Engine, :running_spiders, [] ->
-            %{
-              :Crawly_1 => {:some_pid, "test_1"}
-            }
+          _, Crawly.Engine, :get_crawl_id, [:Crawly_1] ->
+            {:ok, "test_1"}
 
           _, Crawly.Engine, :stop_spider, [:Crawly_1] ->
             :ok
@@ -56,18 +54,20 @@ defmodule CrawlyUi.SpiderManagerTest do
         job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
         job_2 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
 
-        assert SpiderManager.close_spider(job_1) == {:ok, :stopped}
-        assert SpiderManager.close_spider(job_2) == {:ok, :already_stopped}
+        assert SpiderManager.close_job_spider(job_1) == {:ok, :stopped}
+        assert SpiderManager.close_job_spider(job_2) == {:error, :spider_not_running}
+
+        assert_called(:rpc.call(:crawly@test, Crawly.Engine, :stop_spider, [:Crawly_1]))
       end
     end
 
     test "node_down" do
       with_mock :rpc, [:unstick],
-        call: fn _, Crawly.Engine, :running_spiders, [] ->
+        call: fn _, Crawly.Engine, :get_crawl_id, [:Crawly_1] ->
           {:badrpc, :nodedown}
         end do
         job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
-        assert SpiderManager.close_spider(job_1) == {:ok, :nodedown}
+        assert SpiderManager.close_job_spider(job_1) == {:error, :nodedown}
       end
     end
   end
@@ -85,6 +85,29 @@ defmodule CrawlyUi.SpiderManagerTest do
         call: fn :node, Crawly, :list_spiders, [] -> ["Crawly.TestSpider"] end do
         assert SpiderManager.list_spiders("node") == ["Crawly.TestSpider"]
       end
+    end
+  end
+
+  test "get_spider_id/2" do
+    with_mock :rpc, [:unstick],
+      call: fn
+        _, Crawly.Engine, :get_crawl_id, [:Crawly_1] ->
+          {:ok, "test_1"}
+
+        _, Crawly.Engine, :get_crawl_id, [:Crawly_2] ->
+          {:badrpc, :nodedown}
+      end do
+      assert SpiderManager.get_spider_id(:node, :Crawly_1) == {:ok, "test_1"}
+      assert SpiderManager.get_spider_id(:node, :Crawly_2) == {:error, :nodedown}
+    end
+  end
+
+  test "stop_spider/1" do
+    with_mock :rpc, [:unstick],
+      call: fn _, Crawly.Engine, :stop_spider, [_] ->
+        :ok
+      end do
+      assert :ok == SpiderManager.stop_spider(:node, :Crawly)
     end
   end
 end

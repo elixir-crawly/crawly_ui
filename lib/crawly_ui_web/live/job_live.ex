@@ -2,6 +2,7 @@ defmodule CrawlyUIWeb.JobLive do
   use Phoenix.LiveView
 
   alias CrawlyUI.Manager
+  alias CrawlyUI.SpiderManager
 
   import CrawlyUIWeb.PaginationHelpers
 
@@ -30,7 +31,7 @@ defmodule CrawlyUIWeb.JobLive do
     page = socket.assigns.page
     rows = paginate(jobs, page)
 
-    if Enum.any?(jobs, &(&1.state == "running")) do
+    if Enum.any?(rows, &(&1.state == "running")) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
@@ -59,6 +60,37 @@ defmodule CrawlyUIWeb.JobLive do
      push_redirect(socket,
        to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
      )}
+  end
+
+  def handle_event("cancel", %{"job" => job_id}, socket) do
+    job = job_id |> String.to_integer() |> Manager.get_job!()
+
+    state =
+      case SpiderManager.close_job_spider(job) do
+        {:ok, :stopped} ->
+          "cancelled"
+
+        {:error, :nodedown} ->
+          "node down"
+
+        _ ->
+          "stopped"
+      end
+
+    Manager.update_job(job, %{state: state})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("delete", %{"job" => job_id}, socket) do
+    job = job_id |> String.to_integer() |> Manager.get_job!()
+
+    job |> Manager.delete_all_job_items()
+    job |> Manager.delete_job()
+
+    jobs = socket.assigns.live_action |> list_jobs()
+
+    {:noreply, assign(socket, jobs: jobs)}
   end
 
   defp live_update(socket, state, time) do

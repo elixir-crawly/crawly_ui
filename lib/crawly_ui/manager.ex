@@ -27,10 +27,10 @@ defmodule CrawlyUI.Manager do
       case is_job_abandoned(job) do
         true ->
           state =
-            case SpiderManager.close_spider(job) do
+            case SpiderManager.close_job_spider(job) do
               {:ok, :stopped} -> "abandoned"
-              {:ok, :already_stopped} -> "stopped"
-              _ -> "node down"
+              {:error, :nodedown} -> "node down"
+              _ -> "stopped"
             end
 
           update_job(job, %{state: state})
@@ -143,6 +143,15 @@ defmodule CrawlyUI.Manager do
   """
   def delete_job(%Job{} = job) do
     Repo.delete(job)
+  end
+
+  @doc """
+  Deletes all items belong to a specific job
+  """
+  def delete_all_job_items(job) do
+    items = list_items(job.id)
+
+    Enum.map(items, &delete_item/1)
   end
 
   @doc """
@@ -270,6 +279,8 @@ defmodule CrawlyUI.Manager do
       [%Item{}, ...]
 
   """
+  def list_items(job_id), do: list_items(job_id, %{})
+
   def list_items(job_id, params) do
     query =
       case Map.get(params, "search") do

@@ -11,37 +11,32 @@ defmodule CrawlyUi.ManagerTest do
 
   describe "update_job_status/0" do
     test "updates job state" do
-      with_mock :rpc, [:unstick],
-        call: fn
-          _, Crawly.Engine, :running_spiders, [] ->
-            %{:Crawly => {:some_pid, "test_1"}}
+      job_1 = insert_job(%{tag: "test_1"})
+      insert_item(job_1.id, inserted_at_expired())
 
-          _, Crawly.Engine, :stop_spider, [_] ->
-            :ok
+      job_2 = insert_job(%{inserted_at: inserted_at_expired()})
+
+      with_mock CrawlyUI.SpiderManager,
+        close_job_spider: fn
+          ^job_1 -> {:ok, :stopped}
+          ^job_2 -> {:error, :spider_not_running}
         end do
         # Job with matching tag means it is running and abandonned, otherwise stopped
 
-        %{id: job_id_1} = insert_job(%{tag: "test_1"})
-        insert_item(job_id_1, inserted_at_expired())
-
-        %{id: job_id_2} = insert_job(%{inserted_at: inserted_at_expired()})
-
-        assert %{state: "running"} = Repo.get(Job, job_id_1)
-        assert %{state: "running"} = Repo.get(Job, job_id_2)
+        assert %{state: "running"} = Repo.get(Job, job_1.id)
+        assert %{state: "running"} = Repo.get(Job, job_2.id)
 
         Manager.update_job_status()
 
-        assert %{state: "abandoned"} = Repo.get(Job, job_id_1)
-        assert %{state: "stopped"} = Repo.get(Job, job_id_2)
-
-        assert_called(:rpc.call(:crawly@test, Crawly.Engine, :stop_spider, [:Crawly]))
+        assert %{state: "abandoned"} = Repo.get(Job, job_1.id)
+        assert %{state: "stopped"} = Repo.get(Job, job_2.id)
       end
     end
 
     test "updates job state to node down when calling worker node failed" do
-      with_mock :rpc, [:unstick],
-        call: fn _, Crawly.Engine, :running_spiders, [] ->
-          {:badrpc, :nodedown}
+      with_mock CrawlyUI.SpiderManager,
+        close_job_spider: fn _ ->
+          {:error, :nodedown}
         end do
         %{id: job_id_1} = insert_job()
         insert_item(job_id_1, inserted_at_expired())
@@ -153,6 +148,22 @@ defmodule CrawlyUi.ManagerTest do
     job = insert_job()
     assert {:ok, %Job{}} = Manager.delete_job(job)
     assert nil == Repo.get(Job, job.id)
+  end
+
+  test "delete_all_job_items/1 deletes all items belongs to a job" do
+    job_1 = insert_job()
+    %{id: job_2_id} = insert_job()
+
+    insert_item(job_1.id)
+    insert_item(job_1.id)
+
+    insert_item(job_2_id)
+
+    assert Repo.all(Item) |> length() == 3
+
+    Manager.delete_all_job_items(job_1)
+
+    assert [%{job_id: ^job_2_id}] = Repo.all(Item, job_id: job_1.id)
   end
 
   test "change_job/1" do

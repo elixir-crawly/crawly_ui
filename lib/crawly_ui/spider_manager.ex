@@ -1,4 +1,8 @@
 defmodule CrawlyUI.SpiderManager do
+  @moduledoc """
+  The Spider Manager, makes all the rpcs calls to wokrer node to start, stop or get spider information
+  """
+
   alias CrawlyUI.Manager.Job
 
   def start_spider(node, spider) when is_binary(node) and is_binary(spider) do
@@ -16,22 +20,20 @@ defmodule CrawlyUI.SpiderManager do
     end
   end
 
-  def close_spider(%Job{node: node, spider: spider, tag: tag}) do
+  def close_job_spider(%Job{node: node, spider: spider, tag: tag}) do
     spider = String.to_atom(spider)
     node = String.to_atom(node)
 
-    case running_spiders(node) do
-      {:badrpc, _} ->
-        {:ok, :nodedown}
+    case get_spider_id(node, spider) do
+      {:error, reason} ->
+        {:error, reason}
 
-      running_spiders when is_map(running_spiders) ->
-        {_, spider_tag} = Map.get(running_spiders, spider, {nil, nil})
-
+      {:ok, spider_tag} ->
         if spider_tag == tag do
-          stop_spider(node, spider)
+          :ok = stop_spider(node, spider)
           {:ok, :stopped}
         else
-          {:ok, :already_stopped}
+          {:error, :spider_not_running}
         end
     end
   end
@@ -44,11 +46,14 @@ defmodule CrawlyUI.SpiderManager do
     node |> String.to_atom() |> list_spiders()
   end
 
-  defp running_spiders(node) when is_atom(node) do
-    :rpc.call(node, Crawly.Engine, :running_spiders, [])
+  def get_spider_id(node, spider) when is_atom(node) and is_atom(spider) do
+    case :rpc.call(node, Crawly.Engine, :get_crawl_id, [spider]) do
+      {:badrpc, reason} -> {:error, reason}
+      reply -> reply
+    end
   end
 
-  defp stop_spider(node, spider) when is_atom(spider) and is_atom(node) do
+  def stop_spider(node, spider) when is_atom(spider) and is_atom(node) do
     :rpc.call(node, Crawly.Engine, :stop_spider, [spider])
   end
 end
