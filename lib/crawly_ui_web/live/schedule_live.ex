@@ -1,6 +1,8 @@
 defmodule CrawlyUIWeb.ScheduleLive do
   use Phoenix.LiveView
 
+  alias CrawlyUI.SpiderManager
+
   def render(%{template: template} = assigns) do
     CrawlyUIWeb.JobView.render(template, assigns)
   end
@@ -8,8 +10,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
   def mount(%{"node" => node}, _session, socket) do
     if connected?(socket), do: Process.send_after(self(), :pick_spider, 1000)
 
-    node = String.to_atom(node)
-    spiders = :rpc.call(node, Crawly, :list_spiders, [])
+    spiders = SpiderManager.list_spiders(node)
 
     {:ok, assign(socket, template: "pick_spider.html", node: node, spiders: spiders, error: nil)}
   end
@@ -30,7 +31,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
     if connected?(socket), do: Process.send_after(self(), :pick_spider, 1000)
 
     node = socket.assigns.node
-    spiders = :rpc.call(node, Crawly, :list_spiders, [])
+    spiders = SpiderManager.list_spiders(node)
 
     {:noreply, assign(socket, spiders: spiders)}
   end
@@ -43,18 +44,10 @@ defmodule CrawlyUIWeb.ScheduleLive do
   end
 
   def handle_event("schedule_spider", %{"spider" => spider}, socket) do
-    node_atom = socket.assigns.node
-    spider_atom = String.to_atom(spider)
+    node = socket.assigns.node
 
-    node = to_string(node_atom)
-
-    uuid = Ecto.UUID.generate()
-
-    case :rpc.call(node_atom, Crawly.Engine, :start_spider, [spider_atom, uuid]) do
-      :ok ->
-        {:ok, _} =
-          CrawlyUI.Manager.create_job(%{spider: spider, tag: uuid, state: "new", node: node})
-
+    case SpiderManager.start_spider(node, spider) do
+      {:ok, :started} ->
         {:noreply,
          socket
          |> put_flash(

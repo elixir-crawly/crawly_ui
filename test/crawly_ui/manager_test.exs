@@ -423,23 +423,4 @@ defmodule CrawlyUi.ManagerTest do
 
     assert %Ecto.Changeset{} = Manager.change_item(item)
   end
-
-  test "close_spider/1" do
-    with_mock :rpc, [:unstick],
-      call: fn
-        _, Crawly.Engine, :running_spiders, [] ->
-          %{
-            :Crawly_1 => {:some_pid, "test_1"}
-          }
-
-        _, Crawly.Engine, :stop_spider, [:Crawly_1] ->
-          :ok
-      end do
-      job_1 = insert_job(%{spider: "Crawly_1", tag: "test_1"})
-      job_2 = insert_job(%{spider: "Crawly_1", tag: "non_existing_tag"})
-
-      assert Manager.close_spider(job_1) == {:ok, :stopped}
-      assert Manager.close_spider(job_2) == {:ok, :already_stopped}
-    end
-  end
 end

@@ -9,6 +9,8 @@ defmodule CrawlyUI.Manager do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
 
+  alias CrawlyUI.SpiderManager
+
   @job_abandoned_timeout 60 * 30
 
   @doc """
@@ -25,7 +27,7 @@ defmodule CrawlyUI.Manager do
       case is_job_abandoned(job) do
         true ->
           state =
-            case close_spider(job) do
+            case SpiderManager.close_spider(job) do
               {:ok, :stopped} -> "abandoned"
               {:ok, :already_stopped} -> "stopped"
               _ -> "node down"
@@ -383,25 +385,5 @@ defmodule CrawlyUI.Manager do
   """
   def change_item(%Item{} = item) do
     Item.changeset(item, %{})
-  end
-
-  def close_spider(%Job{node: node, spider: spider, tag: tag}) do
-    spider_atom = String.to_existing_atom(spider)
-    node_atom = String.to_atom(node)
-
-    case :rpc.call(node_atom, Crawly.Engine, :running_spiders, []) do
-      {:badrpc, _} ->
-        {:ok, :node_down}
-
-      running_spiders when is_map(running_spiders) ->
-        {_, spider_tag} = Map.get(running_spiders, spider_atom, {nil, nil})
-
-        if spider_tag == tag do
-          :rpc.call(node_atom, Crawly.Engine, :stop_spider, [spider_atom])
-          {:ok, :stopped}
-        else
-          {:ok, :already_stopped}
-        end
-    end
   end
 end
