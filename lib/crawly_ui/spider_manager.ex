@@ -30,7 +30,7 @@ defmodule CrawlyUI.SpiderManager do
 
       {:ok, spider_tag} ->
         if spider_tag == tag do
-          :ok = stop_spider(node, spider)
+          stop_spider(node, spider)
           {:ok, :stopped}
         else
           {:error, :spider_not_running}

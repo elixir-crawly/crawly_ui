@@ -12,12 +12,11 @@ defmodule CrawlyUIWeb.JobLive do
 
   def mount(params, _session, socket) do
     jobs = list_jobs(socket.assigns.live_action)
-
     page = Map.get(params, "page", "1") |> String.to_integer()
-
     rows = paginate(jobs, page)
 
     live_update(socket, :update_job, 100)
+
     {:ok, assign(socket, jobs: jobs, page: page, rows: rows)}
   end
 
@@ -27,17 +26,15 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_job_status()
     Manager.update_running_jobs()
 
-    jobs = list_jobs(socket.assigns.live_action)
-    page = socket.assigns.page
-    rows = paginate(jobs, page)
+    socket = update_socket(socket)
 
-    if Enum.any?(rows, &(&1.state == "running")) do
+    if Enum.any?(socket.assigns.rows, &(&1.state == "running")) do
       live_update(socket, :update_job, 100)
     else
       live_update(socket, :update_job, 1000)
     end
 
-    {:noreply, assign(socket, jobs: jobs, rows: rows)}
+    {:noreply, socket}
   end
 
   def handle_event("schedule", _, socket) do
