@@ -32,6 +32,22 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert html =~ "Jobs"
   end
 
+  test "mount job view for showing all jobs of a spider", %{conn: conn} do
+    job_1 = insert_job(%{spider: "TestSpider"})
+    job_2 = insert_job(%{spider: "TestSpider"})
+    insert_job(%{spider: "OtherSpider"})
+
+    {:ok, _view, html} = live(conn, "/spider?spider=TestSpider")
+
+    assert html =~ "Spider"
+    assert html =~ "TestSpider"
+
+    assert html =~ "#{job_1.inserted_at}"
+    assert html =~ "#{job_2.inserted_at}"
+
+    refute html =~ "OtherSpider"
+  end
+
   test "redirect when click schedule", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
     render_click(view, :schedule)
@@ -48,6 +64,12 @@ defmodule CrawlyUIWeb.JobLiveTest do
     {:ok, view, _html} = live(conn, "/")
     render_click(view, :list_all_jobs)
     assert_redirect(view, "/all")
+  end
+
+  test "redirect to a spider's jobs", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+    render_click(view, :show_spider, %{"spider" => "TestSpider"})
+    assert_redirect(view, "/spider?spider=TestSpider")
   end
 
   test "update index view after 100ms when jobs is updated to running", %{conn: conn} do

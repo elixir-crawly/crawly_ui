@@ -3,74 +3,55 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
 
   alias CrawlyUIWeb.PaginationHelpers
 
-  describe "render_pages/2" do
-    test "styled html for the view's page number" do
-      assert PaginationHelpers.render_pages(1, 1) ==
-               "<li class=\"active\"><a href=\"#\"> 1 </a></li>"
-    end
-
-    test "link to other pages" do
-      assert PaginationHelpers.render_pages(1, 2) ==
-               "<li><a href=\"#\" phx-click=\"goto_page\" phx-value-page=2> 2 </a></li>"
-    end
-
-    test "for .. string" do
-      assert PaginationHelpers.render_pages(1, "..") == "<li>..</li>"
-    end
+  test "render pagination links when there is 1 page" do
+    assert PaginationHelpers.pagination_links(1, 0) =~
+             "<nav>\n<ul class=\"pagination\">\n\n\n\n</ul>\n</nav>\n"
   end
 
-  describe "render_goto_next/2" do
-    test "link to next page" do
-      assert PaginationHelpers.render_goto_next(2, 3) ==
-               "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=3> >> </a>"
-    end
+  test "render pagination links when there are less than 11 pages" do
+    pagination = PaginationHelpers.pagination_links(5, 10)
 
-    test "do nothing for last page" do
-      assert PaginationHelpers.render_goto_next(3, 3) == nil
-    end
+    assert pagination =~
+             "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=4> << </a>"
 
-    test "when there is less or equal to 1 page" do
-      assert PaginationHelpers.render_goto_next(1, 1) == nil
-    end
+    assert pagination =~
+             "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=6> >> </a>"
+
+    Enum.each(1..10, fn page -> match_page(pagination, page) end)
   end
 
-  describe "render_goto_prev/1" do
-    test "link to previous page" do
-      assert PaginationHelpers.render_goto_prev(2, 3) ==
-               "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=1> << </a>"
-    end
+  test "render when current page is less than 6" do
+    pagination = PaginationHelpers.pagination_links(1, 11)
 
-    test "do nothing for last page" do
-      assert PaginationHelpers.render_goto_prev(1, 3) == nil
-    end
+    refute pagination =~ "<<"
 
-    test "when there is less or equal to 1 page" do
-      assert PaginationHelpers.render_goto_prev(1, 1) == nil
-    end
+    Enum.each([1, 2, 3, 4, 5, 6, 11], fn page -> match_page(pagination, page) end)
+
+    refute String.contains?(pagination, ">7<")
   end
 
-  describe "list_pages/2" do
-    test "when there is no data" do
-      assert PaginationHelpers.list_pages(1, 0) == []
-    end
+  test "render when current page is less than the total number of pages - 5" do
+    pagination = PaginationHelpers.pagination_links(11, 11)
 
-    test "when number for pages is below 11" do
-      list = Enum.to_list(1..10)
+    refute pagination =~ ">>"
 
-      assert PaginationHelpers.list_pages(1, 10) == list
-    end
+    Enum.each([1, 6, 7, 8, 9, 10, 11], fn page -> match_page(pagination, page) end)
 
-    test "when current page is less than 6" do
-      assert PaginationHelpers.list_pages(3, 11) == [1, 2, 3, 4, 5, 6, "..", 11]
-    end
+    refute String.contains?(pagination, ">2<")
+  end
 
-    test "when current page is less than the total number of pages - 5" do
-      assert PaginationHelpers.list_pages(17, 20) == [1, "..", 15, 16, 17, 18, 19, 20]
-    end
+  test "render when current page is not close to first or last page" do
+    pagination = PaginationHelpers.pagination_links(15, 30)
 
-    test "current page is not close to first or last page" do
-      assert PaginationHelpers.list_pages(15, 30) ==
-               [1, "..", 11, 12, 13, 14, 15, 16, 17, 18, 19, "..", 30]
-    end
+    Enum.each([1, 11, 12, 13, 14, 15, 16, 17, 18, 19, 30], fn page ->
+      match_page(pagination, page)
+    end)
+
+    refute String.contains?(pagination, ">2<")
+    refute String.contains?(pagination, ">29<")
+  end
+
+  defp match_page(pagination, page) do
+    assert String.contains?(pagination, Integer.to_string(page))
   end
 end

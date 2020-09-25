@@ -11,6 +11,7 @@ defmodule CrawlyUIWeb.JobViewTest do
              total_pages: 1,
              live_action: :index,
              page: 1,
+             spider: nil,
              rows: [job]
            ) =~ "-"
   end
@@ -22,6 +23,7 @@ defmodule CrawlyUIWeb.JobViewTest do
              total_pages: 1,
              live_action: :index,
              page: 1,
+             spider: nil,
              rows: [job]
            ) =~
              "10 min"
@@ -34,6 +36,7 @@ defmodule CrawlyUIWeb.JobViewTest do
              total_pages: 1,
              live_action: :index,
              page: 1,
+             spider: nil,
              rows: [job]
            ) =~
              "1.5 hours"

@@ -8,11 +8,7 @@
     </a>
 </div>
 <% else %>
-  <%= if @live_action == :index do %>
-  <h1> Running Jobs</h1>
-  <% else %>
-   <h1>Jobs</h1>
-  <% end %>
+ <%= raw title(@live_action, @spider) %>
 <table>
   <thead>
     <tr>
@@ -31,7 +27,12 @@
   <tbody>
     <%= for live_job <- @rows do %>
         <tr>
-          <td><%= live_job.spider %></td>
+          <td>
+           <%= if @live_action == :spider do %>
+           <%= live_job.spider %>
+           <% else %>
+          <a href="#" phx-click="show_spider" phx-value-spider=<%= live_job.spider %>><%= live_job.spider %></a></td>
+           <% end %>
           <td><%= live_job.node %></td>
           <td>
             <a href="#" phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
@@ -46,15 +47,7 @@
     <% end %>
   </tbody>
 </table>
-<nav>
-  <ul class="pagination">
-    <%= raw render_goto_prev(@page, @total_pages) %>
-    <%= for page <- list_pages(@page, @total_pages) do %>
-      <%= raw render_pages(@page, page) %>
-    <% end %>
-    <%= raw render_goto_next(@page, @total_pages) %>
-  </ul>
-</nav>
+  <%= raw pagination_links(@page, @total_pages) %>
   <%= if @live_action == :index do %>
   <br>
   <button phx-click=list_all_jobs>All Jobs</button>

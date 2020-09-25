@@ -1,6 +1,16 @@
 defmodule CrawlyUIWeb.JobView do
   use CrawlyUIWeb, :view
 
+  def title(:index, _), do: "<h1>Running Jobs</h1>"
+  def title(:show, _), do: "<h1>Jobs</h1>"
+
+  def title(:spider, spider) do
+    """
+    <h1>Spider</h1>
+    <h2>#{spider}</h2>
+    """
+  end
+
   def render_run_time(run_time) do
     case run_time do
       nil ->
