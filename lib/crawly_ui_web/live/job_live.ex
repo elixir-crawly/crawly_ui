@@ -4,20 +4,24 @@ defmodule CrawlyUIWeb.JobLive do
   alias CrawlyUI.Manager
   alias CrawlyUI.SpiderManager
 
-  import CrawlyUIWeb.PaginationHelpers
-
   def render(assigns) do
     CrawlyUIWeb.JobView.render("index.html", assigns)
   end
 
   def mount(params, _session, socket) do
-    jobs = list_jobs(socket.assigns.live_action)
-    page = Map.get(params, "page", "1") |> String.to_integer()
-    rows = paginate(jobs, page)
+    page = Map.get(params, "page", 1)
+
+    %{
+      entries: rows,
+      page_number: page_number,
+      total_pages: total_pages
+    } = list_jobs(socket.assigns.live_action, page: page)
+
+    socket = assign(socket, rows: rows, page: page_number || 1, total_pages: total_pages)
 
     live_update(socket, :update_job, 100)
 
-    {:ok, assign(socket, jobs: jobs, page: page, rows: rows)}
+    {:ok, socket}
   end
 
   def handle_info(:update_job, socket) do
@@ -93,17 +97,20 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   defp update_socket(socket) do
-    jobs = socket.assigns.live_action |> list_jobs()
     page = socket.assigns.page
-    rows = paginate(jobs, page)
 
-    assign(socket, jobs: jobs, rows: rows)
+    %{
+      entries: rows,
+      total_pages: total_pages
+    } = list_jobs(socket.assigns.live_action, page: page)
+
+    assign(socket, rows: rows, total_pages: total_pages)
   end
 
   defp live_update(socket, state, time) do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
 
-  defp list_jobs(:index), do: Manager.list_running_jobs()
-  defp list_jobs(_), do: Manager.list_jobs()
+  defp list_jobs(:index, params), do: Manager.list_running_jobs(params)
+  defp list_jobs(_, params), do: Manager.list_jobs(params)
 end

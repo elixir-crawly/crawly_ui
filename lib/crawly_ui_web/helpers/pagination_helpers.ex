@@ -1,6 +1,4 @@
 defmodule CrawlyUIWeb.PaginationHelpers do
-  @page_size 10
-
   @doc """
   Render html for pagination, list all available pages and link to the pages
   """
@@ -13,38 +11,32 @@ defmodule CrawlyUIWeb.PaginationHelpers do
         ".."
 
       _ ->
-        "<a phx-click=\"goto_page\" phx-value-page=#{page_number}> #{page_number} </a>"
+        "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page_number}> #{page_number} </a>"
     end
   end
 
   @doc """
   Render html for go to next page when there are more than 1 page
   """
-  def render_goto_next(page, data) do
-    number_of_pages = number_of_pages(data)
-
+  def render_goto_next(page, number_of_pages) do
     if page != number_of_pages and number_of_pages > 1 do
-      "<a phx-click=\"goto_page\" phx-value-page=#{page + 1}> >> </a>"
+      "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page + 1}> >> </a>"
     end
   end
 
   @doc """
   Render html for go to previous page when there are more than 1 page
   """
-  def render_goto_prev(page, data) do
-    number_of_pages = number_of_pages(data)
-
+  def render_goto_prev(page, number_of_pages) do
     if page > 1 and number_of_pages > 1 do
-      "<a phx-click=\"goto_page\" phx-value-page=#{page - 1}> << </a>"
+      "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page - 1}> << </a>"
     end
   end
 
   @doc """
   List the number amount of pages for given data, truncate when the list is too long
   """
-  def list_pages(page, data) do
-    number_of_pages = number_of_pages(data)
-
+  def list_pages(page, number_of_pages) do
     cond do
       # No pagination if there is 1 or less page
       number_of_pages <= 1 ->
@@ -71,22 +63,6 @@ defmodule CrawlyUIWeb.PaginationHelpers do
         |> Enum.sort()
     end
     |> may_put_separator()
-  end
-
-  @doc """
-  Returns data to display in a given page number
-  """
-  def paginate(data, page_number) do
-    page_size = page_size()
-    Enum.slice(data, (page_number - 1) * page_size, page_size)
-  end
-
-  defp number_of_pages(data) do
-    (length(data) / page_size()) |> ceil()
-  end
-
-  defp page_size do
-    Application.get_env(:crawly_ui, :page_size, @page_size)
   end
 
   defp may_put_separator(page_list) do

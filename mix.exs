@@ -53,6 +53,7 @@ defmodule CrawlyUI.MixProject do
       {:quantum, "~> 3.0-rc"},
       {:timex, "~> 3.5"},
       {:phoenix_live_view, "~> 0.14.4"},
+      {:scrivener_ecto, "~> 2.5.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:excoveralls, "~> 0.10", only: :test},
       {:mock, "~> 0.3.0", only: :test}

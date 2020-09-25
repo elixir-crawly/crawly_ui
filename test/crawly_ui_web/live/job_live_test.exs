@@ -129,10 +129,12 @@ defmodule CrawlyUIWeb.JobLiveTest do
   end
 
   test "go to page", %{conn: conn} do
+    # page 1
     job_1 = insert_job(%{inserted_at: inserted_at(6 * 60)})
-    job_2 = insert_job()
+    Enum.each(1..9, &insert_job(%{inserted_at: inserted_at(&1)}))
 
-    Application.put_env(:crawly_ui, :page_size, 1)
+    # page 2
+    job_2 = insert_job()
 
     {:ok, view, _html} = live(conn, "/")
 
@@ -146,8 +148,6 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     assert render(new_view) =~ "<td>#{job_1.inserted_at}</td>"
     refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
-
-    Application.put_env(:crawly_ui, :page_size, 10)
   end
 
   test "cancel running job", %{conn: conn} do

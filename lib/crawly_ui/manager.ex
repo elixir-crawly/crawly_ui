@@ -74,16 +74,16 @@ defmodule CrawlyUI.Manager do
       [%Job{}, ...]}
 
   """
-  def list_jobs(query \\ Job) do
+  def list_jobs(query \\ Job, params) do
     query
     |> order_by(desc: :state, desc: :inserted_at)
-    |> Repo.all()
+    |> Repo.paginate(params)
   end
 
-  def list_running_jobs() do
+  def list_running_jobs(params \\ []) do
     Job
     |> where([j], j.state == "running")
-    |> list_jobs()
+    |> list_jobs(params)
   end
 
   @doc """
@@ -303,11 +303,11 @@ defmodule CrawlyUI.Manager do
       [%Item{}, ...]
 
   """
-  def list_items(job_id), do: list_items(job_id, %{})
+  def list_items(job_id), do: list_items(job_id, [])
 
   def list_items(job_id, params) do
     query =
-      case Map.get(params, "search") do
+      case Keyword.get(params, :search) do
         nil ->
           Item
           |> where([i], i.job_id == ^job_id)
@@ -328,7 +328,7 @@ defmodule CrawlyUI.Manager do
           end
       end
 
-    query |> order_by(desc: :inserted_at) |> Repo.all()
+    query |> order_by(desc: :inserted_at) |> Repo.paginate(params)
   end
 
   @doc """

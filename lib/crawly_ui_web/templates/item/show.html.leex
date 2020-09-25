@@ -3,7 +3,7 @@
     <div class="row">
 
         <div class="column column-25" style="overflow: scroll; background-color: #ccc;">
-            <div><span><<a phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= @next_item.id %>> Next Item </a></span> | <span> <a phx-click="job_items" phx-value-job=<%= @job_id %>> Go to items </a></span></div>
+            <div><span><<a href="#" phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= @next_item.id %>> Next Item </a></span> | <span> <a href="#" phx-click="job_items" phx-value-job=<%= @job_id %>> Go to items </a></span></div>
             <%= for {field_name, field_value} <- @item.data do %>
             <b><%= field_name %></b>:
             <br />

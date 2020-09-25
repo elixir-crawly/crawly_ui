@@ -16,7 +16,7 @@
     <th>Discovery time: <%= item.inserted_at %>
       <%= case Map.get(item.data, "url") do  %>
         <% nil -> %> <%= "" %>
-        <%_url -> %>  <a phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= item.id %>> Preview </a>
+        <%_url -> %>  <a href="#" phx-click="show_item" phx-value-job=<%= @job_id %> phx-value-item=<%= item.id %>> Preview </a>
       <% end %>
     </th>
   </tr>
@@ -32,10 +32,10 @@
 <% end %>
 <nav>
  <nav>
-  <%= raw render_goto_prev(@page, @items) %>
-  <%= for page <- list_pages(@page, @items) do %>
+  <%= raw render_goto_prev(@page, @total_pages) %>
+  <%= for page <- list_pages(@page,  @total_pages) do %>
     <%= raw render_pages(@page, page) %>
   <% end %>
-   <%= raw render_goto_next(@page, @items) %>
+   <%= raw render_goto_next(@page, @total_pages) %>
 </nav>
 </nav>

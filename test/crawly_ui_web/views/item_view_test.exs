@@ -22,9 +22,9 @@ defmodule CrawlyUIWeb.ItemViewTest do
           "list" => ["data_1", "data_2"]
         })
 
-      items = CrawlyUI.Manager.list_items(job_id, %{})
+      %{total_pages: total_page, entries: rows} = CrawlyUI.Manager.list_items(job_id)
 
-      params = [job_id: job_id, items: items, search: nil, rows: items, page: 1]
+      params = [job_id: job_id, total_pages: total_page, search: nil, rows: rows, page: 1]
 
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "index.html", params)
 
@@ -117,7 +117,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
     %{id: job_id} = insert_job()
     insert_item(job_id, nil, data)
 
-    items = CrawlyUI.Manager.list_items(job_id, %{})
-    [job_id: job_id, items: items, search: search, rows: items, page: 1]
+    %{total_pages: total_pages, entries: rows} = CrawlyUI.Manager.list_items(job_id)
+    [job_id: job_id, total_pages: total_pages, search: search, rows: rows, page: 1]
   end
 end
