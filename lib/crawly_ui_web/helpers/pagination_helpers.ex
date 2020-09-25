@@ -5,13 +5,13 @@ defmodule CrawlyUIWeb.PaginationHelpers do
   def render_pages(page, page_number) do
     case page_number do
       page_number when page_number == page ->
-        "<strong> #{page_number} </strong>"
+        "<li class=\"active\"><a href=\"#\"> #{page} </a></li>"
 
       ".." ->
-        ".."
+        "<li>..</li>"
 
       _ ->
-        "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page_number}> #{page_number} </a>"
+        "<li><a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page_number}> #{page_number} </a></li>"
     end
   end
 

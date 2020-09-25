@@ -39,7 +39,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
                "<td class=\"c\"><a target='blank' href='http://example_1.com'>http://example_1.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_1.inserted_at}\n  <a phx-click=\"show_item\" phx-value-job=#{
+               "<th>Discovery time: #{item_1.inserted_at}\n  <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
                  job_id
                } phx-value-item=#{item_1.id}> Preview </a>"
 
@@ -50,7 +50,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
                "<td class=\"c\"><a target='blank' href='https://example_2.com'>https://example_2.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_2.inserted_at}\n  <a phx-click=\"show_item\" phx-value-job=#{
+               "<th>Discovery time: #{item_2.inserted_at}\n  <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
                  job_id
                } phx-value-item=#{item_2.id}> Preview </a>"
 
@@ -96,10 +96,10 @@ defmodule CrawlyUIWeb.ItemViewTest do
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "show.html", params)
 
       assert rendered_string =~
-               "<a phx-click=\"show_item\" phx-value-job=#{job_id} phx-value-item=#{next_item.id}> Next Item </a>"
+               "<a href=\"#\" phx-click=\"show_item\" phx-value-job=#{job_id} phx-value-item=#{next_item.id}> Next Item </a>"
 
       assert rendered_string =~
-               "<a phx-click=\"job_items\" phx-value-job=#{job_id}> Go to items </a>"
+               "<a href=\"#\" phx-click=\"job_items\" phx-value-job=#{job_id}> Go to items </a>"
 
       assert rendered_string =~
                "<b>field_1</b>:\n            <br />\ndata_1"

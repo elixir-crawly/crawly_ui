@@ -31,11 +31,11 @@
   </table>
 <% end %>
 <nav>
- <nav>
+ <ul class="pagination">
   <%= raw render_goto_prev(@page, @total_pages) %>
-  <%= for page <- list_pages(@page,  @total_pages) do %>
+  <%= for page <- list_pages(@page, @total_pages) do %>
     <%= raw render_pages(@page, page) %>
   <% end %>
    <%= raw render_goto_next(@page, @total_pages) %>
-</nav>
+  </ul>
 </nav>

@@ -5,23 +5,24 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
 
   describe "render_pages/2" do
     test "styled html for the view's page number" do
-      assert PaginationHelpers.render_pages(1, 1) == "<strong> 1 </strong>"
+      assert PaginationHelpers.render_pages(1, 1) ==
+               "<li class=\"active\"><a href=\"#\"> 1 </a></li>"
     end
 
     test "link to other pages" do
       assert PaginationHelpers.render_pages(1, 2) ==
-               "<a phx-click=\"goto_page\" phx-value-page=2> 2 </a>"
+               "<li><a href=\"#\" phx-click=\"goto_page\" phx-value-page=2> 2 </a></li>"
     end
 
     test "for .. string" do
-      assert PaginationHelpers.render_pages(1, "..") == ".."
+      assert PaginationHelpers.render_pages(1, "..") == "<li>..</li>"
     end
   end
 
   describe "render_goto_next/2" do
     test "link to next page" do
       assert PaginationHelpers.render_goto_next(2, 3) ==
-               "<a phx-click=\"goto_page\" phx-value-page=3> >> </a>"
+               "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=3> >> </a>"
     end
 
     test "do nothing for last page" do
@@ -36,7 +37,7 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
   describe "render_goto_prev/1" do
     test "link to previous page" do
       assert PaginationHelpers.render_goto_prev(2, 3) ==
-               "<a phx-click=\"goto_page\" phx-value-page=1> << </a>"
+               "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=1> << </a>"
     end
 
     test "do nothing for last page" do
