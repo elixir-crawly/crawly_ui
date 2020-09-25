@@ -164,13 +164,13 @@ defmodule CrawlyUIWeb.JobLiveTest do
       {:ok, view, _html} = live(conn, "/")
 
       assert render(view) =~
-               "<button phx-click=\"cancel\" phx-value-job=\"#{job_1.id}\">Cancel</button></td>"
+               "phx-click=\"cancel\" phx-value-job=\"#{job_1.id}\">Cancel"
 
       assert render(view) =~
-               "<button phx-click=\"cancel\" phx-value-job=\"#{job_2.id}\">Cancel</button></td>"
+               "phx-click=\"cancel\" phx-value-job=\"#{job_2.id}\">Cancel"
 
       assert render(view) =~
-               "<button phx-click=\"cancel\" phx-value-job=\"#{job_3.id}\">Cancel</button></td>"
+               "phx-click=\"cancel\" phx-value-job=\"#{job_3.id}\">Cancel"
 
       render_click(view, :cancel, %{"job" => Integer.to_string(job_1.id)})
       render_click(view, :cancel, %{"job" => Integer.to_string(job_2.id)})
@@ -201,10 +201,10 @@ defmodule CrawlyUIWeb.JobLiveTest do
     {:ok, view, _html} = live(conn, "/all")
 
     assert render(view) =~
-             "<button phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete</button></td>"
+             "phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete"
 
     assert render(view) =~
-             "<button phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete</button></td>"
+             "phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete"
 
     render_click(view, :delete, %{"job" => Integer.to_string(job_1.id)})
     render_click(view, :delete, %{"job" => Integer.to_string(job_2.id)})
@@ -213,9 +213,9 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert [] == CrawlyUI.Repo.all(CrawlyUI.Manager.Item, job_id: job_2.id)
 
     refute render(view) =~
-             "<button phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete</button></td>"
+             "phx-click=\"delete\" phx-value-job=\"#{job_1.id}\">Delete"
 
     refute render(view) =~
-             "<button phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete</button></td>"
+             "phx-click=\"delete\" phx-value-job=\"#{job_2.id}\">Delete"
   end
 end
