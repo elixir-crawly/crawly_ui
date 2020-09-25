@@ -1,42 +1,50 @@
 defmodule CrawlyUIWeb.PaginationHelpers do
-  @doc """
-  Render html for pagination, list all available pages and link to the pages
-  """
-  def render_pages(page, page_number) do
+  def pagination_links(page, total_pages) do
+    goto_next = render_goto_next(page, total_pages)
+    goto_prev = render_goto_prev(page, total_pages)
+
+    pages =
+      for page_number <- list_pages(page, total_pages) do
+        render_pages(page, page_number)
+      end
+
+    """
+    <nav>
+    <ul class="pagination">
+    #{goto_prev}
+    #{pages}
+    #{goto_next}
+    </ul>
+    </nav>
+    """
+  end
+
+  defp render_pages(page, page_number) do
     case page_number do
       page_number when page_number == page ->
-        "<li class=\"active\"><a href=\"#\"> #{page} </a></li>"
+        "<li class=\"active\"><a href=\"#\">#{page}</a></li>"
 
       ".." ->
         "<li>..</li>"
 
       _ ->
-        "<li><a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page_number}> #{page_number} </a></li>"
+        "<li><a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page_number}>#{page_number}</a></li>"
     end
   end
 
-  @doc """
-  Render html for go to next page when there are more than 1 page
-  """
-  def render_goto_next(page, number_of_pages) do
+  defp render_goto_next(page, number_of_pages) do
     if page != number_of_pages and number_of_pages > 1 do
       "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page + 1}> >> </a>"
     end
   end
 
-  @doc """
-  Render html for go to previous page when there are more than 1 page
-  """
-  def render_goto_prev(page, number_of_pages) do
+  defp render_goto_prev(page, number_of_pages) do
     if page > 1 and number_of_pages > 1 do
       "<a href=\"#\" phx-click=\"goto_page\" phx-value-page=#{page - 1}> << </a>"
     end
   end
 
-  @doc """
-  List the number amount of pages for given data, truncate when the list is too long
-  """
-  def list_pages(page, number_of_pages) do
+  defp list_pages(page, number_of_pages) do
     cond do
       # No pagination if there is 1 or less page
       number_of_pages <= 1 ->

@@ -4,20 +4,24 @@ defmodule CrawlyUIWeb.JobLive do
   alias CrawlyUI.Manager
   alias CrawlyUI.SpiderManager
 
+  import Ecto.Query
+
   def render(assigns) do
     CrawlyUIWeb.JobView.render("index.html", assigns)
   end
 
   def mount(params, _session, socket) do
     page = Map.get(params, "page", 1)
+    spider = Map.get(params, "spider", nil)
 
     %{
       entries: rows,
       page_number: page_number,
       total_pages: total_pages
-    } = list_jobs(socket.assigns.live_action, page: page)
+    } = list_jobs(socket.assigns.live_action, spider, page: page)
 
-    socket = assign(socket, rows: rows, page: page_number || 1, total_pages: total_pages)
+    socket =
+      assign(socket, rows: rows, spider: spider, page: page_number, total_pages: total_pages)
 
     live_update(socket, :update_job, 100)
 
@@ -63,6 +67,13 @@ defmodule CrawlyUIWeb.JobLive do
      )}
   end
 
+  def handle_event("show_spider", %{"spider" => spider}, socket) do
+    {:noreply,
+     push_redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.job_path(socket, :spider, spider: spider)
+     )}
+  end
+
   def handle_event("cancel", %{"job" => job_id}, socket) do
     job = job_id |> String.to_integer() |> Manager.get_job!()
 
@@ -98,11 +109,12 @@ defmodule CrawlyUIWeb.JobLive do
 
   defp update_socket(socket) do
     page = socket.assigns.page
+    spider = socket.assigns.spider
 
     %{
       entries: rows,
       total_pages: total_pages
-    } = list_jobs(socket.assigns.live_action, page: page)
+    } = list_jobs(socket.assigns.live_action, spider, page: page)
 
     assign(socket, rows: rows, total_pages: total_pages)
   end
@@ -111,6 +123,12 @@ defmodule CrawlyUIWeb.JobLive do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
 
-  defp list_jobs(:index, params), do: Manager.list_running_jobs(params)
-  defp list_jobs(_, params), do: Manager.list_jobs(params)
+  defp list_jobs(:index, _, params), do: Manager.list_running_jobs(params)
+  defp list_jobs(:show, _, params), do: Manager.list_jobs(params)
+
+  defp list_jobs(:spider, spider, params) do
+    Manager.Job
+    |> where([j], j.spider == ^spider)
+    |> Manager.list_jobs(params)
+  end
 end
