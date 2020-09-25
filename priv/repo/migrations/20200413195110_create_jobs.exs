@@ -10,6 +10,5 @@ defmodule CrawlyUI.Repo.Migrations.CreateJobs do
 
       timestamps()
     end
-
   end
 end

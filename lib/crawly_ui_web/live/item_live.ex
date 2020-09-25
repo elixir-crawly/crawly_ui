@@ -3,8 +3,6 @@ defmodule CrawlyUIWeb.ItemLive do
 
   alias CrawlyUI.Manager
 
-  import CrawlyUIWeb.PaginationHelpers
-
   def render(%{template: template} = assigns) do
     CrawlyUIWeb.ItemView.render(template, assigns)
   end
@@ -19,16 +17,25 @@ defmodule CrawlyUIWeb.ItemLive do
 
   # index view
   def mount(%{"job_id" => job_id} = params, _session, socket) do
-    items = Manager.list_items(job_id, params)
+    page = Map.get(params, "page", "1") |> String.to_integer()
+    search = Map.get(params, "search", nil)
+
+    %{
+      entries: rows,
+      page_number: page_number,
+      total_pages: total_pages
+    } = Manager.list_items(job_id, page: page, search: search)
 
     live_update(socket, :update_items, 100)
 
-    page = Map.get(params, "page", "1") |> String.to_integer()
-
-    rows = paginate(items, page)
-
     {:ok,
-     assign(socket, template: "index.html", page: page, items: items, job_id: job_id, rows: rows)}
+     assign(socket,
+       template: "index.html",
+       page: page_number,
+       total_pages: total_pages,
+       job_id: job_id,
+       rows: rows
+     )}
   end
 
   def handle_info(:update_items, socket) do
@@ -36,8 +43,10 @@ defmodule CrawlyUIWeb.ItemLive do
     search = socket.assigns.search
     page = socket.assigns.page
 
-    items = Manager.list_items(job_id, %{"search" => search})
-    rows = paginate(items, page)
+    %{
+      entries: rows,
+      total_pages: total_pages
+    } = Manager.list_items(job_id, page: page, search: search)
 
     # If job is still running, we will update the item view
     %{state: state} = Manager.get_job!(job_id)
@@ -46,7 +55,7 @@ defmodule CrawlyUIWeb.ItemLive do
       live_update(socket, :update_items, 1000)
     end
 
-    {:noreply, assign(socket, items: items, rows: rows)}
+    {:noreply, assign(socket, total_pages: total_pages, rows: rows)}
   end
 
   def handle_params(params, _url, socket) do
@@ -64,17 +73,14 @@ defmodule CrawlyUIWeb.ItemLive do
 
   def handle_event("search", %{"search" => search}, socket) do
     job_id = socket.assigns.job_id
-
     page = socket.assigns.page
 
-    items = Manager.list_items(job_id, %{"search" => search})
-    rows = paginate(items, page)
+    %{
+      entries: rows,
+      total_pages: total_pages
+    } = Manager.list_items(job_id, page: page, search: search)
 
-    {:noreply,
-     assign(socket, items: items, rows: rows)
-     |> push_patch(
-       to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id, search: search)
-     )}
+    {:noreply, assign(socket, total_pages: total_pages, rows: rows, search: search)}
   end
 
   def handle_event("show_item", %{"job" => job_id, "item" => item_id}, socket) do

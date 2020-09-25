@@ -104,7 +104,7 @@ defmodule CrawlyUi.ManagerTest do
     [job_1, job_2, job_3] =
       Enum.map([1, 2, 3], fn x -> insert_job(%{inserted_at: inserted_at(x)}) end)
 
-    assert [^job_1, ^job_2, ^job_3] = Manager.list_jobs()
+    assert %{entries: [^job_1, ^job_2, ^job_3]} = Manager.list_jobs([])
   end
 
   test "get_job/1 returns a job" do
@@ -332,26 +332,26 @@ defmodule CrawlyUi.ManagerTest do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       items = Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x)) end)
 
-      assert items == Manager.list_items(job.id, %{})
+      assert %{entries: ^items} = Manager.list_items(job.id, [])
     end
 
     test "lists all items of a job when search string doesn't contain :" do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       items = Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x), %{"id" => x}) end)
 
-      assert items == Manager.list_items(job.id, %{"search" => "id"})
+      assert %{entries: ^items} = Manager.list_items(job.id, search: "id")
     end
 
     test "list items matches the valid search string" do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
       Enum.map(0..5, fn x -> insert_item(job.id, inserted_at(60 * x), %{"id" => x}) end)
 
-      assert [%Item{data: %{"id" => 1}}] = Manager.list_items(job.id, %{"search" => "id:1"})
+      assert %{entries: [%Item{data: %{"id" => 1}}]} = Manager.list_items(job.id, search: "id:1")
     end
 
     test "list items when there job has no item" do
       job = insert_job()
-      assert [] == Manager.list_items(job.id, %{"search" => "id:1"})
+      assert %{entries: []} = Manager.list_items(job.id, search: "id:1")
     end
   end
 

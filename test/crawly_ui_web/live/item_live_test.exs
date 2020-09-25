@@ -129,8 +129,12 @@ defmodule CrawlyUIWeb.ItemLiveTest do
     job_id: job_id,
     item_id: item_id
   } do
-    item_2 = insert_item(job_id)
+    # page 1
     item_1 = CrawlyUI.Manager.get_item!(item_id)
+    Enum.each(1..9, &insert_item(job_id, inserted_at(&1)))
+
+    # page 2
+    item_2 = insert_item(job_id)
 
     Application.put_env(:crawly_ui, :page_size, 1)
 

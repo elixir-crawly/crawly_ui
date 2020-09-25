@@ -8,7 +8,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     job = insert_job(%{run_time: nil})
 
     assert render_to_string(CrawlyUIWeb.JobView, "index.html",
-             jobs: [job],
+             total_pages: 1,
              live_action: :index,
              page: 1,
              rows: [job]
@@ -19,7 +19,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     job = insert_job(%{run_time: 10})
 
     assert render_to_string(CrawlyUIWeb.JobView, "index.html",
-             jobs: [job],
+             total_pages: 1,
              live_action: :index,
              page: 1,
              rows: [job]
@@ -31,7 +31,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     job = insert_job(%{run_time: 90})
 
     assert render_to_string(CrawlyUIWeb.JobView, "index.html",
-             jobs: [job],
+             total_pages: 1,
              live_action: :index,
              page: 1,
              rows: [job]

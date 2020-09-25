@@ -1,4 +1,4 @@
-<%= if Enum.empty?(@jobs) and  @live_action == :index do %>
+<%= if Enum.empty?(@rows) and  @live_action == :index do %>
 <div class="Hero">
     <h1 class="Hero__title">Welcome to Crawly UI</h1>
     <p class="Hero__description">A centralized panel which allows you to start/stop and debug your spiders.</p>
@@ -34,7 +34,7 @@
           <td><%= live_job.spider %></td>
           <td><%= live_job.node %></td>
           <td>
-            <a phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
+            <a href="#" phx-click="job_items" phx-value-id=<%= live_job.id %>><%= live_job.items_count %></a>
           </td>
 
           <td><%= live_job.state %></td>
@@ -47,11 +47,13 @@
   </tbody>
 </table>
 <nav>
-  <%= raw render_goto_prev(@page, @jobs) %>
-  <%= for page <- list_pages(@page, @jobs) do %>
-    <%= raw render_pages(@page, page) %>
-  <% end %>
-   <%= raw render_goto_next(@page, @jobs) %>
+  <ul class="pagination">
+    <%= raw render_goto_prev(@page, @total_pages) %>
+    <%= for page <- list_pages(@page, @total_pages) do %>
+      <%= raw render_pages(@page, page) %>
+    <% end %>
+    <%= raw render_goto_next(@page, @total_pages) %>
+  </ul>
 </nav>
   <%= if @live_action == :index do %>
   <br>
