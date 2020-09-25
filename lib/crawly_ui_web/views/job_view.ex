@@ -16,11 +16,15 @@ defmodule CrawlyUIWeb.JobView do
     end
   end
 
-  def render_button(%{state: "running"} = job) do
-    "<button phx-click=cancel phx-value-job=#{job.id}>Cancel</button>"
+  def render_button(%{state: "running", spider: spider} = job) do
+    "<button data-confirm=\"Do you really want to cancel running spider #{spider}?\" phx-click=cancel phx-value-job=#{
+      job.id
+    }>Cancel</button>"
   end
 
-  def render_button(job) do
-    "<button phx-click=delete phx-value-job=#{job.id}>Delete</button>"
+  def render_button(%{spider: spider, items_count: items_count} = job) do
+    "<button data-confirm=\"This will delete this job of spider #{spider} and all #{items_count} item(s). Are you sure?\" phx-click=delete phx-value-job=#{
+      job.id
+    }>Delete</button>"
   end
 end
