@@ -96,7 +96,9 @@ defmodule CrawlyUIWeb.ItemViewTest do
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "show.html", params)
 
       assert rendered_string =~
-               "<a href=\"#\" phx-click=\"show_item\" phx-value-job=#{job_id} phx-value-item=#{next_item.id}> Next Item </a>"
+               "<a href=\"#\" phx-click=\"show_item\" phx-value-job=#{job_id} phx-value-item=#{
+                 next_item.id
+               }> Next Item </a>"
 
       assert rendered_string =~
                "<a href=\"#\" phx-click=\"job_items\" phx-value-job=#{job_id}> Go to items </a>"
