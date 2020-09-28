@@ -116,7 +116,8 @@ defmodule CrawlyUIWeb.JobLive do
           "stopped"
       end
 
-    Manager.update_job(job, %{state: state})
+    crawl_speed = Manager.crawl_speed(job)
+    Manager.update_job(job, %{state: state, crawl_speed: crawl_speed})
 
     socket = update_socket(socket)
 
@@ -147,16 +148,15 @@ defmodule CrawlyUIWeb.JobLive do
       :index ->
         %{entries: recent_rows} = get_recent_jobs()
 
-          assign(socket,
-            rows: rows,
-            total_pages: total_pages,
-            recent_rows: recent_rows
-          )
-        _ ->
+        assign(socket,
+          rows: rows,
+          total_pages: total_pages,
+          recent_rows: recent_rows
+        )
 
-    assign(socket, rows: rows, total_pages: total_pages)
+      _ ->
+        assign(socket, rows: rows, total_pages: total_pages)
     end
-
   end
 
   defp live_update(socket, state, time) do

@@ -7,7 +7,7 @@ defmodule CrawlyUIWeb.JobViewTest do
   test "render runtime when job run time is nil" do
     job = insert_job(%{run_time: nil})
 
-    assert render_to_string(CrawlyUIWeb.JobView, "index.html",
+    assert render_to_string(CrawlyUIWeb.JobView, "show.html",
              total_pages: 1,
              live_action: :index,
              page: 1,
@@ -19,7 +19,7 @@ defmodule CrawlyUIWeb.JobViewTest do
   test "render runtime when job run time is less than an hour" do
     job = insert_job(%{run_time: 10})
 
-    assert render_to_string(CrawlyUIWeb.JobView, "index.html",
+    assert render_to_string(CrawlyUIWeb.JobView, "show.html",
              total_pages: 1,
              live_action: :index,
              page: 1,
@@ -32,7 +32,7 @@ defmodule CrawlyUIWeb.JobViewTest do
   test "render runtime when job run time is more than an hour" do
     job = insert_job(%{run_time: 90})
 
-    assert render_to_string(CrawlyUIWeb.JobView, "index.html",
+    assert render_to_string(CrawlyUIWeb.JobView, "show.html",
              total_pages: 1,
              live_action: :index,
              page: 1,
@@ -48,7 +48,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     job_3 = insert_job(%{spider: "Test"})
 
     view =
-      render_to_string(CrawlyUIWeb.JobView, "index.html",
+      render_to_string(CrawlyUIWeb.JobView, "show.html",
         total_pages: 1,
         live_action: :index,
         page: 1,
@@ -64,7 +64,7 @@ defmodule CrawlyUIWeb.JobViewTest do
   test "render cancel button" do
     job = insert_job(%{spider: "Elixir.Spider.Test", state: "running"})
 
-    assert render_to_string(CrawlyUIWeb.JobView, "index.html",
+    assert render_to_string(CrawlyUIWeb.JobView, "show.html",
              total_pages: 1,
              live_action: :index,
              page: 1,
@@ -79,7 +79,7 @@ defmodule CrawlyUIWeb.JobViewTest do
   test "render delete button" do
     job = insert_job(%{spider: "Elixir.Spider.Test", state: "stopped", items_count: 100})
 
-    assert render_to_string(CrawlyUIWeb.JobView, "index.html",
+    assert render_to_string(CrawlyUIWeb.JobView, "show.html",
              total_pages: 1,
              live_action: :index,
              page: 1,

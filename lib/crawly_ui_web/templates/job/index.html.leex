@@ -5,7 +5,6 @@
   <p class="Hero__description">Looks like you have not scheduled any jobs yet. Why don't you give it a try, by
     scheduling a Crawly Job?</p>
   <button phx-click=schedule>Schedule</button>
-  <button phx-click=list_all_jobs>All Past Jobs</button>
   </a>
 </div>
 <% else %>
@@ -13,8 +12,8 @@
 <%= raw render_jobs_table(@rows, @live_action) %>
 <%= raw pagination_links(@page, @total_pages) %>
 
+<br>
 <h1>Recent Jobs</h1>
 <%= raw render_jobs_table(@recent_rows, @live_action) %>
 <button phx-click=list_all_jobs>See more</button>
-
 <% end %>
