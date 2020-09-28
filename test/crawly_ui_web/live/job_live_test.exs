@@ -172,6 +172,14 @@ defmodule CrawlyUIWeb.JobLiveTest do
     refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
   end
 
+  test "go to page for spide view", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/spider?spider=TestSpider")
+
+    view
+    |> render_click(:goto_page, %{"page" => "2"})
+    |> follow_redirect(conn, "/spider?page=2&spider=TestSpider")
+  end
+
   test "cancel running job", %{conn: conn} do
     job_1 = insert_job(%{state: "running"})
     job_2 = insert_job(%{state: "running"})

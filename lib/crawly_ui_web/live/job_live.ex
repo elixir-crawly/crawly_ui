@@ -61,10 +61,19 @@ defmodule CrawlyUIWeb.JobLive do
   def handle_event("goto_page", %{"page" => page}, socket) do
     live_action = socket.assigns.live_action
 
-    {:noreply,
-     push_redirect(socket,
-       to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
-     )}
+    if live_action == :spider do
+      spider = socket.assigns.spider
+
+      {:noreply,
+       push_redirect(socket,
+         to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page, spider: spider)
+       )}
+    else
+      {:noreply,
+       push_redirect(socket,
+         to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
+       )}
+    end
   end
 
   def handle_event("show_spider", %{"spider" => spider}, socket) do
