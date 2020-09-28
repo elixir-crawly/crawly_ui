@@ -9,7 +9,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
   test "mount job view when there is no job", %{conn: conn} do
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
-    assert html =~ "Welcome to Crawly UI"
+    assert html =~ "No jobs are currently running"
   end
 
   test "mount job view when there is no running job", %{conn: conn} do
@@ -17,11 +17,11 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
-    assert html =~ "Welcome to Crawly UI"
+    assert html =~ "No jobs are currently running"
   end
 
   test "mount job view when there are running jobs", %{conn: conn} do
-    insert_job(%{state: "runing"})
+    insert_job(%{state: "running"})
     {:ok, _view, html} = live(conn, "/")
     assert html =~ "Jobs"
   end
@@ -77,7 +77,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     {:ok, view, _html} = live(conn, "/")
 
-    assert render(view) =~ "Welcome to Crawly UI"
+    assert render(view) =~ "No jobs are currently running"
 
     Process.sleep(50)
 
@@ -86,7 +86,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     CrawlyUI.Manager.update_job(job, %{state: "running"})
 
-    assert render(view) =~ "Welcome to Crawly UI"
+    assert render(view) =~ "No jobs are currently running"
 
     Process.sleep(70)
 
@@ -151,14 +151,13 @@ defmodule CrawlyUIWeb.JobLiveTest do
   end
 
   test "go to page", %{conn: conn} do
-    # page 1
-    job_1 = insert_job(%{inserted_at: inserted_at(6 * 60)})
-    Enum.each(1..9, &insert_job(%{inserted_at: inserted_at(&1)}))
-
     # page 2
+    job_1 = insert_job(%{inserted_at: inserted_at(6 * 60)})
+    # page 1
+    Enum.each(1..9, &insert_job(%{inserted_at: inserted_at(&1)}))
     job_2 = insert_job()
 
-    {:ok, view, _html} = live(conn, "/")
+    {:ok, view, _html} = live(conn, "/all")
 
     assert render(view) =~ "<td>#{job_2.inserted_at}</td>"
     refute render(view) =~ "<td>#{job_1.inserted_at}</td>"
@@ -166,18 +165,26 @@ defmodule CrawlyUIWeb.JobLiveTest do
     {:ok, new_view, _html} =
       view
       |> render_click(:goto_page, %{"page" => "2"})
-      |> follow_redirect(conn, "/?page=2")
+      |> follow_redirect(conn, "/all?page=2")
 
     assert render(new_view) =~ "<td>#{job_1.inserted_at}</td>"
     refute render(new_view) =~ "<td>#{job_2.inserted_at}</td>"
   end
 
-  test "go to page for spide view", %{conn: conn} do
+  test "go to page for index view", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert view
+           |> render_click(:goto_page, %{"page" => "2"})
+           |> follow_redirect(conn, "/?page=2")
+  end
+
+  test "go to page for spider view", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/spider?spider=TestSpider")
 
-    view
-    |> render_click(:goto_page, %{"page" => "2"})
-    |> follow_redirect(conn, "/spider?page=2&spider=TestSpider")
+    assert view
+           |> render_click(:goto_page, %{"page" => "2"})
+           |> follow_redirect(conn, "/spider?page=2&spider=TestSpider")
   end
 
   test "cancel running job", %{conn: conn} do
@@ -206,7 +213,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
       render_click(view, :cancel, %{"job" => Integer.to_string(job_2.id)})
       render_click(view, :cancel, %{"job" => Integer.to_string(job_3.id)})
 
-      assert render(view) =~ "Welcome to Crawly UI"
+      assert render(view) =~ "No jobs are currently running"
 
       {:ok, view, _html} = live(conn, "/all")
 

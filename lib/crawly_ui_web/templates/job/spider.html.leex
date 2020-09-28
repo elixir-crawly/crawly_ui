@@ -1,0 +1,8 @@
+<%= if @spider == nil do %>
+<h1>Spider</h1>
+<% else %>
+<h1>Spider</h1>
+<h2><%= raw render_spider_name(@spider) %></h2>
+<%= raw render_jobs_table(@rows, @live_action) %>
+<%= raw pagination_links(@page, @total_pages) %>
+<% end %>
