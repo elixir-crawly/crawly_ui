@@ -174,6 +174,7 @@ defmodule CrawlyUIWeb.JobLive do
 
   defp get_recent_jobs() do
     Manager.Job
+    |> where([j], not (j.state == "running"))
     |> order_by(desc: :inserted_at)
     |> CrawlyUI.Repo.paginate(page: 1, page_size: 5)
   end

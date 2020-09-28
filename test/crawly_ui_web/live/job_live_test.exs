@@ -9,7 +9,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
   test "mount job view when there is no job", %{conn: conn} do
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
-    assert html =~ "Welcome to Crawly UI"
+    assert html =~ "No jobs are currently running"
   end
 
   test "mount job view when there is no running job", %{conn: conn} do
@@ -17,7 +17,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     {:ok, view, html} = live(conn, "/")
     assert CrawlyUIWeb.JobLive = view.module
-    assert html =~ "Welcome to Crawly UI"
+    assert html =~ "No jobs are currently running"
   end
 
   test "mount job view when there are running jobs", %{conn: conn} do
@@ -77,7 +77,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     {:ok, view, _html} = live(conn, "/")
 
-    assert render(view) =~ "Welcome to Crawly UI"
+    assert render(view) =~ "No jobs are currently running"
 
     Process.sleep(50)
 
@@ -86,7 +86,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
     CrawlyUI.Manager.update_job(job, %{state: "running"})
 
-    assert render(view) =~ "Welcome to Crawly UI"
+    assert render(view) =~ "No jobs are currently running"
 
     Process.sleep(70)
 
@@ -213,7 +213,7 @@ defmodule CrawlyUIWeb.JobLiveTest do
       render_click(view, :cancel, %{"job" => Integer.to_string(job_2.id)})
       render_click(view, :cancel, %{"job" => Integer.to_string(job_3.id)})
 
-      assert render(view) =~ "Welcome to Crawly UI"
+      assert render(view) =~ "No jobs are currently running"
 
       {:ok, view, _html} = live(conn, "/all")
 
