@@ -7,8 +7,18 @@ defmodule CrawlyUIWeb.JobView do
   def title(:spider, spider) do
     """
     <h1>Spider</h1>
-    <h2>#{spider}</h2>
+    <h2>#{render_spider_name(spider)}</h2>
     """
+  end
+
+  def render_spider_name(spider) when is_atom(spider) do
+    spider |> to_string() |> render_spider_name()
+  end
+
+  def render_spider_name(spider) when is_binary(spider) do
+    spider
+    |> String.split(".")
+    |> List.last()
   end
 
   def render_run_time(run_time) do
@@ -27,14 +37,14 @@ defmodule CrawlyUIWeb.JobView do
   end
 
   def render_button(%{state: "running", spider: spider} = job) do
-    "<button data-confirm=\"Do you really want to cancel running spider #{spider}?\" phx-click=cancel phx-value-job=#{
-      job.id
-    }>Cancel</button>"
+    "<button data-confirm=\"Do you really want to cancel running spider #{
+      render_spider_name(spider)
+    }?\" phx-click=cancel phx-value-job=#{job.id}>Cancel</button>"
   end
 
   def render_button(%{spider: spider, items_count: items_count} = job) do
-    "<button data-confirm=\"This will delete this job of spider #{spider} and all #{items_count} item(s). Are you sure?\" phx-click=delete phx-value-job=#{
-      job.id
-    }>Delete</button>"
+    "<button data-confirm=\"This will delete this job of spider #{render_spider_name(spider)} and all #{
+      items_count
+    } item(s). Are you sure?\" phx-click=delete phx-value-job=#{job.id}>Delete</button>"
   end
 end

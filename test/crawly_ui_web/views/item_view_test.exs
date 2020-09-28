@@ -29,7 +29,7 @@ defmodule CrawlyUIWeb.ItemViewTest do
       rendered_string = render_to_string(CrawlyUIWeb.ItemView, "index.html", params)
 
       assert rendered_string =~
-               "<td class=\"w\"><b>field_1</b></td>\n    <td class=\"c\">data_1</td>"
+               "<td class=\"w\"><b>field_1</b></td>\n      <td class=\"c\">data_1</td>"
 
       # test render image
       assert rendered_string =~ "<td class=\"c\"><img width='150px' src='image_1_src' /></td>"
@@ -39,18 +39,18 @@ defmodule CrawlyUIWeb.ItemViewTest do
                "<td class=\"c\"><a target='blank' href='http://example_1.com'>http://example_1.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_1.inserted_at}\n  <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
+               "<th>Discovery time: #{item_1.inserted_at}\n <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
                  job_id
                } phx-value-item=#{item_1.id}> Preview </a>"
 
       assert rendered_string =~
-               "<td class=\"w\"><b>field_1</b></td>\n    <td class=\"c\">data_2</td>"
+               "<td class=\"w\"><b>field_1</b></td>\n      <td class=\"c\">data_2</td>"
 
       assert rendered_string =~
                "<td class=\"c\"><a target='blank' href='https://example_2.com'>https://example_2.com</a></td>"
 
       assert rendered_string =~
-               "<th>Discovery time: #{item_2.inserted_at}\n  <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
+               "<th>Discovery time: #{item_2.inserted_at}\n <a href=\"#\" phx-click=\"show_item\" phx-value-job=#{
                  job_id
                } phx-value-item=#{item_2.id}> Preview </a>"
 

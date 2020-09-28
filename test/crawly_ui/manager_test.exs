@@ -317,7 +317,7 @@ defmodule CrawlyUi.ManagerTest do
     assert %Job{items_count: 6, crawl_speed: 1, run_time: 6} = Repo.get(Job, job_1.id)
     assert %Job{items_count: 4, crawl_speed: 4, run_time: 4} = Repo.get(Job, job_2.id)
     assert %Job{items_count: 0, crawl_speed: 0, run_time: 0} = Repo.get(Job, job_3.id)
-    assert %Job{items_count: 3, crawl_speed: 3, run_time: 2} = Repo.get(Job, job_4.id)
+    assert %Job{items_count: 3, crawl_speed: 2, run_time: 2} = Repo.get(Job, job_4.id)
   end
 
   test "get_job_by_tag/1" do
