@@ -1,16 +1,6 @@
 defmodule CrawlyUIWeb.JobView do
   use CrawlyUIWeb, :view
 
-  def title(:index, _), do: "<h1>Running Jobs</h1>"
-  def title(:show, _), do: "<h1>Jobs</h1>"
-
-  def title(:spider, spider) do
-    """
-    <h1>Spider</h1>
-    <h2>#{render_spider_name(spider)}</h2>
-    """
-  end
-
   def render_spider_name(spider) when is_atom(spider) do
     spider |> to_string() |> render_spider_name()
   end
@@ -46,5 +36,56 @@ defmodule CrawlyUIWeb.JobView do
     "<button data-confirm=\"This will delete this job of spider #{render_spider_name(spider)} and all #{
       items_count
     } item(s). Are you sure?\" phx-click=delete phx-value-job=#{job.id}>Delete</button>"
+  end
+
+  def render_jobs_table(jobs, live_action) do
+    """
+    <table>
+    <thead>
+    <tr>
+      <th>Spider</th>
+      <th>Node</th>
+      <th>Items</th>
+
+      <th>State</th>
+
+      <th>Start Time</th>
+      <th>Crawl Speed</th>
+      <th>Crawl time</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    #{render_row(jobs, live_action)}
+    </tbody>
+    </table>
+    """
+  end
+
+  defp render_row(jobs, live_action) do
+    for job <- jobs do
+      """
+      <tr>
+        <td>#{render_spider_col(job.spider, live_action)}</td>
+        <td>#{job.node}</td>
+        <td>
+          <a href="#" phx-click="job_items" phx-value-id=#{job.id}>#{job.items_count}</a>
+        </td>
+        <td>#{job.state}</td>
+        <td>#{job.inserted_at}</td>
+        <td>#{job.crawl_speed} items/min</td>
+        <td>#{render_run_time(job.run_time)}</td>
+        <td>#{render_button(job)}</td>
+      </tr>
+      """
+    end
+  end
+
+  defp render_spider_col(spider, :spider), do: render_spider_name(spider)
+
+  defp render_spider_col(spider, _) do
+    " <a href=\"#\" phx-click=\"show_spider\" phx-value-spider=#{spider}>#{
+      render_spider_name(spider)
+    }</a></td>"
   end
 end
