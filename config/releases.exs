@@ -24,6 +24,7 @@ secret_key_base =
     """
 
 config :crawly_ui, CrawlyUIWeb.Endpoint,
+  url: [host: System.get_env("HOST") || "localhost"],
   http: [
     port: String.to_integer(System.get_env("PORT") || "4000"),
     transport_options: [socket_opts: [:inet6]]
