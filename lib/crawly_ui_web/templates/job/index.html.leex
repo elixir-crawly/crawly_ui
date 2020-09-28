@@ -29,9 +29,9 @@
         <tr>
           <td>
            <%= if @live_action == :spider do %>
-           <%= live_job.spider %>
+           <%= raw render_spider_name(live_job.spider) %>
            <% else %>
-          <a href="#" phx-click="show_spider" phx-value-spider=<%= live_job.spider %>><%= live_job.spider %></a></td>
+          <a href="#" phx-click="show_spider" phx-value-spider=<%= live_job.spider %>><%= raw render_spider_name(live_job.spider) %></a></td>
            <% end %>
           <td><%= live_job.node %></td>
           <td>
@@ -40,7 +40,7 @@
 
           <td><%= live_job.state %></td>
           <td><%= live_job.inserted_at %></td>
-          <td><%= live_job.crawl_speed || "-" %> items/min</td>
+          <td><%= live_job.crawl_speed %> items/min</td>
           <td><%= raw render_run_time(live_job.run_time) %></td>
           <td> <%= raw render_button(live_job) %></td>
         </tr>

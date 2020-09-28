@@ -5,11 +5,10 @@
 <form phx-submit="schedule_spider">
   <div class="row">
     <div class="column">
-        <input name="node" type="hidden" value="<%= @node %>">
        <label for="inputState">Spider</label>
        <select name="spider" class="form-control">
           <%= for spider <- @spiders do %>
-          <option> <%= spider %> </option>
+          <option value="<%= spider%>"><%= raw render_spider_name(spider) %></option>
           <% end %>
        </select>
        <div class="column"><%= submit "Schedule" %></div>

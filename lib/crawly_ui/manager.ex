@@ -16,7 +16,7 @@ defmodule CrawlyUI.Manager do
   @doc """
   Update all job status if the jobs are determined abandonned.
 
-  If the job is abandonned, try to reach the wokder node to close the spider.
+  If the job is abandonned, try to reach the worker node to close the spider.
   If success and spider is running, job state is put to "abandonned" and tell the worker to close the spider. If node is reachable but spider with the same tag is not running, then job stat is put to "stopped". Otherwise, update job state to "node down"
 
   """
@@ -204,7 +204,7 @@ defmodule CrawlyUI.Manager do
       3
 
   """
-  def crawl_speed(job) do
+  def crawl_speed(%{state: "running"} = job) do
     start_time = Timex.now()
     end_time = Timex.shift(start_time, minutes: -1)
 
@@ -214,6 +214,14 @@ defmodule CrawlyUI.Manager do
         select: count("*")
       )
     )
+  end
+
+  def crawl_speed(job) do
+    if job.run_time == 0 do
+      job.items_count
+    else
+      (job.items_count / job.run_time) |> round
+    end
   end
 
   @doc """
@@ -243,19 +251,8 @@ defmodule CrawlyUI.Manager do
   Update crawl speed for all active jobs
   """
   def update_crawl_speeds(jobs) do
-    start_time = Timex.now()
-    end_time = Timex.shift(start_time, minutes: -1)
-
     Enum.each(jobs, fn job ->
-      cnt =
-        Repo.one(
-          from(i in "items",
-            where:
-              i.job_id == ^job.id and i.inserted_at > ^end_time and i.inserted_at < ^start_time,
-            select: count("*")
-          )
-        )
-
+      cnt = crawl_speed(job)
       {:ok, _} = update_job(job, %{crawl_speed: cnt})
     end)
   end
@@ -286,8 +283,10 @@ defmodule CrawlyUI.Manager do
   def update_all_jobs() do
     jobs = from(j in Job) |> Repo.all()
     update_run_times(jobs)
-    update_crawl_speeds(jobs)
     update_item_counts(jobs)
+
+    # Crawl speed for all jobs need updated runtime and items count
+    from(j in Job) |> Repo.all() |> update_crawl_speeds()
   end
 
   def get_job_by_tag(tag) do
