@@ -163,6 +163,23 @@ defmodule CrawlyUI.Manager do
     Enum.map(items, &delete_item/1)
   end
 
+  def cancel_running_job(job) do
+    state =
+      case SpiderManager.close_job_spider(job) do
+        {:ok, :stopped} ->
+          "cancelled"
+
+        {:error, :nodedown} ->
+          "node down"
+
+        _ ->
+          "stopped"
+      end
+
+    crawl_speed = crawl_speed(job)
+    update_job(job, %{state: state, crawl_speed: crawl_speed})
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking job changes.
 

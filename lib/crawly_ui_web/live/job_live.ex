@@ -16,30 +16,11 @@ defmodule CrawlyUIWeb.JobLive do
     Manager.update_all_jobs()
 
     page = Map.get(params, "page", 1)
-    spider = Map.get(params, "spider", nil)
-
-    %{
-      entries: rows,
-      page_number: page_number,
-      total_pages: total_pages
-    } = list_jobs(socket.assigns.live_action, spider, page)
 
     socket =
-      case socket.assigns.live_action do
-        :index ->
-          %{entries: recent_rows} = get_recent_jobs()
-
-          assign(socket,
-            rows: rows,
-            page: page_number,
-            spider: spider,
-            total_pages: total_pages,
-            recent_rows: recent_rows
-          )
-
-        _ ->
-          assign(socket, rows: rows, spider: spider, page: page_number, total_pages: total_pages)
-      end
+      socket
+      |> assign(page: page)
+      |> update_socket()
 
     live_update(socket, :update_job, 100)
 
@@ -79,45 +60,23 @@ defmodule CrawlyUIWeb.JobLive do
   def handle_event("goto_page", %{"page" => page}, socket) do
     live_action = socket.assigns.live_action
 
-    if live_action == :spider do
-      spider = socket.assigns.spider
-
-      {:noreply,
-       push_redirect(socket,
-         to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page, spider: spider)
-       )}
-    else
-      {:noreply,
-       push_redirect(socket,
-         to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
-       )}
-    end
+    {:noreply,
+     push_redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.job_path(socket, live_action, page: page)
+     )}
   end
 
   def handle_event("show_spider", %{"spider" => spider}, socket) do
     {:noreply,
      push_redirect(socket,
-       to: CrawlyUIWeb.Router.Helpers.job_path(socket, :spider, spider: spider)
+       to: CrawlyUIWeb.Router.Helpers.spider_path(socket, :spider, spider: spider)
      )}
   end
 
   def handle_event("cancel", %{"job" => job_id}, socket) do
     job = job_id |> String.to_integer() |> Manager.get_job!()
 
-    state =
-      case SpiderManager.close_job_spider(job) do
-        {:ok, :stopped} ->
-          "cancelled"
-
-        {:error, :nodedown} ->
-          "node down"
-
-        _ ->
-          "stopped"
-      end
-
-    crawl_speed = Manager.crawl_speed(job)
-    Manager.update_job(job, %{state: state, crawl_speed: crawl_speed})
+    Manager.cancel_running_job(job)
 
     socket = update_socket(socket)
 
@@ -137,12 +96,12 @@ defmodule CrawlyUIWeb.JobLive do
 
   defp update_socket(socket) do
     page = socket.assigns.page
-    spider = socket.assigns.spider
 
     %{
       entries: rows,
+      page_number: page_number,
       total_pages: total_pages
-    } = list_jobs(socket.assigns.live_action, spider, page)
+    } = list_jobs(socket.assigns.live_action, page)
 
     case socket.assigns.live_action do
       :index ->
@@ -150,12 +109,13 @@ defmodule CrawlyUIWeb.JobLive do
 
         assign(socket,
           rows: rows,
+           page: page_number,
           total_pages: total_pages,
           recent_rows: recent_rows
         )
 
       _ ->
-        assign(socket, rows: rows, total_pages: total_pages)
+        assign(socket, rows: rows, total_pages: total_pages, page: page_number)
     end
   end
 
@@ -163,14 +123,8 @@ defmodule CrawlyUIWeb.JobLive do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
 
-  defp list_jobs(:index, _, page), do: Manager.list_running_jobs(page: page, page_size: 5)
-  defp list_jobs(:show, _, page), do: Manager.list_jobs(page: page)
-
-  defp list_jobs(:spider, spider, page) do
-    Manager.Job
-    |> where([j], j.spider == ^spider)
-    |> Manager.list_jobs(page: page)
-  end
+  defp list_jobs(:index, page), do: Manager.list_running_jobs(page: page, page_size: 5)
+  defp list_jobs(:show, page), do: Manager.list_jobs(page: page)
 
   defp get_recent_jobs() do
     Manager.Job
