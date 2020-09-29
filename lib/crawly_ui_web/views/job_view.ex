@@ -1,6 +1,18 @@
 defmodule CrawlyUIWeb.JobView do
   use CrawlyUIWeb, :view
 
+  @doc """
+  Render to display spider name to take the last part of the module. i.e Elixir.Spider.Walmart -> Walmart
+
+  ## Examples
+
+      iex> render_spider_name("Elixir.SPiders.Walmart")
+      "Walmart"
+
+       iex> render_spider_name(:"Elixir.SPiders.Walmart")
+      "Walmart"
+
+  """
   def render_spider_name(spider) when is_atom(spider) do
     spider |> to_string() |> render_spider_name()
   end
@@ -11,6 +23,9 @@ defmodule CrawlyUIWeb.JobView do
     |> List.last()
   end
 
+  @doc """
+  Convert the spider runtime in hour if it is larger than 60 minutes, else keep the minute scale
+  """
   def render_run_time(run_time) do
     case run_time do
       nil ->
@@ -26,6 +41,9 @@ defmodule CrawlyUIWeb.JobView do
     end
   end
 
+  @doc """
+  Render button template. Cancel for running job and Delete button otherwise
+  """
   def render_button(%{state: "running", spider: spider} = job) do
     "<button data-confirm=\"Do you really want to cancel running spider #{
       render_spider_name(spider)
@@ -38,6 +56,9 @@ defmodule CrawlyUIWeb.JobView do
     } item(s). Are you sure?\" phx-click=delete phx-value-job=#{job.id}>Delete</button>"
   end
 
+  @doc """
+  Render table to display all jobs, one job = one row
+  """
   def render_jobs_table(jobs, live_action) do
     """
     <table>
@@ -81,6 +102,7 @@ defmodule CrawlyUIWeb.JobView do
     end
   end
 
+  # Show plain text when in spider view otherwise link to spider page
   defp render_spider_col(spider, :spider), do: render_spider_name(spider)
 
   defp render_spider_col(spider, _) do

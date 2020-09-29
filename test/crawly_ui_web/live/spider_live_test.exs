@@ -85,7 +85,7 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
 
     assert render(view) =~ "#{job_1.inserted_at}"
 
-    Process.sleep(600)
+    Process.sleep(700)
     job_2 = insert_job(%{spider: "TestSpider", state: "cancelled"})
     Process.sleep(500)
 
@@ -130,12 +130,16 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
 
   test "redirect to index when a spider job starts successfully", %{conn: conn} do
     with_mock CrawlyUI.SpiderManager, [],
-      list_spiders: fn _ -> ["Crawly.TestSpider"] end,
       start_spider: fn
-        "test", _ -> {:ok, :started}
+        _, _ -> {:ok, :started}
       end do
-      {:ok, view, _html} = live(conn, "/schedule/spider?node=test")
-      render_click(view, :schedule_spider, %{spider: "Crawly.TestSpider"})
+      {:ok, view, _html} = live(conn, "/spider")
+
+      render_click(view, :schedule_spider, %{
+        "spider" => "Crawly.TestSpider",
+        "node" => "test@node"
+      })
+
       flash = assert_redirect(view, "/")
 
       assert flash["info"] ==
@@ -143,15 +147,19 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
     end
   end
 
-  test "redirect to schedule page when a spider job failed at starting", %{conn: conn} do
+  test "refresh page when a spider job failed at starting", %{conn: conn} do
     with_mock CrawlyUI.SpiderManager, [],
-      list_spiders: fn _ -> ["Crawly.TestSpider"] end,
       start_spider: fn
-        "other_node", _ -> {:error, "Failed"}
+        _, _ -> {:error, "Failed"}
       end do
-      {:ok, view, _html} = live(conn, "/schedule/spider?node=other_node")
-      render_click(view, :schedule_spider, %{spider: "Crawly.TestSpider"})
-      flash = assert_redirect(view, "/schedule")
+      {:ok, view, _html} = live(conn, "/spider")
+
+      render_click(view, :schedule_spider, %{
+        "spider" => "Crawly.TestSpider",
+        "node" => "test@node"
+      })
+
+      flash = assert_redirect(view, "/spider")
 
       assert flash["error"] ==
                "{:error, \"Failed\"}"
