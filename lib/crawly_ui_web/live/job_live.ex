@@ -10,7 +10,8 @@ defmodule CrawlyUIWeb.JobLive do
   end
 
   def mount(params, _session, socket) do
-    Manager.update_all_jobs()
+    # TODO: This kills prod :( as query seems to be very heavy
+    # Manager.update_all_jobs()
 
     page = Map.get(params, "page", 1)
 
