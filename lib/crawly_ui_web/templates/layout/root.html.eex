@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <title><%= assigns[:page_title] || "Crawly UI" %></title>
+    <title><%= assigns[:page_title] || "Crawly UI, Interactive Web Scraping Platform" %></title>
     <%= csrf_meta_tag() %>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -105,7 +105,10 @@
                     </div>
 
                     <nav class="Navigation">
-                        <a class="Button" href="/schedule">Schedule Spider</a>
+                        <a href="/">Home</a>
+                        <a href="/all">Jobs</a>
+                        <a href="/spider">Spiders</a>
+                        <a href="/schedule">Schedule</a>
                     </nav>
 
                 </section>

@@ -194,3 +194,8 @@ iframe {
 .left{
     float: left;
 }
+
+.Navigation a{
+    font-size: medium;
+    color: black;
+}
