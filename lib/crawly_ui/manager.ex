@@ -80,6 +80,9 @@ defmodule CrawlyUI.Manager do
     |> Repo.paginate(params)
   end
 
+  @doc """
+  List only running jobs
+  """
   def list_running_jobs(params \\ []) do
     Job
     |> where([j], j.state == "running")
@@ -173,6 +176,15 @@ defmodule CrawlyUI.Manager do
     Enum.map(items, &delete_item/1)
   end
 
+  @doc """
+  Make rpc call through Spider Manager to close spider. Depending on the reply, update the Job state accordingly.
+
+  ## Examples
+
+      iex> cancel_running_job(job)
+      {:ok, %Job{state: "cancelled"}}
+
+  """
   def cancel_running_job(job) do
     state =
       case SpiderManager.close_job_spider(job) do
@@ -223,7 +235,7 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns crawl speed time of the given job
+  Returns crawl speed time of the given job. Returns average crawl speed if the job is not running
 
   ## Examples
 

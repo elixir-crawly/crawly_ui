@@ -140,7 +140,7 @@ defmodule CrawlyUIWeb.SpiderLive do
   end
 
   defp list_jobs(spider, page) do
-    # For a spcific spider
+    # For a specific spider
     Manager.Job
     |> where([j], j.spider == ^spider)
     |> Manager.list_jobs(page: page)

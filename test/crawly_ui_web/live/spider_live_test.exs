@@ -87,7 +87,6 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
 
     Process.sleep(600)
     job_2 = insert_job(%{spider: "TestSpider", state: "cancelled"})
-    refute render(view) =~ "#{job_2.inserted_at}"
     Process.sleep(500)
 
     assert render(view) =~ "#{job_1.inserted_at}"

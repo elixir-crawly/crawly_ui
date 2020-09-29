@@ -103,6 +103,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     case socket.assigns.live_action do
       :index ->
+        # Get also recent jobs on index page
         %{entries: recent_rows} = Manager.list_recent_jobs()
 
         assign(socket,
