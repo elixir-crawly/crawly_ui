@@ -134,7 +134,6 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
       list_spiders: fn _ -> ["Crawly.TestSpider"] end,
       start_spider: fn
         "test", _ -> {:ok, :started}
-        "other_node", _ -> {:error, "Failed"}
       end do
       {:ok, view, _html} = live(conn, "/schedule/spider?node=test")
       render_click(view, :schedule_spider, %{spider: "Crawly.TestSpider"})
@@ -149,7 +148,6 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
     with_mock CrawlyUI.SpiderManager, [],
       list_spiders: fn _ -> ["Crawly.TestSpider"] end,
       start_spider: fn
-        "test", _ -> {:ok, :started}
         "other_node", _ -> {:error, "Failed"}
       end do
       {:ok, view, _html} = live(conn, "/schedule/spider?node=other_node")

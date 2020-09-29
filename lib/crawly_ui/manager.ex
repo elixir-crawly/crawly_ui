@@ -87,6 +87,16 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
+  List recent jobs that are not running
+  """
+  def list_recent_jobs() do
+    Job
+    |> where([j], not (j.state == "running"))
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(page: 1, page_size: 5)
+  end
+
+  @doc """
   Gets a single job.
 
   Raises `Ecto.NoResultsError` if the Job does not exist.

@@ -2,9 +2,6 @@ defmodule CrawlyUIWeb.JobLive do
   use Phoenix.LiveView
 
   alias CrawlyUI.Manager
-  alias CrawlyUI.SpiderManager
-
-  import Ecto.Query
 
   def render(assigns) do
     template = template(assigns.live_action)
@@ -105,7 +102,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     case socket.assigns.live_action do
       :index ->
-        %{entries: recent_rows} = get_recent_jobs()
+        %{entries: recent_rows} = Manager.list_recent_jobs()
 
         assign(socket,
           rows: rows,
@@ -123,17 +120,10 @@ defmodule CrawlyUIWeb.JobLive do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
 
+  # List only running jobs and limit for page size of 5 for index, else list all jobs and default page size for all jobs view
   defp list_jobs(:index, page), do: Manager.list_running_jobs(page: page, page_size: 5)
   defp list_jobs(:show, page), do: Manager.list_jobs(page: page)
 
-  defp get_recent_jobs() do
-    Manager.Job
-    |> where([j], not (j.state == "running"))
-    |> order_by(desc: :inserted_at)
-    |> CrawlyUI.Repo.paginate(page: 1, page_size: 5)
-  end
-
   defp template(:index), do: "index.html"
   defp template(:show), do: "show.html"
-  defp template(:spider), do: "spider.html"
 end
