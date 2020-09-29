@@ -1,19 +1,25 @@
 <%= if @spider == nil do %>
 <h1>Spiders</h1>
+<%= if @available_spiders != [] do %>
 <h2>Available for schedule</h2>
+<%= for {node, spiders} <- @available_spiders do%>
 <table>
- <%= for {node, spiders} <- @available_spiders do%>
    <tr>
       <th colspan="2"><%= node %></th>
    </tr>
    <%= for spider <- spiders do%>
    <tr>
-      <td><a href="#" phx-click=show_spider phx-value-spider=<%= spider %>><%= raw render_spider_name(spider) %></td>
-      <td><button phx-click="schedule_spider" phx-value-node=<%= node %> phx-value-spider=<%= spider%>> Schedule</button></td>
+      <td><a href="#" phx-click=show_spider phx-value-spider=<%= spider %>><%= raw render_spider_name(spider) %></a>
+      </td>
+      <td class="w"><button phx-click="schedule_spider" phx-value-node=<%= node %> phx-value-spider=<%= spider%>>
+            Schedule</button></td>
    </tr>
    <% end %>
-   <% end %>
 </table>
+<br>
+<br>
+<% end %>
+<% end %>
 
 <% else %>
 <h1>Spider</h1>

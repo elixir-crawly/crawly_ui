@@ -109,7 +109,7 @@ defmodule CrawlyUIWeb.JobLive do
 
         assign(socket,
           rows: rows,
-           page: page_number,
+          page: page_number,
           total_pages: total_pages,
           recent_rows: recent_rows
         )
