@@ -39,7 +39,7 @@ defmodule CrawlyUIWeb.SpiderLive do
 
   def handle_info(:update_spiders, socket) do
     socket = update_spiders(socket)
-    if connected?(socket), do: Process.send_after(self(), :update_job, 1000)
+    if connected?(socket), do: Process.send_after(self(), :update_spiders, 1000)
     {:noreply, socket}
   end
 

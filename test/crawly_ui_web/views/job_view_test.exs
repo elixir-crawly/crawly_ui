@@ -42,7 +42,7 @@ defmodule CrawlyUIWeb.JobViewTest do
              "1.5 hours"
   end
 
-  test "render spider name" do
+  test "render spider name with String input" do
     job_1 = insert_job(%{spider: "Elixir.Spider.Test"})
     job_2 = insert_job(%{spider: "Spider.Test"})
     job_3 = insert_job(%{spider: "Test"})
@@ -59,6 +59,19 @@ defmodule CrawlyUIWeb.JobViewTest do
     assert view =~ ">Test</a>"
     refute view =~ ">Spider.Test</a>"
     refute view =~ ">Elixir.Spider.Test</a>"
+  end
+
+  test "render spider name with atom input" do
+    view =
+      render_to_string(CrawlyUIWeb.JobView, "pick_spider.html",
+        node: "test@worker.com",
+        spiders: [:"Elixir.Spider.Test", :"Spider.Test", :Test],
+        error: nil
+      )
+
+    assert view =~ "<option value=\"Test\">Test</option>"
+    assert view =~ "<option value=\"Spider.Test\">Test</option>"
+    assert view =~ "<option value=\"Elixir.Spider.Test\">Test</option>"
   end
 
   test "render cancel button" do
