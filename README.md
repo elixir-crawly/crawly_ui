@@ -34,6 +34,12 @@ and finally maintenance. And that's what we're trying to achieve with CrawlyUI
 project.
 
 ## Trying it
+
+### Live demo
+Live demo is available at:
+http://crawlyui.com/
+
+### Locally
 You could run it locally using the following commands
 
 1. `docker-compose build`
