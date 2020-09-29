@@ -32,22 +32,6 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert html =~ "Jobs"
   end
 
-  test "mount job view for showing all jobs of a spider", %{conn: conn} do
-    job_1 = insert_job(%{spider: "TestSpider"})
-    job_2 = insert_job(%{spider: "TestSpider"})
-    insert_job(%{spider: "OtherSpider"})
-
-    {:ok, _view, html} = live(conn, "/spider?spider=TestSpider")
-
-    assert html =~ "Spider"
-    assert html =~ "TestSpider"
-
-    assert html =~ "#{job_1.inserted_at}"
-    assert html =~ "#{job_2.inserted_at}"
-
-    refute html =~ "OtherSpider"
-  end
-
   test "redirect when click schedule", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
     render_click(view, :schedule)
@@ -179,39 +163,19 @@ defmodule CrawlyUIWeb.JobLiveTest do
            |> follow_redirect(conn, "/?page=2")
   end
 
-  test "go to page for spider view", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/spider?spider=TestSpider")
-
-    assert view
-           |> render_click(:goto_page, %{"page" => "2"})
-           |> follow_redirect(conn, "/spider?page=2&spider=TestSpider")
-  end
-
   test "cancel running job", %{conn: conn} do
     job_1 = insert_job(%{state: "running"})
-    job_2 = insert_job(%{state: "running"})
-    job_3 = insert_job(%{state: "running"})
 
     with_mock CrawlyUI.SpiderManager, [],
       close_job_spider: fn
         ^job_1 -> {:ok, :stopped}
-        ^job_2 -> {:error, :spider_not_running}
-        ^job_3 -> {:error, :nodedown}
       end do
       {:ok, view, _html} = live(conn, "/")
 
       assert render(view) =~
                "phx-click=\"cancel\" phx-value-job=\"#{job_1.id}\">Cancel"
 
-      assert render(view) =~
-               "phx-click=\"cancel\" phx-value-job=\"#{job_2.id}\">Cancel"
-
-      assert render(view) =~
-               "phx-click=\"cancel\" phx-value-job=\"#{job_3.id}\">Cancel"
-
       render_click(view, :cancel, %{"job" => Integer.to_string(job_1.id)})
-      render_click(view, :cancel, %{"job" => Integer.to_string(job_2.id)})
-      render_click(view, :cancel, %{"job" => Integer.to_string(job_3.id)})
 
       assert render(view) =~ "No jobs are currently running"
 
@@ -219,12 +183,6 @@ defmodule CrawlyUIWeb.JobLiveTest do
 
       assert render(view) =~
                "<td>cancelled</td><td>#{job_1.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
-
-      assert render(view) =~
-               "<td>stopped</td><td>#{job_2.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
-
-      assert render(view) =~
-               "<td>node down</td><td>#{job_3.inserted_at}</td><td>0 items/min</td><td>0 min</td><td>"
     end
   end
 

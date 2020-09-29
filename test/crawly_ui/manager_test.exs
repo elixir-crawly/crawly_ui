@@ -144,6 +144,27 @@ defmodule CrawlyUi.ManagerTest do
     end
   end
 
+  test "cancell_running_job/1" do
+    job_1 = insert_job(%{state: "running"})
+    job_2 = insert_job(%{state: "running"})
+    job_3 = insert_job(%{state: "running"})
+
+    with_mock CrawlyUI.SpiderManager, [],
+      close_job_spider: fn
+        ^job_1 -> {:ok, :stopped}
+        ^job_2 -> {:error, :spider_not_running}
+        ^job_3 -> {:error, :nodedown}
+      end do
+      job_id_1 = job_1.id
+      job_id_2 = job_2.id
+      job_id_3 = job_3.id
+
+      assert {:ok, %Job{id: ^job_id_1, state: "cancelled"}} = Manager.cancel_running_job(job_1)
+      assert {:ok, %Job{id: ^job_id_2, state: "stopped"}} = Manager.cancel_running_job(job_2)
+      assert {:ok, %Job{id: ^job_id_3, state: "node down"}} = Manager.cancel_running_job(job_3)
+    end
+  end
+
   test "delete_job/1 sucessfully delete a job" do
     job = insert_job()
     assert {:ok, %Job{}} = Manager.delete_job(job)
@@ -186,22 +207,34 @@ defmodule CrawlyUi.ManagerTest do
     end
   end
 
-  test "crawl_speed/1" do
-    job = insert_job()
+  describe "crawl_speed/1" do
+    test "for running job" do
+      job = insert_job()
 
-    %{id: job_2} = insert_job()
+      %{id: job_2} = insert_job()
 
-    # item fetched more than a minute ago
-    insert_item(job.id, inserted_at(61))
+      # item fetched more than a minute ago
+      insert_item(job.id, inserted_at(61))
 
-    # newly fetch item
-    insert_item(job.id, inserted_at(50))
-    insert_item(job.id, inserted_at(10))
+      # newly fetch item
+      insert_item(job.id, inserted_at(50))
+      insert_item(job.id, inserted_at(10))
 
-    # item from other job
-    insert_item(job_2, inserted_at(10))
+      # item from other job
+      insert_item(job_2, inserted_at(10))
 
-    assert 2 == Manager.crawl_speed(job)
+      assert 2 == Manager.crawl_speed(job)
+    end
+
+    test "not running job and running is not 0" do
+      job = insert_job(%{run_time: 4, items_count: 8, state: "cancelled"})
+      assert 2 == Manager.crawl_speed(job)
+    end
+
+    test "not running job and running is 0" do
+      job = insert_job(%{run_time: 0, items_count: 8, state: "cancelled"})
+      assert 8 == Manager.crawl_speed(job)
+    end
   end
 
   test "count_items/1" do

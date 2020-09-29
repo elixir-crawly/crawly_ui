@@ -80,10 +80,23 @@ defmodule CrawlyUI.Manager do
     |> Repo.paginate(params)
   end
 
+  @doc """
+  List only running jobs
+  """
   def list_running_jobs(params \\ []) do
     Job
     |> where([j], j.state == "running")
     |> list_jobs(params)
+  end
+
+  @doc """
+  List recent jobs that are not running
+  """
+  def list_recent_jobs() do
+    Job
+    |> where([j], not (j.state == "running"))
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(page: 1, page_size: 5)
   end
 
   @doc """
@@ -164,6 +177,32 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
+  Make rpc call through Spider Manager to close spider. Depending on the reply, update the Job state accordingly.
+
+  ## Examples
+
+      iex> cancel_running_job(job)
+      {:ok, %Job{state: "cancelled"}}
+
+  """
+  def cancel_running_job(job) do
+    state =
+      case SpiderManager.close_job_spider(job) do
+        {:ok, :stopped} ->
+          "cancelled"
+
+        {:error, :nodedown} ->
+          "node down"
+
+        _ ->
+          "stopped"
+      end
+
+    crawl_speed = crawl_speed(job)
+    update_job(job, %{state: state, crawl_speed: crawl_speed})
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking job changes.
 
   ## Examples
@@ -196,7 +235,7 @@ defmodule CrawlyUI.Manager do
   end
 
   @doc """
-  Returns crawl speed time of the given job
+  Returns crawl speed time of the given job. Returns average crawl speed if the job is not running
 
   ## Examples
 
