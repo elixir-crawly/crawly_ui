@@ -26,7 +26,7 @@ defmodule CrawlyUIWeb.ItemLive do
       total_pages: total_pages
     } = Manager.list_items(job_id, page: page, search: search)
 
-    live_update(socket, :update_items, 100)
+    live_update(socket, :update_items, 10_000)
 
     {:ok,
      assign(socket,
@@ -52,7 +52,7 @@ defmodule CrawlyUIWeb.ItemLive do
     %{state: state} = Manager.get_job!(job_id)
 
     if state == "running" or state == "new" do
-      live_update(socket, :update_items, 1000)
+      live_update(socket, :update_items, 10_000)
     end
 
     {:noreply, assign(socket, total_pages: total_pages, rows: rows)}

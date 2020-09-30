@@ -12,7 +12,6 @@ defmodule CrawlyUIWeb.JobLive do
   def mount(params, _session, socket) do
     # TODO: This kills prod :( as query seems to be very heavy
     # Manager.update_all_jobs()
-
     page = Map.get(params, "page", 1)
 
     socket =
@@ -20,7 +19,7 @@ defmodule CrawlyUIWeb.JobLive do
       |> assign(page: page)
       |> update_socket()
 
-    live_update(socket, :update_job, 100)
+    live_update(socket, :update_job, 10_000)
 
     {:ok, socket}
   end
@@ -33,11 +32,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     socket = update_socket(socket)
 
-    if Enum.any?(socket.assigns.rows, &(&1.state == "running")) do
-      live_update(socket, :update_job, 100)
-    else
-      live_update(socket, :update_job, 1000)
-    end
+    live_update(socket, :update_job, 10_000)
 
     {:noreply, socket}
   end

@@ -18,6 +18,7 @@ config :crawly_ui, CrawlyUI.Repo,
 # with webpack to recompile .js and .css sources.
 config :crawly_ui, CrawlyUIWeb.Endpoint,
   http: [port: 4000],
+  url: [host: "localhost"],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
