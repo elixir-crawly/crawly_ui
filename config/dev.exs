@@ -10,6 +10,8 @@ config :crawly_ui, CrawlyUI.Repo,
   pool_size: 10,
   timeout: 60_000
 
+config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 10_000
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

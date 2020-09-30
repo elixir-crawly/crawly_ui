@@ -14,5 +14,7 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 100
+config :crawly_ui, CrawlyUIWeb.ItemLive, update_interval: 100
 # Print only warnings and errors during test
 config :logger, level: :warn

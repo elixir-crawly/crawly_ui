@@ -10,6 +10,8 @@ use Mix.Config
 config :crawly_ui,
   ecto_repos: [CrawlyUI.Repo]
 
+config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 20_000
+
 # Configures the endpoint
 config :crawly_ui, CrawlyUIWeb.Endpoint,
   url: [host: "localhost"],

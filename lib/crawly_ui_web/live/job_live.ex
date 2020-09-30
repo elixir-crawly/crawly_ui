@@ -19,7 +19,7 @@ defmodule CrawlyUIWeb.JobLive do
       |> assign(page: page)
       |> update_socket()
 
-    live_update(socket, :update_job, 10_000)
+    live_update(socket, :update_job)
 
     {:ok, socket}
   end
@@ -32,7 +32,7 @@ defmodule CrawlyUIWeb.JobLive do
 
     socket = update_socket(socket)
 
-    live_update(socket, :update_job, 10_000)
+    live_update(socket, :update_job)
 
     {:noreply, socket}
   end
@@ -113,7 +113,7 @@ defmodule CrawlyUIWeb.JobLive do
     end
   end
 
-  defp live_update(socket, state, time) do
+  defp live_update(socket, state, time \\ update_interval()) do
     if connected?(socket), do: Process.send_after(self(), state, time)
   end
 
@@ -123,4 +123,9 @@ defmodule CrawlyUIWeb.JobLive do
 
   defp template(:index), do: "index.html"
   defp template(:show), do: "show.html"
+
+  defp update_interval() do
+    settings = Application.get_env(:crawly_ui, __MODULE__, [])
+    Keyword.get(settings, :update_interval, 10_000)
+  end
 end
