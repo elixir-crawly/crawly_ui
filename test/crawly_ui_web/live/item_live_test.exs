@@ -71,13 +71,15 @@ defmodule CrawlyUIWeb.ItemLiveTest do
   test "handle empty search string", %{conn: conn, job_id: job_id} do
     {:ok, _view, html} = live(conn, "/jobs/#{job_id}/items?search=")
 
-    assert html =~ "<input type=\"text\" placeholder=\"Search\" name=\"search\"/>"
+    assert html =~
+             "<input type=\"text\" placeholder=\"Search\" name=\"search\" autocomplete=\"off\"/>"
   end
 
   test "handle valid search string", %{conn: conn, job_id: job_id} do
     {:ok, _view, html} = live(conn, "/jobs/#{job_id}/items?search=location%3ACanada")
 
-    assert html =~ "<input type=\"text\" placeholder=\"location:Canada\" name=\"search\"/>"
+    assert html =~
+             "<input type=\"text\" value=\"location:Canada\" name=\"search\" autocomplete=\"off\"/>"
   end
 
   test "update view with search result", %{conn: conn, job_id: job_id, item_id: item_id} do
@@ -146,7 +148,7 @@ defmodule CrawlyUIWeb.ItemLiveTest do
     {:ok, new_view, _html} =
       view
       |> render_click(:goto_page, %{"page" => "2"})
-      |> follow_redirect(conn, "/jobs/#{job_id}/items?page=2")
+      |> follow_redirect(conn, "/jobs/#{job_id}/items?page=2&search=")
 
     refute render(new_view) =~ "Discovery time: #{item_2.inserted_at}"
     assert render(new_view) =~ "Discovery time: #{item_1.inserted_at}"

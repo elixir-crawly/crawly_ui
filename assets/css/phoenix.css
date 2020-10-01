@@ -199,3 +199,22 @@ iframe {
     font-size: medium;
     color: black;
 }
+
+form.search{
+    width: 100%;
+}
+
+form.search input{
+    float: left;
+    margin: 0px;
+}
+
+form.search button{
+    float: right;
+}
+
+form.search .help_text{
+    font-size: smaller;
+    float: left;
+    margin-left: 2px;
+}

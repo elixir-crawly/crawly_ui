@@ -1,6 +1,8 @@
 defmodule CrawlyUi.ManagerTest do
   use CrawlyUI.DataCase
 
+  import Ecto.Query, warn: false
+
   alias CrawlyUI.Repo
 
   alias CrawlyUI.Manager
@@ -385,6 +387,40 @@ defmodule CrawlyUi.ManagerTest do
     test "list items when there job has no item" do
       job = insert_job()
       assert %{entries: []} = Manager.list_items(job.id, search: "id:1")
+    end
+
+    test "search can filter items" do
+      job = insert_job(%{inserted_at: inserted_at(6 * 60)})
+
+      # Inserting items
+      insert_item(job.id, inserted_at(60 * 1), %{"id" => 1, "title" => "chair", "color" => "blue"})
+
+      insert_item(job.id, inserted_at(60 * 2), %{"id" => 2, "title" => "chair", "color" => "red"})
+      insert_item(job.id, inserted_at(60 * 3), %{"id" => 3, "title" => "sofa", "color" => "red"})
+
+      assert %{entries: [%Item{data: %{"id" => 1}}]} = Manager.list_items(job.id, search: "id:1")
+
+      assert %{entries: [%Item{data: %{"id" => 3}}]} =
+               Manager.list_items(job.id, search: "title:sofa")
+
+      assert %{entries: [%Item{data: %{"id" => 2}}]} =
+               Manager.list_items(job.id, search: "title:chair && color:red")
+    end
+
+    test "search can support wildcards" do
+      job = insert_job(%{inserted_at: inserted_at(6 * 60)})
+
+      # Inserting items
+      insert_item(job.id, inserted_at(60 * 1), %{"id" => 1, "title" => "chair", "color" => "blue"})
+
+      insert_item(job.id, inserted_at(60 * 2), %{"id" => 2, "title" => "chair2", "color" => "red"})
+
+      insert_item(job.id, inserted_at(60 * 3), %{"id" => 3, "title" => "sofa", "color" => "red"})
+
+      result = Manager.list_items(job.id, search: "title:chair%")
+      data = Enum.map(result.entries, fn item -> item.data end)
+
+      assert [%{"title" => "chair"}, %{"title" => "chair2"}] = data
     end
   end
 

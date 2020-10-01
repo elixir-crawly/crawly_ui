@@ -1,13 +1,23 @@
 <h1>Items</h1>
 
 <!-- The form -->
-<form phx-submit="search">
+<form phx-submit="search" class="search">
+
   <%= if @search do %>
-  <div class="column"><input type="text" placeholder="<%= @search %>" name="search"></div>
+  <div class="row">
+      <div class="column column-90"><input type="text" value="<%= @search %>" name="search" autocomplete="off"></div>
+      <div class="column column-offset-0">(*)<button type="submit"><i class="fa fa-search"></i></button></div>
+  </div>
   <% else %>
-  <div class="column"><input type="text" placeholder="Search" name="search"></div>
+  <div class="row">
+      <div class="column column-90">
+          <input type="text" placeholder="Search" name="search" autocomplete="off">
+          <div class="help_text">(*) <i>"field_name:field_value"</i> or more complex expressions <i>"title:%pi% && color:blue || color:green";</i> </div>
+      </div>
+      <div class="column column-offset-0"><button type="submit"><i class="fa fa-search"></i></button></div>
+  </div>
   <% end %>
-  <button type="submit"><i class="fa fa-search"></i></button>
+
 </form>
 <%= for item <- @rows do %>
 <table class="w3-table-all card">
