@@ -62,14 +62,14 @@ defmodule CrawlyUIWeb.ItemViewTest do
       params = index_params(%{"field" => "value"}, nil)
 
       assert render_to_string(CrawlyUIWeb.ItemView, "index.html", params) =~
-               "<div class=\"column\"><input type=\"text\" placeholder=\"Search\" name=\"search\"></div>"
+               "<input type=\"text\" placeholder=\"Search\" name=\"search\" autocomplete=\"off\">"
     end
 
     test "with search param" do
       params = index_params(%{"field" => "value"}, "search string")
 
       assert render_to_string(CrawlyUIWeb.ItemView, "index.html", params) =~
-               "<div class=\"column\"><input type=\"text\" placeholder=\"search string\" name=\"search\"></div>"
+               "<input type=\"text\" value=\"search string\" name=\"search\" autocomplete=\"off\">"
     end
   end
 

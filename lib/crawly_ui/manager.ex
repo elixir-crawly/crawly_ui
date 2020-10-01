@@ -344,29 +344,55 @@ defmodule CrawlyUI.Manager do
   def list_items(job_id), do: list_items(job_id, [])
 
   def list_items(job_id, params) do
+    query = Item |> where([i], i.job_id == ^job_id)
+
     query =
       case Keyword.get(params, :search) do
         nil ->
-          Item
-          |> where([i], i.job_id == ^job_id)
+          query
 
-        search ->
-          case String.contains?(search, ":") do
-            true ->
-              [key, value] = String.split(search, ":")
-              value = "%#{String.trim(value)}%"
+        search_string ->
+          case search(search_string) do
+            {:error, :parse_error} ->
+              query
 
-              Item
-              |> where([i], i.job_id == ^job_id)
-              |> where([i], fragment("data->>? ILIKE ?", ^key, ^value))
-
-            false ->
-              Item
-              |> where([i], i.job_id == ^job_id)
+            ecto_fragment ->
+              query
+              |> where([i], ^ecto_fragment)
           end
       end
 
-    query |> order_by(desc: :inserted_at) |> Repo.paginate(params)
+    query
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(params)
+  end
+
+  def parse_search_string(search_string) do
+    case CrawlyUI.QueryParser.query(search_string) do
+      {:ok, [], _rest, _map, _, _} -> {:error, :parse_error}
+      {:ok, tokens, _rest, _map, _, _} -> {:ok, tokens}
+    end
+  end
+
+  # Return an ECTO fragement for the given search query
+  def search(search_string) do
+    with {:ok, tokens} <- parse_search_string(search_string),
+         tokens = Enum.map(tokens, &String.trim(&1)) do
+      # take first two elements from the list
+      [key, value | rest] = tokens
+
+      Enum.reduce(
+        Enum.chunk_every(rest, 3),
+        dynamic(fragment("data->>? ILIKE ?", ^key, ^value)),
+        fn
+          ["||", key, value], acc ->
+            dynamic(^acc or fragment("data->>? ILIKE ?", ^key, ^value))
+
+          ["&&", key, value], acc ->
+            dynamic(^acc and fragment("data->>? ILIKE ?", ^key, ^value))
+        end
+      )
+    end
   end
 
   @doc """

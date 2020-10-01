@@ -43,7 +43,7 @@ defmodule CrawlyUI.MixProject do
       {:phoenix, "~> 1.5.4"},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.1"},
+      {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -54,6 +54,7 @@ defmodule CrawlyUI.MixProject do
       {:timex, "~> 3.5"},
       {:phoenix_live_view, "~> 0.14.4"},
       {:scrivener_ecto, "~> 2.5.0"},
+      {:nimble_parsec, "~> 1.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:excoveralls, "~> 0.10", only: :test},
       {:mock, "~> 0.3.0", only: :test}

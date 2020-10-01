@@ -100,7 +100,11 @@ defmodule CrawlyUIWeb.ItemLive do
 
     {:noreply,
      push_redirect(socket,
-       to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id, page: page)
+       to:
+         CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id,
+           page: page,
+           search: socket.assigns.search
+         )
      )}
   end
 
