@@ -22,6 +22,8 @@
   <% end %>
 
 </form>
+
+<a href="/jobs/<%= @job_id %>/export" class="float-right"> Export as JSON</a>
 <%= for item <- @rows do %>
 <table class="w3-table-all card">
   <tbody>

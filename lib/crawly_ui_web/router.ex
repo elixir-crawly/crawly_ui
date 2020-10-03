@@ -27,5 +27,7 @@ defmodule CrawlyUIWeb.Router do
 
     live "/jobs/:job_id/items", ItemLive, :index
     live "/jobs/:job_id/items/:id", ItemLive, :show
+
+    get "/jobs/:job_id/export", ItemController, :export
   end
 end
