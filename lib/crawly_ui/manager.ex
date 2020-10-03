@@ -11,6 +11,8 @@ defmodule CrawlyUI.Manager do
 
   alias CrawlyUI.SpiderManager
 
+  require Logger
+
   @job_abandoned_timeout 60 * 30
 
   @doc """
@@ -314,6 +316,27 @@ defmodule CrawlyUI.Manager do
     update_run_times(jobs)
     update_crawl_speeds(jobs)
     update_item_counts(jobs)
+  end
+
+  @doc """
+  Update crawl speed, run time and item counts for all active jobs
+  """
+  def update_jobs_speed() do
+    Logger.info("Updating crawl speeds")
+
+    jobs =
+      Job
+      |> where([j], j.crawl_speed == 0 and j.state != "running")
+      |> Repo.all()
+
+    Enum.each(
+      jobs,
+      fn job ->
+        if job.run_time != 0 do
+          update_job(job, %{crawl_speed: (job.items_count / job.run_time) |> trunc()})
+        end
+      end
+    )
   end
 
   @doc """

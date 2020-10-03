@@ -30,11 +30,14 @@ config :phoenix, :json_library, Jason
 
 config :crawly_ui, CrawlyUI.Scheduler,
   jobs: [
-    # Every hour
-    {"* */1 * * *", {CrawlyUI.Manager, :update_job_status, []}},
+    # Every 5 mins
+    {"*/5 * * * *", {CrawlyUI.Manager, :update_job_status, []}},
 
-    # Every minute
-    {"*/4 * * * *", {CrawlyUI.Manager, :update_running_jobs, []}}
+    # Every 5 mins
+    {"*/5 * * * *", {CrawlyUI.Manager, :update_running_jobs, []}},
+
+    # Every 5 mins
+    {"*/5 * * * *", {CrawlyUI.Manager, :update_jobs_speed, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom
