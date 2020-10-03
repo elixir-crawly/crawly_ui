@@ -90,7 +90,7 @@ defmodule CrawlyUIWeb.JobView do
         <td>#{render_spider_col(job.spider, live_action)}</td>
         <td>#{job.node}</td>
         <td>
-          <a href="#" phx-click="job_items" phx-value-id=#{job.id}>#{job.items_count}</a>
+          <a href="/jobs/#{job.id}/items">#{job.items_count}</a>
         </td>
         <td>#{job.state}</td>
         <td>#{job.inserted_at}</td>
@@ -106,7 +106,7 @@ defmodule CrawlyUIWeb.JobView do
   defp render_spider_col(spider, :spider), do: render_spider_name(spider)
 
   defp render_spider_col(spider, _) do
-    " <a href=\"#\" phx-click=\"show_spider\" phx-value-spider=#{spider}>#{
+    " <a href=\"\" phx-click=\"show_spider\" phx-value-spider=#{spider}>#{
       render_spider_name(spider)
     }</a></td>"
   end

@@ -31,6 +31,9 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   ],
   secret_key_base: secret_key_base
 
+config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 20_000
+config :crawly_ui, CrawlyUIWeb.ItemLive, update_interval: 20_000
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

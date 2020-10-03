@@ -26,30 +26,6 @@ defmodule CrawlyUIWeb.JobLiveTest do
     assert html =~ "Jobs"
   end
 
-  test "mount job view for showing all jobs", %{conn: conn} do
-    insert_job(%{state: "abandoned"})
-    {:ok, _view, html} = live(conn, "/all")
-    assert html =~ "Jobs"
-  end
-
-  test "redirect when click schedule", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
-    render_click(view, :schedule)
-    assert_redirect(view, "/schedule")
-  end
-
-  test "redirect when click on job's items", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
-    render_click(view, :job_items, %{"id" => "1"})
-    assert_redirect(view, "/jobs/1/items")
-  end
-
-  test "redirect when on list all jobs", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
-    render_click(view, :list_all_jobs)
-    assert_redirect(view, "/all")
-  end
-
   test "redirect to a spider's jobs", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
     render_click(view, :show_spider, %{"spider" => "TestSpider"})

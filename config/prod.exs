@@ -13,6 +13,9 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   server: true,
   url: [host: "example.com", port: 80]
 
+config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 20_000
+config :crawly_ui, CrawlyUIWeb.ItemLive, update_interval: 20_000
+
 # Do not print debug messages in production
 config :logger, level: :info
 

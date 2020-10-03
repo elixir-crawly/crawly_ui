@@ -4,7 +4,7 @@
 <p>
 No jobs are currently running. You can schedule a new one by hitting Schedule button
 </p>
-<button phx-click=schedule>Schedule</button>
+<a href="/schedule" class="button button-black">Schedule</a>
 <% else %>
 <%= raw render_jobs_table(@rows, @live_action) %>
 <%= raw pagination_links(@page, @total_pages) %>
@@ -14,4 +14,4 @@ No jobs are currently running. You can schedule a new one by hitting Schedule bu
 <br>
 <h1>Recent Jobs</h1>
 <%= raw render_jobs_table(@recent_rows, @live_action) %>
-<button phx-click=list_all_jobs>See more</button>
+<a href="/all" class="button button-black">See more</a>

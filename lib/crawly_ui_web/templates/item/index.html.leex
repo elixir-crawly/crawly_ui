@@ -7,7 +7,7 @@
   <div class="row">
       <div class="column column-90">
           <input type="text" value="<%= @search %>" name="search" autocomplete="off">
-          <div class="help_text">(*) <i>"field_name:field_value"</i> or more complex expressions <i>"title:%pi% && color:blue || color:green";</i> </div>
+          <div class="help_text">(*) <i>field_name:field_value</i>. Use % for wildcards, || and && to combine queries, e.g.: <i>title:%pi% && color:blue</i> </div>
       </div>
       <div class="column column-offset-0"><button type="submit"><i class="fa fa-search"></i></button></div>
   </div>
@@ -15,7 +15,7 @@
   <div class="row">
       <div class="column column-90">
           <input type="text" placeholder="Search" name="search" autocomplete="off">
-          <div class="help_text">(*) <i>"field_name:field_value"</i> or more complex expressions <i>"title:%pi% && color:blue || color:green";</i> </div>
+          <div class="help_text">(*) General use case: <i>field_name:field_value</i>. Use % for wildcards, || and && to combine queries, e.g.: <i>title:%pi% && color:blue || color:green</i> </div>
       </div>
       <div class="column column-offset-0"><button type="submit"><i class="fa fa-search"></i></button></div>
   </div>

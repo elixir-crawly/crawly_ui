@@ -37,19 +37,6 @@ defmodule CrawlyUIWeb.JobLive do
     {:noreply, socket}
   end
 
-  def handle_event("schedule", _, socket) do
-    {:noreply, push_redirect(socket, to: "/schedule")}
-  end
-
-  def handle_event("job_items", %{"id" => job_id}, socket) do
-    {:noreply,
-     push_redirect(socket, to: CrawlyUIWeb.Router.Helpers.item_path(socket, :index, job_id))}
-  end
-
-  def handle_event("list_all_jobs", _, socket) do
-    {:noreply, push_redirect(socket, to: "/all")}
-  end
-
   def handle_event("goto_page", %{"page" => page}, socket) do
     live_action = socket.assigns.live_action
 
