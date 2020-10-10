@@ -1,0 +1,7 @@
+<!-- lib/gallery_web/templates/live.html.leex -->
+<main role="main" class="container">
+    <p><%= live_flash(@flash, :notice) %></p>
+    <p><%= live_flash(@flash, :error) %></p>
+    <p><%= live_flash(@flash, :info) %></p>
+    <%= @inner_content %>
+</main>

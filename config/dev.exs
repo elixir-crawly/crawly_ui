@@ -19,7 +19,7 @@ config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 10_000
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :crawly_ui, CrawlyUIWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: 4222],
   url: [host: "localhost"],
   debug_errors: true,
   code_reloader: true,

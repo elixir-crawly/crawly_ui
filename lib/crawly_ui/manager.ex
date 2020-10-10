@@ -8,6 +8,7 @@ defmodule CrawlyUI.Manager do
 
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
+  alias CrawlyUI.Manager.Spider
 
   alias CrawlyUI.SpiderManager
 
@@ -508,4 +509,62 @@ defmodule CrawlyUI.Manager do
   def change_item(%Item{} = item) do
     Item.changeset(item, %{})
   end
+
+  def create_spider(attrs \\ %{}) do
+    attrs = Map.update!(attrs, "rules", fn v -> encode_rules(v) end)
+
+    %Spider{}
+    |> Spider.changeset(attrs)
+    |> Repo.insert(returning: false)
+  end
+
+  def update_spider(name, attrs) do
+    attrs = Map.update!(attrs, "rules", fn v -> encode_rules(v) end)
+    case CrawlyUI.Manager.get_spider!(name) do
+      nil ->
+        {:error, :not_found}
+      data ->
+        CrawlyUI.Manager.Spider.changeset(data, attrs) |> Repo.update()
+    end
+  end
+
+  @doc """
+  List generated spiders
+  """
+  def list_spiders(query \\ Spider, params) do
+    query
+    |> order_by(desc: :inserted_at)
+    |> Repo.paginate(params)
+  end
+
+  def get_spider!(name) do
+    case Repo.get_by(Spider, [name: name]) do
+      nil ->
+        nil
+      data ->
+        Map.update!(data, :rules, fn v -> decode_rules(v) end)
+    end
+  end
+
+  # Convert all values in rules into Base encoded binaries (so they can be stored
+  # in database)
+  defp encode_rules(rules) do
+    Enum.into(
+      rules,
+      %{},
+      fn {k, v} -> {k, v |> :erlang.term_to_binary() |> Base.encode16()} end
+    )
+  end
+
+  # Convert all values in rules into Base encoded binaries (so they can be stored
+  # in database)
+  defp decode_rules(rules) do
+    Enum.into(
+      rules,
+      %{},
+      fn {k, v} -> {k, v |> Base.decode16!() |> :erlang.binary_to_term()} end
+    )
+  end
+
+
 end

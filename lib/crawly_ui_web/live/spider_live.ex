@@ -1,5 +1,5 @@
 defmodule CrawlyUIWeb.SpiderLive do
-  use Phoenix.LiveView
+  use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
 
   alias CrawlyUI.Manager
   alias CrawlyUI.SpiderManager
@@ -17,20 +17,20 @@ defmodule CrawlyUIWeb.SpiderLive do
       case spider do
         nil ->
           # Show a view that lists all available spiders
-          if connected?(socket), do: Process.send_after(self(), :update_spiders, 1000)
+          if connected?(socket), do: Process.send_after(self(), :update_spiders, 10_000)
 
           socket
-          |> assign(spider: spider)
+          |> assign(spider: spider, nodes: Node.list())
           |> update_spiders()
 
         spider ->
           # Show all jobs that run on a spider
           page = Map.get(params, "page", 1)
 
-          if connected?(socket), do: Process.send_after(self(), :update_job, 100)
+          if connected?(socket), do: Process.send_after(self(), :update_job, 10_000)
 
           socket
-          |> assign(page: page, spider: spider)
+          |> assign(page: page, spider: spider, nodes: Node.list())
           |> update_job()
       end
 
@@ -47,9 +47,9 @@ defmodule CrawlyUIWeb.SpiderLive do
     socket = update_job(socket)
 
     if Enum.any?(socket.assigns.rows, &(&1.state == "running")) do
-      if connected?(socket), do: Process.send_after(self(), :update_job, 100)
+      if connected?(socket), do: Process.send_after(self(), :update_job, 10_000)
     else
-      if connected?(socket), do: Process.send_after(self(), :update_job, 1000)
+      if connected?(socket), do: Process.send_after(self(), :update_job, 10_000)
     end
 
     {:noreply, socket}
@@ -68,6 +68,13 @@ defmodule CrawlyUIWeb.SpiderLive do
     {:noreply,
      push_redirect(socket,
        to: CrawlyUIWeb.Router.Helpers.spider_path(socket, :spider, spider: spider)
+     )}
+  end
+
+  def handle_event("edit_spider", %{"spider" => spider}, socket) do
+    {:noreply,
+     push_redirect(socket,
+       to: "/spider/new?spider=#{spider}"
      )}
   end
 
@@ -90,6 +97,27 @@ defmodule CrawlyUIWeb.SpiderLive do
     socket = update_job(socket)
 
     {:noreply, socket}
+  end
+
+  def handle_event("schedule_autospider", %{"node" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("schedule_autospider", %{"node" => node_name, "spider" => spider_name}, socket) do
+    CrawlyUI.create_spider(node_name, spider_name)
+    case CrawlyUI.SpiderManager.start_spider(node_name, spider_name) do
+      {:ok, :started} ->
+        socket =
+          socket
+          |> put_flash(:info, "Spider was scheduled")
+          |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))
+        {:noreply, socket}
+      {:error, reason} ->
+        socket =
+          socket
+          |> put_flash(:info, "Was unable to start spider: #{inspect reason}")
+        {:noreply, socket}
+    end
   end
 
   def handle_event("schedule_spider", %{"spider" => spider, "node" => node}, socket) do
@@ -122,7 +150,15 @@ defmodule CrawlyUIWeb.SpiderLive do
         {node, spiders}
       end)
 
-    assign(socket, spider: spider, available_spiders: available_spiders)
+    generic_spiders = Enum.map(Manager.list_spiders(page_size: 10), fn spider -> spider.name end)
+
+    all_spiders = available_spiders
+
+    assign(socket,
+      spider: spider,
+      available_spiders: all_spiders,
+      generic_spiders: generic_spiders
+    )
   end
 
   defp update_job(socket) do
