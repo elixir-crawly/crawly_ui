@@ -18,7 +18,7 @@ defmodule CrawlyUIWeb.ErrorHelpers do
   end
 
   def get_hint(data, field) do
-    message = case Map.get(data, field) do
+    case Map.get(data, field) do
       nil ->
         nil
 
@@ -26,13 +26,12 @@ defmodule CrawlyUIWeb.ErrorHelpers do
         case String.length(message) <= 100 do
           true ->
             content_tag(:span, message)
+
           false ->
             message = "#{String.slice(message, 0, 100)} ..."
             content_tag(:span, message)
         end
     end
-
-
   end
 
   @doc """

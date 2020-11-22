@@ -26,7 +26,7 @@ defmodule CrawlyUIWeb.NewSpiderLive do
               "name" => data.name,
               "fields" => data.fields,
               "start_urls" => data.start_urls,
-              "links_to_follow" => data.links_to_follow,
+              "links_to_follow" => data.links_to_follow
             }
           })
 
@@ -131,9 +131,11 @@ defmodule CrawlyUIWeb.NewSpiderLive do
     current_rule = Map.merge(socket.assigns.current_rule, rule)
     current_rule_url = Map.get(current_rule, "_url")
     new_rules_map = Map.put(current_rules_map, current_rule_url, current_rule)
+
     socket =
       socket
       |> assign(%{rules: new_rules_map, current_step: 2})
+
     {:noreply, post_rule_added_cleanup(socket)}
   end
 
@@ -162,10 +164,12 @@ defmodule CrawlyUIWeb.NewSpiderLive do
           {:error, reason} ->
             {:noreply, assign(socket, %{error: "#{inspect(reason.errors)}"})}
         end
+
       true ->
-        case CrawlyUI.Manager.update_spider(Map.get(socket.assigns.data, "name"), attrs)  do
+        case CrawlyUI.Manager.update_spider(Map.get(socket.assigns.data, "name"), attrs) do
           {:error, reason} ->
             {:noreply, assign(socket, %{error: inspect(reason)})}
+
           {:ok, _} ->
             {:noreply, redirect(socket, to: "/spider")}
         end
@@ -186,7 +190,6 @@ defmodule CrawlyUIWeb.NewSpiderLive do
     assign(socket, %{
       # Do we make a new spider or editing already made one
       updating: false,
-
       current_rule: %{},
       rules: %{},
       error: nil,

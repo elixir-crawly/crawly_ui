@@ -13,6 +13,5 @@ defmodule CrawlyUI.Repo.Migrations.AddSpiderModel do
     end
 
     create unique_index(:spiders, [:name])
-
   end
 end

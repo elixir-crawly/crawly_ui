@@ -33,17 +33,18 @@ defmodule CrawlyUI do
 
     name = spider.name
 
-    links_to_follow = case spider.links_to_follow do
-      nil ->
-        []
-      links_string ->
-        String.split(links_string, ",")
-    end
+    links_to_follow =
+      case spider.links_to_follow do
+        nil ->
+          []
+
+        links_string ->
+          String.split(links_string, ",")
+      end
 
     start_urls = spider.start_urls |> String.split(",")
 
-    parsed_start_url =
-      start_urls |> List.first() |> URI.parse()
+    parsed_start_url = start_urls |> List.first() |> URI.parse()
     domain = "#{parsed_start_url.scheme}://#{parsed_start_url.host}"
     fields = spider.fields |> String.split(",")
 
@@ -143,7 +144,7 @@ defmodule CrawlyUI do
       end
     """
 
-#    IO.puts(contents)
+    #    IO.puts(contents)
     module = Module.concat(["#{name}"])
     contents = Code.string_to_quoted!(contents)
     {:module, name, code, _last} = Module.create(module, contents, Macro.Env.location(__ENV__))

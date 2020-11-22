@@ -520,9 +520,11 @@ defmodule CrawlyUI.Manager do
 
   def update_spider(name, attrs) do
     attrs = Map.update!(attrs, "rules", fn v -> encode_rules(v) end)
+
     case CrawlyUI.Manager.get_spider!(name) do
       nil ->
         {:error, :not_found}
+
       data ->
         CrawlyUI.Manager.Spider.changeset(data, attrs) |> Repo.update()
     end
@@ -538,9 +540,10 @@ defmodule CrawlyUI.Manager do
   end
 
   def get_spider!(name) do
-    case Repo.get_by(Spider, [name: name]) do
+    case Repo.get_by(Spider, name: name) do
       nil ->
         nil
+
       data ->
         Map.update!(data, :rules, fn v -> decode_rules(v) end)
     end
@@ -565,6 +568,4 @@ defmodule CrawlyUI.Manager do
       fn {k, v} -> {k, v |> Base.decode16!() |> :erlang.binary_to_term()} end
     )
   end
-
-
 end

@@ -105,17 +105,21 @@ defmodule CrawlyUIWeb.SpiderLive do
 
   def handle_event("schedule_autospider", %{"node" => node_name, "spider" => spider_name}, socket) do
     CrawlyUI.create_spider(node_name, spider_name)
+
     case CrawlyUI.SpiderManager.start_spider(node_name, spider_name) do
       {:ok, :started} ->
         socket =
           socket
           |> put_flash(:info, "Spider was scheduled")
           |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))
+
         {:noreply, socket}
+
       {:error, reason} ->
         socket =
           socket
-          |> put_flash(:info, "Was unable to start spider: #{inspect reason}")
+          |> put_flash(:info, "Was unable to start spider: #{inspect(reason)}")
+
         {:noreply, socket}
     end
   end

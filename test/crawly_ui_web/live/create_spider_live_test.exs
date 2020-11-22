@@ -44,7 +44,7 @@ defmodule CrawlyUIWeb.CreateSpiderLiveTest do
     data = %{"url" => "response_url", "title" => "article h1"}
     assert render_submit(view, "rule_added", data) =~ "<td>http://example.com/page/1</td>"
 
-    assert render_click(view, "rule_delete", %{"url" => "http://example.com/page/1"})
-           =~ "<table><thead><tr><th>Page</th><th>Actions</th></tr></thead><tbody></tbody></table>"
+    assert render_click(view, "rule_delete", %{"url" => "http://example.com/page/1"}) =~
+             "<table><thead><tr><th>Page</th><th>Actions</th></tr></thead><tbody></tbody></table>"
   end
 end
