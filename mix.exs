@@ -55,7 +55,8 @@ defmodule CrawlyUI.MixProject do
       {:phoenix_live_view, "~> 0.14.4"},
       {:scrivener_ecto, "~> 2.5.0"},
       {:nimble_parsec, "~> 1.0"},
-      {:floki, ">= 0.0.0", only: :test},
+      {:httpoison, "~> 1.6"},
+      {:floki, "~> 0.29.0"},
       {:excoveralls, "~> 0.10", only: :test},
       {:mock, "~> 0.3.0", only: :test}
     ]

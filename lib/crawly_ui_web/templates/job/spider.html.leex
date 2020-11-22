@@ -1,27 +1,68 @@
 <%= if @spider == nil do %>
-<h1>Spiders</h1>
-<%= if @available_spiders != [] do %>
-<h2>Available for schedule</h2>
-<%= for {node, spiders} <- @available_spiders do%>
-<table>
-   <tr>
-      <th colspan="2"><%= node %></th>
-   </tr>
-   <%= for spider <- spiders do%>
-   <tr>
-      <td><a href="#" phx-click=show_spider phx-value-spider=<%= spider %>><%= raw render_spider_name(spider) %></a>
-      </td>
-      <td class="w"><button phx-click="schedule_spider" phx-value-node=<%= node %> phx-value-spider=<%= spider%>>
-            Schedule</button></td>
-   </tr>
-   <% end %>
-</table>
-<br>
-<br>
-<% end %>
-<% end %>
+    <!-- Rendering a list of spiders -->
+    <h1>Spiders</h1>
+    <%= if @available_spiders != [] do %>
+    <h2>Available for schedule</h2>
+    <%= for {node, spiders} <- @available_spiders do %>
+        <%= if spiders == [] do %>
+        <% else %>
+        <table>
+           <tr>
+              <th colspan="2"><%= node %></th>
+           </tr>
+               <%= for spider <- spiders do%>
+               <tr>
+                  <td>
+                      <a href="#" phx-click=show_spider phx-value-spider=<%= spider %>>
+                          <%= raw render_spider_name(spider) %>
+                      </a>
+                  </td>
+                   <td class="w">
+                      <button phx-click="schedule_spider" phx-value-node=<%= node %> phx-value-spider=<%= spider%>>
+                          Schedule
+                      </button>
+                  </td>
+               </tr>
+               <% end %>
+        </table>
+        <br>
+        <br>
+        <% end %>
+    <% end %>
+    <% end %>
+    <h2> Generic spiders </h2>
+    <table>
+    <%= for spider <- @generic_spiders do %>
+        <tr>
+            <td>
+                <a href="#" phx-click=show_spider phx-value-spider=<%= spider %>>
+                    <%= spider %>
+                </a>
+            </td>
+            <td class="w">
+                <button phx-click="edit_spider" phx-value-spider=<%= spider%> >
+                    Edit
+                </button>
+            </td>
+            <td class="w">
+                <form action="#" phx-change="schedule_autospider">
+                    <input type="hidden" name="spider" value="<%= spider %>" />
+                    <select class="button button-outline" name="node">
+                        <option value="">Schedule</option>
+                        <%= for node <- @nodes do %>
+                        <option value="<%= node %>"><%= node %></option>
+                        <% end %>
+                    </select>
+                </form>
+            </td>
+        </tr>
 
+    <% end %>
+    </table>
+    <br />
+    <br />
 <% else %>
+<!-- Rendering a individual spider page -->
 <h1>Spider</h1>
 <h2><%= raw render_spider_name(@spider) %></h2>
 <%= raw render_jobs_table(@rows, @live_action) %>

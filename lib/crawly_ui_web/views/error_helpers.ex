@@ -17,6 +17,23 @@ defmodule CrawlyUIWeb.ErrorHelpers do
     end)
   end
 
+  def get_hint(data, field) do
+    case Map.get(data, field) do
+      nil ->
+        nil
+
+      message ->
+        case String.length(message) <= 100 do
+          true ->
+            content_tag(:span, message)
+
+          false ->
+            message = "#{String.slice(message, 0, 100)} ..."
+            content_tag(:span, message)
+        end
+    end
+  end
+
   @doc """
   Translates an error message using gettext.
   """

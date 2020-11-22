@@ -6,7 +6,7 @@ defmodule CrawlyUI.SpiderManager do
   alias CrawlyUI.Manager.Job
 
   def start_spider(node, spider) when is_binary(node) and is_binary(spider) do
-    spider_atom = String.to_atom(spider)
+    spider_atom = Module.concat([Elixir, spider])
     node_atom = String.to_atom(node)
 
     uuid = Ecto.UUID.generate()

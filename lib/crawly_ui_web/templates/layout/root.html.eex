@@ -108,6 +108,7 @@
                         <a href="/">Home</a>
                         <a href="/all">Jobs</a>
                         <a href="/spider">Spiders</a>
+                        <a href="/spider/new">Create spider</a>
                         <a href="/schedule">Schedule</a>
                     </nav>
 
@@ -115,8 +116,6 @@
             </header>
             <main class="Main">
                 <section class="Section container">
-                    <p><%= live_flash(@flash, :info) %></p>
-                    <p><%= live_flash(@flash, :error) %></p>
                     <%= @inner_content %>
                 </section>
             </main>

@@ -1,0 +1,104 @@
+<h2><%= @title %> </h2>
+<%=if @error do %>
+<b style="color: red">Error: <%= @error %></b>
+<% end %>
+
+<%= if @current_step == 0 do %>
+<form phx-submit="step1">
+    <label>Spider Name</label>
+    <input type="text" value="<%= Map.get(@data, "name") %>" name="name" required />
+
+    <label>Fields (coma separated)</label>
+    <input type="text" name="fields" value="<%= raw Map.get(@data, "fields") %>"  required />
+    <input type="submit" value="Update"/>
+</form>
+<% end %>
+
+<%= if @current_step == 1 do %>
+<form phx-submit="step2">
+    <label>Start urls (one per line)</label>
+    <textarea name="start_urls"><%= Map.get(@data, "start_urls") %></textarea>
+
+    <label>Paths to follow (one per line)</label>
+    <textarea name="links_to_follow"><%= Map.get(@data, "links_to_follow") %></textarea>
+    <input type="submit" value="Update"/>
+</form>
+<% end %>
+
+<%= if @current_step == 2 do %>
+<!--
+Extraction rules part
+-->
+<table>
+    <thead>
+    <tr>
+        <th>Page</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+        <%= for {url, _rule} <- @rules do %>
+        <tr>
+            <td><%= url %></td>
+            <td>
+                <a phx-click="rule_delete" href="#" phx-value-url="<%= url %>">Remove</a> ||
+                <a phx-click="rule_edit" href="#" phx-value-url="<%= url %>">Edit</a>
+            </td>
+        </tr>
+        <% end %>
+
+    </tbody>
+</table>
+<hr />
+<h5 class="float-left"> Add new rule </h5>
+<form class="row row-center column-50" phx-submit="step3">
+    <div class="row">
+        <div class="column column-50">
+            <input class="subscribe-input" type="url" placeholder="URL" name="pageUrl" value="">
+        </div>
+        <div class="column column-50">
+            <button class="subscribe-button float-left">Add</button>
+        </div>
+    </div>
+</form>
+<br style="clear: both" />
+<button phx-click="save_spider">Save spider</button>
+<% end %>
+
+<%= if @current_step == 3 do %>
+<!--
+Extraction rules part
+-->
+
+<div class="row">
+    <div class="column column-85">
+        Start typing CSS selectors, and see what you can get from: <br /><a target="_blank" href=""><b> <%= Map.get(@current_rule, "_url") %></b></a>
+        <br />
+        <form phx-change="form_change" phx-submit="rule_added">
+            <%= for field <- Map.get(@data, "fields", "") |> String.split(",") do %>
+                <p class="float-left"></p>
+                <br />
+                <label><%= field %><%= if get_hint(@hints, field) != nil do %> <i>(You will get: '<%= raw get_hint(@hints, field) %>')</i> <% end %></label>
+                <input type="text" name="<%= field %>" phx-debounce="1000" value="<%= Map.get(@current_rule, field, Map.get(@form_data, field, "")) %>"/>
+                <br style="clear: both;">
+            <% end %>
+            <input type="submit" value="Update">
+        </form>
+    </div>
+
+</div>
+<hr />
+
+<div class="column column-35">
+    <div style="border: 2px dotted;">
+        <h4>Full preview of extracted element</h4>
+        <%= Jason.encode!(@hints) %>
+        <hr />
+    </div>
+</div>
+<% end %>
+<hr />
+Quick navigation:
+<a href="#" phx-click="step0">Step1: Define spider name</a> ||
+<a href="#" phx-click="step1">Step2: Crawl URLs</a> ||
+<a href="#" phx-click="step2">Step3: Extract items</a>
