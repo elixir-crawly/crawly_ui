@@ -57,6 +57,7 @@ defmodule CrawlyUI.MixProject do
       {:nimble_parsec, "~> 1.0"},
       {:httpoison, "~> 1.6"},
       {:floki, "~> 0.29.0"},
+      {:logger_file_backend, "~> 0.0.11"},
       {:excoveralls, "~> 0.10", only: :test},
       {:mock, "~> 0.3.0", only: :test}
     ]
