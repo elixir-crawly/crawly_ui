@@ -35,7 +35,7 @@ config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 20_000
 config :crawly_ui, CrawlyUIWeb.ItemLive, update_interval: 20_000
 
 config :logger,
-  backends: [{LoggerFileBackend, :debug_log}]
+  backends: [:console, {LoggerFileBackend, :debug_log}]
 
 # configuration for the {LoggerFileBackend, :error_log} backend
 config :logger, :debug_log,

@@ -21,7 +21,7 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   live_view: [signing_salt: "mKlOeOvv3fK8OTEEYjXqPaFqBXoVvRcC"]
 
 config :logger,
-  backends: [{LoggerFileBackend, :debug_log}]
+  backends: [:console, {LoggerFileBackend, :debug_log}]
 
 # configuration for the {LoggerFileBackend, :error_log} backend
 config :logger, :debug_log,
