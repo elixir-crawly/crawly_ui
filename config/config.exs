@@ -20,10 +20,13 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
   pubsub_server: CrawlyUI.PubSub,
   live_view: [signing_salt: "mKlOeOvv3fK8OTEEYjXqPaFqBXoVvRcC"]
 
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+config :logger,
+  backends: [:console, {LoggerFileBackend, :debug_log}]
+
+# configuration for the {LoggerFileBackend, :error_log} backend
+config :logger, :debug_log,
+  path: System.get_env("LOG_PATH", "/tmp/debug.log"),
+  level: :debug
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason

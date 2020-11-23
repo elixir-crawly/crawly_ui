@@ -39,3 +39,12 @@ config :crawly,
     Crawly.Pipelines.JSONEncoder,
     {Crawly.Pipelines.WriteToFile, extension: "json", folder: "/tmp"}
   ]
+
+# tell logger to load a LoggerFileBackend processes
+config :logger,
+  backends: [{LoggerFileBackend, :debug_log}]
+
+# configuration for the {LoggerFileBackend, :error_log} backend
+config :logger, :debug_log,
+  path: System.get_env("LOG_PATH", "/tmp/debug.log"),
+  level: :debug

@@ -29,8 +29,13 @@ defmodule Spiders.Walmart do
     }
 
     product_hrefs = document |> Floki.find("a.product-title-link") |> Floki.attribute("href")
-    department_hrefs = document |> Floki.find(".department-single-level a") |> Floki.attribute("href")
-    show_by_category_hrefs = document |> Floki.find(".SideBarMenuModuleItem a") |> Floki.attribute("href")
+
+    department_hrefs =
+      document |> Floki.find(".department-single-level a") |> Floki.attribute("href")
+
+    show_by_category_hrefs =
+      document |> Floki.find(".SideBarMenuModuleItem a") |> Floki.attribute("href")
+
     pagination_hrefs = document |> Floki.find("link[rel=next]") |> Floki.attribute("href")
 
     hrefs = product_hrefs ++ department_hrefs ++ show_by_category_hrefs ++ pagination_hrefs

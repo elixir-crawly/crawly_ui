@@ -25,6 +25,7 @@ defmodule Shops.MixProject do
     [
       {:crawly, "~> 0.12.0"},
       {:floki, "~> 0.26.0"},
+      {:logger_file_backend, "~> 0.0.11"},
       {:erlang_node_discovery, git: "https://github.com/oltarasenko/erlang-node-discovery"}
     ]
   end

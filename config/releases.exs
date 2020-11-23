@@ -34,6 +34,14 @@ config :crawly_ui, CrawlyUIWeb.Endpoint,
 config :crawly_ui, CrawlyUIWeb.JobLive, update_interval: 20_000
 config :crawly_ui, CrawlyUIWeb.ItemLive, update_interval: 20_000
 
+config :logger,
+  backends: [:console, {LoggerFileBackend, :debug_log}]
+
+# configuration for the {LoggerFileBackend, :error_log} backend
+config :logger, :debug_log,
+  path: System.get_env("LOG_PATH", "/tmp/debug.log"),
+  level: :debug
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix
