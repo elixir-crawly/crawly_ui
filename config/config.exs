@@ -25,7 +25,7 @@ config :logger,
 
 # configuration for the {LoggerFileBackend, :error_log} backend
 config :logger, :debug_log,
-  path: System.get_env("LOG_PATH", "/tmp/debug.log"),
+  path: System.get_env("LOG_PATH", "/tmp/ui_debug.log"),
   level: :debug
 
 # Use Jason for JSON parsing in Phoenix

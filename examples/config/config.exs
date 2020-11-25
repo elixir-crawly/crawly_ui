@@ -42,9 +42,9 @@ config :crawly,
 
 # tell logger to load a LoggerFileBackend processes
 config :logger,
-  backends: [{LoggerFileBackend, :debug_log}]
+  backends: [:console, {LoggerFileBackend, :debug_log}]
 
 # configuration for the {LoggerFileBackend, :error_log} backend
 config :logger, :debug_log,
-  path: System.get_env("LOG_PATH", "/tmp/debug.log"),
+  path: System.get_env("LOG_PATH", "/tmp/worker_debug.log"),
   level: :debug

@@ -39,10 +39,10 @@ defmodule CrawlyUI do
           []
 
         links_string ->
-          String.split(links_string, ",")
+          String.split(links_string, "\r\n")
       end
 
-    start_urls = spider.start_urls |> String.split(",")
+    start_urls = spider.start_urls |> String.replace("\n", "") |> String.split("\r")
 
     parsed_start_url = start_urls |> List.first() |> URI.parse()
     domain = "#{parsed_start_url.scheme}://#{parsed_start_url.host}"
@@ -66,14 +66,16 @@ defmodule CrawlyUI do
         {Crawly.Pipelines.Experimental.SendToUI, ui_node: ui_node}
       ]
 
-      [pipelines: pipelines, closespider_itemcount: 10_000]
+      [pipelines: pipelines, closespider_itemcount: 10_000, concurrent_requests_per_domain: 10]
     end
 
     @impl Crawly.Spider
     def base_url(), do: "#{domain}"
 
     @impl Crawly.Spider
-    def init(_opts), do: [start_urls: ["#{start_urls}"]]
+    def init(_opts) do
+      [start_urls: #{inspect(start_urls)}]
+    end
 
     @impl Crawly.Spider
     def parse_item(response) do
@@ -109,6 +111,7 @@ defmodule CrawlyUI do
               acc
           end
       end)
+      # :io.format("[info] Following URLs was found on the page: ~p", [absolute_urls])
       Crawly.Utils.requests_from_urls(absolute_urls)
     end
 
@@ -144,7 +147,6 @@ defmodule CrawlyUI do
       end
     """
 
-    #    IO.puts(contents)
     module = Module.concat(["#{name}"])
     contents = Code.string_to_quoted!(contents)
     {:module, name, code, _last} = Module.create(module, contents, Macro.Env.location(__ENV__))
