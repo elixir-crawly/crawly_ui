@@ -9,7 +9,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
   end
 
   def mount(%{"node" => node}, _session, socket) do
-    if connected?(socket), do: Process.send_after(self(), :pick_spider, 1000)
+    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10000)
 
     spiders = SpiderManager.list_spiders(node)
 
@@ -18,18 +18,18 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
   def mount(_param, _session, socket) do
     nodes = Node.list()
-    if connected?(socket), do: Process.send_after(self(), :pick_node, 100)
+    if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
     {:ok, assign(socket, template: "pick_node.html", nodes: nodes)}
   end
 
   def handle_info(:pick_node, socket) do
     nodes = Node.list()
-    if connected?(socket), do: Process.send_after(self(), :pick_node, 1000)
+    if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
     {:noreply, assign(socket, nodes: nodes)}
   end
 
   def handle_info(:pick_spider, socket) do
-    if connected?(socket), do: Process.send_after(self(), :pick_spider, 1000)
+    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10000)
 
     node = socket.assigns.node
     spiders = SpiderManager.list_spiders(node)
@@ -58,7 +58,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
       false ->
         :ok
     end
-    
+
     case SpiderManager.start_spider(node, spider) do
       {:ok, :started} ->
         {:noreply,
