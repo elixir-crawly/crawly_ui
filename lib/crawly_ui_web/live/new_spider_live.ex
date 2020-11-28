@@ -83,7 +83,8 @@ defmodule CrawlyUIWeb.NewSpiderLive do
            {:ok, document} <- Floki.parse_document(page.body) do
         current_rule = %{
           "_url" => url,
-          "_document" => document
+          "_document" => document,
+          "_page" => page.body,
         }
 
         socket_data = %{

@@ -71,9 +71,9 @@ Extraction rules part
 -->
 
 <div class="row">
-    <div class="column column-85">
-        Start typing CSS selectors, and see what you can get from: <br /><a target="_blank" href=""><b> <%= Map.get(@current_rule, "_url") %></b></a>
-        <br />
+    <div class="column column-25" style="background-color: #ccc;">
+        <h4>Define extractors for your fields</h4>
+        <hr />
         <form phx-change="form_change" phx-submit="rule_added">
             <%= for field <- Map.get(@data, "fields", "") |> String.split(",") do %>
                 <p class="float-left"></p>
@@ -85,17 +85,21 @@ Extraction rules part
             <input type="submit" value="Update">
         </form>
     </div>
+    <div class="column column-80">
 
-</div>
-<hr />
+        <iframe width="1000px" height="1000px" src="<%= Map.get(@current_rule, "_url") %>" ></iframe>
+        <div style="border: 2px dotted;">
+            <h4>Full preview of extracted element</h4>
+            <%= Jason.encode!(@hints) %>
+            <hr />
+        </div>
 
-<div class="column column-35">
-    <div style="border: 2px dotted;">
-        <h4>Full preview of extracted element</h4>
-        <%= Jason.encode!(@hints) %>
-        <hr />
     </div>
 </div>
+<hr />
+<br />
+
+
 <% end %>
 <hr />
 Quick navigation:

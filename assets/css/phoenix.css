@@ -185,7 +185,7 @@ table.w3-table-all {
 }
 
 
-iframe {
+iframe .preview{
     position: fixed;
     top: 150px;
     left: 600px;
