@@ -84,7 +84,7 @@ defmodule CrawlyUIWeb.NewSpiderLive do
         current_rule = %{
           "_url" => url,
           "_document" => document,
-          "_page" => page.body,
+          "_page" => page.body
         }
 
         socket_data = %{
