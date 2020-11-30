@@ -11,11 +11,17 @@ defmodule CrawlyUIWeb.ScheduleLive do
   def mount(%{"node" => node}, _session, socket) do
     if connected?(socket), do: Process.send_after(self(), :pick_spider, 10000)
 
+    generic_spiders =
+      Enum.map(
+        Manager.list_spiders(page_size: 100),
+        fn spider -> spider.name end
+      )
+
     spiders = SpiderManager.list_spiders(node)
 
     {:ok,
      assign(socket,
-       generic_spiders: [],
+       generic_spiders: generic_spiders,
        template: "pick_spider.html",
        node: node,
        spiders: spiders,
@@ -25,8 +31,17 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
   def mount(_param, _session, socket) do
     nodes = Node.list()
+
+    generic_spiders =
+      Enum.map(
+        Manager.list_spiders(page_size: 100),
+        fn spider -> spider.name end
+      )
+
     if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
-    {:ok, assign(socket, generic_spiders: [], template: "pick_node.html", nodes: nodes)}
+
+    {:ok,
+     assign(socket, generic_spiders: generic_spiders, template: "pick_node.html", nodes: nodes)}
   end
 
   def handle_info(:pick_node, socket) do
@@ -41,14 +56,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
     node = socket.assigns.node
     spiders = SpiderManager.list_spiders(node)
 
-    generic_spiders =
-      Enum.map(
-        Manager.list_spiders(page_size: 100),
-        fn spider -> spider.name end
-      )
-
-    {:noreply,
-     assign(socket, generic_spiders: generic_spiders, spiders: spiders ++ generic_spiders)}
+    {:noreply, assign(socket, spiders: spiders)}
   end
 
   def handle_event("spider_picked", %{"node" => node}, socket) do
