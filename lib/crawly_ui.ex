@@ -153,7 +153,7 @@ defmodule CrawlyUI do
       end
     """
 
-    IO.puts contents
+    IO.puts(contents)
     module = Module.concat(["#{name}"])
     contents = Code.string_to_quoted!(contents)
     {:module, name, code, _last} = Module.create(module, contents, Macro.Env.location(__ENV__))
