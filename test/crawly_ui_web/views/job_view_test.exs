@@ -65,6 +65,7 @@ defmodule CrawlyUIWeb.JobViewTest do
     view =
       render_to_string(CrawlyUIWeb.JobView, "pick_spider.html",
         node: "test@worker.com",
+        generic_spiders: [],
         spiders: [:"Elixir.Spider.Test", :"Spider.Test", :Test],
         error: nil
       )
