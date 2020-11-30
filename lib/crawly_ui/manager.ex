@@ -29,14 +29,9 @@ defmodule CrawlyUI.Manager do
     Enum.each(running_jobs, fn job ->
       case is_job_abandoned(job) do
         true ->
-          state =
-            case SpiderManager.close_job_spider(job) do
-              {:ok, :stopped} -> "abandoned"
-              {:error, :nodedown} -> "node down"
-              _ -> "stopped"
-            end
-
-          update_job(job, %{state: state})
+          # TODO: Check returned value
+          SpiderManager.close_job_spider(job)
+          update_job(job, %{state: "stopped"})
 
         false ->
           :ok
