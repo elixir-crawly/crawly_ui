@@ -50,7 +50,6 @@ defmodule CrawlyUI do
       |> String.split("\r")
 
     start_urls = start_urls ++ urls_from_rules
-
     parsed_start_url = start_urls |> List.first() |> URI.parse()
     domain = "#{parsed_start_url.scheme}://#{parsed_start_url.host}"
     fields = spider.fields |> String.split(",")
@@ -59,7 +58,7 @@ defmodule CrawlyUI do
       Map.values(spider.rules)
       |> Enum.map(fn rule ->
         rule
-        |> Map.drop(["_document", "_url"])
+        |> Map.drop(["_document", "_url", "_page"])
       end)
 
     contents = """
@@ -154,6 +153,7 @@ defmodule CrawlyUI do
       end
     """
 
+    IO.puts contents
     module = Module.concat(["#{name}"])
     contents = Code.string_to_quoted!(contents)
     {:module, name, code, _last} = Module.create(module, contents, Macro.Env.location(__ENV__))
