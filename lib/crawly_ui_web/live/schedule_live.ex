@@ -13,13 +13,20 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
     spiders = SpiderManager.list_spiders(node)
 
-    {:ok, assign(socket, template: "pick_spider.html", node: node, spiders: spiders, error: nil)}
+    {:ok,
+     assign(socket,
+       generic_spiders: [],
+       template: "pick_spider.html",
+       node: node,
+       spiders: spiders,
+       error: nil
+     )}
   end
 
   def mount(_param, _session, socket) do
     nodes = Node.list()
     if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
-    {:ok, assign(socket, template: "pick_node.html", nodes: nodes)}
+    {:ok, assign(socket, generic_spiders: [], template: "pick_node.html", nodes: nodes)}
   end
 
   def handle_info(:pick_node, socket) do
