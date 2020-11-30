@@ -42,7 +42,14 @@ defmodule CrawlyUI do
           String.split(links_string, "\r\n")
       end
 
-    start_urls = spider.start_urls |> String.replace("\n", "") |> String.split("\r")
+    urls_from_rules = Map.keys(spider.rules)
+
+    start_urls =
+      spider.start_urls
+      |> String.replace("\n", "")
+      |> String.split("\r")
+
+    start_urls = start_urls ++ urls_from_rules
 
     parsed_start_url = start_urls |> List.first() |> URI.parse()
     domain = "#{parsed_start_url.scheme}://#{parsed_start_url.host}"
