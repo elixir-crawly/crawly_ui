@@ -189,9 +189,6 @@ defmodule CrawlyUI.Manager do
         {:ok, :stopped} ->
           "cancelled"
 
-        {:error, :nodedown} ->
-          "node down"
-
         _ ->
           "stopped"
       end
@@ -223,6 +220,7 @@ defmodule CrawlyUI.Manager do
 
   """
   def run_time(%Job{inserted_at: start} = job) do
+    IO.inspect most_recent_item(job.id), label: :recent
     case most_recent_item(job.id) do
       nil ->
         0.0
@@ -298,6 +296,7 @@ defmodule CrawlyUI.Manager do
   Update run times for all active jobs
   """
   def update_run_times(jobs) do
+    IO.inspect jobs
     Enum.each(jobs, fn job ->
       cnt = run_time(job) |> trunc()
       {:ok, _} = update_job(job, %{run_time: cnt})
