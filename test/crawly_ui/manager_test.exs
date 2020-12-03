@@ -149,21 +149,17 @@ defmodule CrawlyUi.ManagerTest do
   test "cancell_running_job/1" do
     job_1 = insert_job(%{state: "running"})
     job_2 = insert_job(%{state: "running"})
-    job_3 = insert_job(%{state: "running"})
 
     with_mock CrawlyUI.SpiderManager, [],
       close_job_spider: fn
         ^job_1 -> {:ok, :stopped}
         ^job_2 -> {:error, :spider_not_running}
-        ^job_3 -> {:error, :nodedown}
       end do
       job_id_1 = job_1.id
       job_id_2 = job_2.id
-      job_id_3 = job_3.id
 
       assert {:ok, %Job{id: ^job_id_1, state: "cancelled"}} = Manager.cancel_running_job(job_1)
       assert {:ok, %Job{id: ^job_id_2, state: "stopped"}} = Manager.cancel_running_job(job_2)
-      assert {:ok, %Job{id: ^job_id_3, state: "node down"}} = Manager.cancel_running_job(job_3)
     end
   end
 

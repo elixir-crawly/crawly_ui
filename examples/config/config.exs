@@ -24,7 +24,7 @@ user_agents = [
 ]
 
 config :crawly,
-  closespider_timeout: -1,
+  closespider_timeout: 1,
   closespider_itemcount: 100_000,
   concurrent_requests_per_domain: 2,
   middlewares: [

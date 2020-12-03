@@ -1,9 +1,10 @@
-<h2><%= @title %> </h2>
+<h2><%= @title %></h2>
 <%=if @error do %>
 <b style="color: red">Error: <%= @error %></b>
 <% end %>
 
 <%= if @current_step == 0 do %>
+See instructions <a target="_blank" href="https://www.youtube.com/watch?v=1O-XArob5rU&ab_channel=OlegTarasenko">here</a>
 <form phx-submit="step1">
     <label>Spider Name</label>
     <input type="text" value="<%= Map.get(@data, "name") %>" name="name" required />
