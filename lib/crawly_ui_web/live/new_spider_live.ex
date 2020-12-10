@@ -96,8 +96,9 @@ defmodule CrawlyUIWeb.NewSpiderLive do
 
         socket |> assign(socket_data)
       else
-        {:error, %HTTPoison.Error{reason: reason}} ->
-          socket |> assign(%{error: reason.reason})
+        {:error, %HTTPoison.Error{reason: reason}} = err ->
+          IO.inspect(err)
+          socket |> assign(%{error: "Could not fetch the page: #{inspect(reason)}"})
 
         {:error, reason} ->
           socket |> assign(%{error: inspect(reason)})
