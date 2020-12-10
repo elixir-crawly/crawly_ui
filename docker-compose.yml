@@ -18,10 +18,11 @@ services:
       - 80:4000
 
   postgres:
+    restart: always
     image: postgres:11.4-alpine
     container_name: crawlyuidb
     ports:
-      - 5433:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: example
       PGPASSWORD: example

@@ -3,8 +3,8 @@ use Mix.Config
 # Configure your database
 config :crawly_ui, CrawlyUI.Repo,
   username: System.get_env("PG_USERNAME") || "postgres",
-  password: System.get_env("PG_PASSWORD") || "postgres",
-  database: System.get_env("PG_DATABASE") || "crawly_ui_devv",
+  password: System.get_env("PG_PASSWORD") || "example",
+  database: System.get_env("PG_DATABASE") || "crawlyui",
   hostname: System.get_env("PG_HOST") || "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10,
