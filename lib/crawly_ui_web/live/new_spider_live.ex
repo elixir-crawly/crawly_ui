@@ -1,6 +1,8 @@
 defmodule CrawlyUIWeb.NewSpiderLive do
   use Phoenix.LiveView
 
+  alias CrawlyUI.Utils
+
   def render(assigns) do
     CrawlyUIWeb.JobView.render("new_spider.html", assigns)
   end
@@ -96,8 +98,7 @@ defmodule CrawlyUIWeb.NewSpiderLive do
 
         socket |> assign(socket_data)
       else
-        {:error, %HTTPoison.Error{reason: reason}} = err ->
-          IO.inspect(err)
+        {:error, %HTTPoison.Error{reason: reason}} ->
           socket |> assign(%{error: "Could not fetch the page: #{inspect(reason)}"})
 
         {:error, reason} ->
@@ -114,16 +115,16 @@ defmodule CrawlyUIWeb.NewSpiderLive do
     [target] = Map.get(data, "_target")
     suggested_selector = Map.get(data, target)
 
-    html_tree =
+    hint =
       case suggested_selector do
         "response_url" ->
           Map.get(socket.assigns.current_rule, "_url")
 
-        _selector ->
-          Floki.find(document, suggested_selector)
+        selector ->
+          Utils.extract_data_with_complex_selector(document, selector)
       end
 
-    new_hints = Map.put(hints, target, "#{Floki.text(html_tree)}")
+    new_hints = Map.put(hints, target, "#{inspect(hint)}")
 
     {:noreply, socket |> assign(%{hints: new_hints, form_data: data})}
   end
