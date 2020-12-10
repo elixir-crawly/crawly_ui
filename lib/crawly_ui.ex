@@ -140,9 +140,7 @@ defmodule CrawlyUI do
 
           {field, selector}, acc ->
             extracted_data =
-              document
-              |> Floki.find(selector)
-              |> Floki.text()
+              CrawlyUI.Utils.extract_data_with_complex_selector(document, selector)
 
             case extracted_data == "" do
               true -> acc
@@ -154,6 +152,11 @@ defmodule CrawlyUI do
     """
 
     IO.puts(contents)
+    # Loading extraction utils
+    {mod, bin, file} = :code.get_object_code(CrawlyUI.Utils)
+    :rpc.call(node, :code, :load_binary, [mod, file, bin])
+
+    # Loading generated module
     module = Module.concat(["#{name}"])
     contents = Code.string_to_quoted!(contents)
     {:module, name, code, _last} = Module.create(module, contents, Macro.Env.location(__ENV__))

@@ -18,7 +18,7 @@ See instructions <a target="_blank" href="https://www.youtube.com/watch?v=1O-XAr
 <%= if @current_step == 1 do %>
 <form phx-submit="step2">
     <label>Start urls (one per line)</label>
-    <textarea name="start_urls"><%= Map.get(@data, "start_urls") %></textarea>
+    <textarea name="start_urls" required><%= Map.get(@data, "start_urls") %></textarea>
 
     <label>Paths to follow (one per line)</label>
     <textarea name="links_to_follow"><%= Map.get(@data, "links_to_follow") %></textarea>

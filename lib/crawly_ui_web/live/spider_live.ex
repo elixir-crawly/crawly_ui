@@ -5,6 +5,7 @@ defmodule CrawlyUIWeb.SpiderLive do
   alias CrawlyUI.SpiderManager
 
   import Ecto.Query
+  require Logger
 
   def render(assigns) do
     CrawlyUIWeb.JobView.render("spider.html", assigns)
@@ -39,7 +40,7 @@ defmodule CrawlyUIWeb.SpiderLive do
 
   def handle_info(:update_spiders, socket) do
     socket = update_spiders(socket)
-    if connected?(socket), do: Process.send_after(self(), :update_spiders, 1000)
+    if connected?(socket), do: Process.send_after(self(), :update_spiders, 10_000)
     {:noreply, socket}
   end
 
@@ -108,6 +109,8 @@ defmodule CrawlyUIWeb.SpiderLive do
 
     case CrawlyUI.SpiderManager.start_spider(node_name, spider_name) do
       {:ok, :started} ->
+        Logger.info("Started")
+
         socket =
           socket
           |> put_flash(:info, "Spider was scheduled")
@@ -116,9 +119,11 @@ defmodule CrawlyUIWeb.SpiderLive do
         {:noreply, socket}
 
       {:error, reason} ->
+        Logger.error("Was unable to start spider: #{inspect(reason)}")
+
         socket =
           socket
-          |> put_flash(:info, "Was unable to start spider: #{inspect(reason)}")
+          |> put_flash(:error, "Was unable to start spider: #{inspect(reason)}")
 
         {:noreply, socket}
     end
