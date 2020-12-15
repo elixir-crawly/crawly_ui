@@ -42,9 +42,10 @@ config :crawly,
 
 # tell logger to load a LoggerFileBackend processes
 config :logger,
-  backends: [:console, {LoggerFileBackend, :debug_log}]
-
-# configuration for the {LoggerFileBackend, :error_log} backend
-config :logger, :debug_log,
-  path: System.get_env("LOG_PATH", "/tmp/worker_debug.log"),
+  backends: [
+    :console,
+    {Crawly.Loggers.SendToUiBackend, :send_log_to_ui}
+  ],
   level: :debug
+
+config :logger, :send_log_to_ui, destination: {ui_node, CrawlyUI, :store_log}

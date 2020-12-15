@@ -23,6 +23,20 @@ defmodule CrawlyUI do
     end
   end
 
+  def store_log(job_tag, msg) do
+    case Manager.get_job_by_tag(job_tag) do
+      nil ->
+        Logger.error("Job was not found: #{job_tag}")
+        {:error, :job_not_found}
+
+      job ->
+        {:ok, _log} = Manager.create_log(%{job_id: job.id, message: msg})
+
+        Manager.update_job(job, %{state: "running"})
+        :ok
+    end
+  end
+
   def list_spiders(node) do
     :rpc.call(node, Crawly, :list_spiders, [])
   end

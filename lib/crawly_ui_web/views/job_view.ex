@@ -67,7 +67,7 @@ defmodule CrawlyUIWeb.JobView do
       <th>Spider</th>
       <th>Node</th>
       <th>Items</th>
-
+      <th>Logs</th>
       <th>State</th>
 
       <th>Start Time</th>
@@ -91,6 +91,9 @@ defmodule CrawlyUIWeb.JobView do
         <td>#{job.node}</td>
         <td>
           <a href="/jobs/#{job.id}/items">#{job.items_count}</a>
+        </td>
+        <td>
+          <a href="/logs/#{job.id}/list">logs</a>
         </td>
         <td>#{job.state}</td>
         <td>#{job.inserted_at}</td>

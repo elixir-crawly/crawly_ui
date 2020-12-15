@@ -1,0 +1,22 @@
+<h1>Logs</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        <%= for item <- @items do %>
+        <tr>
+            <td><%= item.inserted_at %></td>
+            <td><%= item.message %></td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<nav>
+    <ul class="pagination">
+        <li><a href="/logs/<%= @id %>/list/?page=<%= @current_page + 1 %>">Next page</a></li>
+    </ul>
+</nav>
