@@ -1,4 +1,41 @@
 defmodule CrawlyUIWeb.PaginationHelpers do
+  def scrivener_links(page, total_pages, link_params \\ nil) do
+    min =
+      case page - 5 <= 0 do
+        true -> 1
+        false -> page - 5
+      end
+
+    max =
+      case page + 5 >= total_pages do
+        true -> total_pages
+        false -> page + 5
+      end
+
+    pages =
+      Enum.map(
+        min..max,
+        fn
+          ^page ->
+            "<li class='active'><a href='#{build_pagination_url(page, link_params)}'>#{page}</a></li>"
+
+          x ->
+            "<li><a href='#{build_pagination_url(x, link_params)}'>#{x}</a></li>"
+        end
+      )
+
+    """
+    <nav>
+    <ul class="pagination">
+    #{pages}
+    </ul>
+    </nav>
+    """
+  end
+
+  defp build_pagination_url(page, nil), do: "?page=#{page}"
+  defp build_pagination_url(page, extra_params), do: "?page=#{page}&#{extra_params}"
+
   def pagination_links(page, total_pages) do
     goto_next = render_goto_next(page, total_pages)
     goto_prev = render_goto_prev(page, total_pages)

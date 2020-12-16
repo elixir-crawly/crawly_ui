@@ -5,6 +5,7 @@ defmodule CrawlyUI.Manager.Log do
   schema "logs" do
     field :message, :string
     field :job_id, :id
+    field :mod, :string
 
     timestamps()
   end
@@ -12,7 +13,7 @@ defmodule CrawlyUI.Manager.Log do
   @doc false
   def changeset(log, attrs) do
     log
-    |> cast(attrs, [:job_id, :message])
-    |> validate_required([:job_id, :message])
+    |> cast(attrs, [:job_id, :message, :mod])
+    |> validate_required([:job_id, :message, :mod])
   end
 end
