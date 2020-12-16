@@ -1,4 +1,16 @@
 <h1>Logs</h1>
+<!-- The form -->
+<form class="filter" method="GET" action="/logs/<%= @id %>/list">
+    <label for="logs_filter">Filter logs:</label>
+
+    <select name="logs_filter" id="logs_filter" onchange="this.form.submit()">
+        <option value="all">all</option>
+        <%= for filter <- @filters do %>
+        <option <%= if filter == @current_filter do %> selected <% end %> value="<%= filter %>"><%= filter %></option>
+        <% end %>
+    </select>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -15,8 +27,5 @@
         <% end %>
     </tbody>
 </table>
-<nav>
-    <ul class="pagination">
-        <li><a href="/logs/<%= @id %>/list/?page=<%= @current_page + 1 %>">Next page</a></li>
-    </ul>
-</nav>
+
+<%= raw scrivener_links(@current_page, @total_pages, @extra_params) %>

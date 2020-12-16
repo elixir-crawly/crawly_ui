@@ -551,8 +551,26 @@ defmodule CrawlyUI.Manager do
   @doc """
   List generated spiders
   """
-  def list_logs(job_id, params) do
+  def list_logs(job_id, params, filter) do
     query = Log |> where([i], i.job_id == ^job_id)
+
+    query =
+      case filter do
+        "all" ->
+          query
+
+        "workers" ->
+          query |> where([i], ilike(i.mod, "%worker%"))
+
+        "manager" ->
+          query |> where([i], ilike(i.mod, "%manager%"))
+
+        "requests" ->
+          query |> where([i], ilike(i.mod, "%middleware%"))
+
+        "items" ->
+          query |> where([i], ilike(i.mod, "%pipelines%"))
+      end
 
     query
     |> order_by(desc: :inserted_at)
