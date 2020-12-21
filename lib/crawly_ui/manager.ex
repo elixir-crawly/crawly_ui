@@ -9,7 +9,6 @@ defmodule CrawlyUI.Manager do
   alias CrawlyUI.Manager.Job
   alias CrawlyUI.Manager.Item
   alias CrawlyUI.Manager.Spider
-  alias CrawlyUI.Manager.Log
 
   alias CrawlyUI.SpiderManager
 
@@ -540,41 +539,6 @@ defmodule CrawlyUI.Manager do
       data ->
         Map.update!(data, :rules, fn v -> decode_rules(v) end)
     end
-  end
-
-  def create_log(attrs \\ %{}) do
-    %Log{}
-    |> Log.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  List generated spiders
-  """
-  def list_logs(job_id, params, filter) do
-    query = Log |> where([i], i.job_id == ^job_id)
-
-    query =
-      case filter do
-        "all" ->
-          query
-
-        "workers" ->
-          query |> where([i], ilike(i.mod, "%worker%"))
-
-        "manager" ->
-          query |> where([i], ilike(i.mod, "%manager%"))
-
-        "requests" ->
-          query |> where([i], ilike(i.mod, "%middleware%"))
-
-        "items" ->
-          query |> where([i], ilike(i.mod, "%pipelines%"))
-      end
-
-    query
-    |> order_by(desc: :inserted_at)
-    |> Repo.paginate(params)
   end
 
   # Convert all values in rules into Base encoded binaries (so they can be stored

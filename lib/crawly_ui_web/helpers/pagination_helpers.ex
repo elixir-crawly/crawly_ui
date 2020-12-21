@@ -1,8 +1,8 @@
 defmodule CrawlyUIWeb.PaginationHelpers do
-  def scrivener_links(page, total_pages, link_params \\ nil) do
+  def simple_pagination(page, total_pages, link_params \\ nil) do
     min =
       case page - 5 <= 0 do
-        true -> 1
+        true -> 0
         false -> page - 5
       end
 

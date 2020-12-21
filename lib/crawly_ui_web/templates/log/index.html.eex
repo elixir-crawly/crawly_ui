@@ -28,4 +28,4 @@
     </tbody>
 </table>
 
-<%= raw scrivener_links(@current_page, @total_pages, @extra_params) %>
+<%= raw simple_pagination(@current_page, @total_pages, @extra_params) %>

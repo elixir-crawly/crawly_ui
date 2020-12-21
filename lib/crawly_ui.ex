@@ -30,7 +30,7 @@ defmodule CrawlyUI do
         {:error, :job_not_found}
 
       job ->
-        {:ok, _log} = Manager.create_log(%{job_id: job.id, message: msg, mod: mod})
+        {:ok, _log} = CrawlyUI.Queries.Log.create_log(%{job_id: job.id, message: msg, mod: mod})
 
         Manager.update_job(job, %{state: "running"})
         :ok
