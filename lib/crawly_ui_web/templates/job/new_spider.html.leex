@@ -4,7 +4,7 @@
 <% end %>
 
 <%= if @current_step == 0 do %>
-See instructions <a target="_blank" href="https://www.youtube.com/watch?v=1O-XArob5rU&ab_channel=OlegTarasenko">here</a>
+<b>Get help:</b> <a target="_blank" href="https://www.youtube.com/watch?v=1O-XArob5rU&ab_channel=OlegTarasenko">Video instructions</a> | <a taget="_blank" href="https://t.me/elixir_crawly">Ask in our telegram group</a>
 <form phx-submit="step1">
     <label>Spider Name (one word without spaces, e.g. `TestSpider`)</label>
     <input type="text" value="<%= Map.get(@data, "name") %>" name="name" required />
