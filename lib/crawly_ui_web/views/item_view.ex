@@ -10,13 +10,17 @@ defmodule CrawlyUIWeb.ItemView do
   end
 
   def render_field_value(_name, value) do
-    is_url = String.contains?(value, "http://") or String.contains?(value, "https://")
+    is_image = String.ends_with?(value, [".jpeg", ".jpg", ".png"])
+    is_url = String.starts_with?(value, ["http://", "https://"])
 
-    case is_url do
-      true ->
+    cond do
+      is_image == true ->
+        "<img width='150px' src='#{value}' />"
+
+      is_url == true ->
         "<a target='blank' href='#{value}'>#{value}</a>"
 
-      false ->
+      true ->
         "#{value}"
     end
   end
