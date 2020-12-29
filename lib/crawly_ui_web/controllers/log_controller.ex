@@ -10,7 +10,7 @@ defmodule CrawlyUIWeb.LogController do
     limit = Map.get(params, "limit", @items_per_page)
 
     filter = Map.get(params, "logs_filter", "all")
-    filters = ["requests", "items", "workers", "manager"]
+    filters = ["requests", "items", "worker", "manager"]
     total_pages = round(Log.count_logs(id, filter) / @items_per_page)
     items = Log.list_logs(id, %{page: page, limit: limit}, filter)
 
