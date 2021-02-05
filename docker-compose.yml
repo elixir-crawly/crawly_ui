@@ -29,14 +29,31 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: crawlyui
 
-  worker:
+  shops_worker:
     stdin_open: true
     tty: true
-    container_name: worker.com
-    command:  iex --cookie 123 --name worker@worker.com -S mix
+    container_name: shops_worker.com
+    command:  iex --cookie 123 --name shops_worker@worker.com -S mix
     build:
-      context: "examples"
+      context: "examples/shops"
       dockerfile: Dockerfile
     environment:
       UI_NODE: "ui@crawlyui.com"
 
+  cars_worker:
+    stdin_open: true
+    tty: true
+    container_name: cars_worker.com
+    command:  iex --cookie 123 --name cars_worker@worker.com -S mix
+    build:
+      context: "examples/cars"
+      dockerfile: Dockerfile
+    environment:
+      UI_NODE: "ui@crawlyui.com"
+    volumes:
+      - images:/examples/cars/images
+      - output:/examples/cars/output
+
+volumes:
+  images:
+  output:
