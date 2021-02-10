@@ -86,21 +86,9 @@ defmodule Spiders.Homebase do
   end
 
   defp product_image(document) do
-    links =
-      document
-      |> Floki.find("a.rsImg")
-      |> Floki.attribute("href")
-
-    do_product_image(links)
-  end
-
-  defp do_product_image([]), do: nil
-  defp do_product_image([link|_]) do
-    %HTTPoison.Response{body: body} = HTTPoison.get!(link)
-
-    local_file_link = @image_folder <> "/" <> Path.basename(link)
-
-    File.write!(local_file_link, body)
-    local_file_link
+    document
+    |> Floki.find("div.rsTextSlide:first-child > a.rsImg")
+    |> Floki.attribute("href")
+    |> Floki.text()
   end
 end
