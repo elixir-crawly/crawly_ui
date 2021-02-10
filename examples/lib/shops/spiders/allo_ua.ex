@@ -38,12 +38,20 @@ defmodule Spiders.AlloUa do
     # Parse response body to document
     {:ok, document} = Floki.parse_document(response.body)
 
+    next_page =
+      document
+      |> Floki.find("div.pagination__next a.pagination__next__link")
+      |> Floki.attribute("href")
+      |> Floki.text()
+
     # Extract individual product page URLs
-    urls =
+    product_pages =
       document
       |> Floki.find("div.product-card__content")
       |> Floki.find("a.product-card__title")
       |> Floki.attribute("href")
+
+    urls = [next_page|product_pages]
 
     requests =
       urls
