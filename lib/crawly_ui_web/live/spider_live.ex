@@ -17,7 +17,7 @@ defmodule CrawlyUIWeb.SpiderLive do
     socket =
       case spider do
         nil ->
-          # Show a view that lists all available spiders
+          # Show a view that lists all generic spiders
           if connected?(socket), do: Process.send_after(self(), :update_spiders, 10_000)
 
           socket
@@ -129,43 +129,14 @@ defmodule CrawlyUIWeb.SpiderLive do
     end
   end
 
-  def handle_event("schedule_spider", %{"spider" => spider, "node" => node}, socket) do
-    case SpiderManager.start_spider(node, spider) do
-      {:ok, :started} ->
-        {:noreply,
-         socket
-         |> put_flash(
-           :info,
-           "Spider scheduled successfully. It might take a bit of time before items will appear here..."
-         )
-         |> redirect(to: CrawlyUIWeb.Router.Helpers.job_path(socket, :index))}
-
-      error ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "#{inspect(error)}")
-         |> redirect(to: CrawlyUIWeb.Router.Helpers.spider_path(socket, :spider))}
-    end
-  end
-
   defp update_spiders(socket) do
     # Update the socket for all spider view
     spider = socket.assigns.spider
-    nodes = Node.list()
-
-    available_spiders =
-      Enum.map(nodes, fn node ->
-        spiders = SpiderManager.list_spiders(node)
-        {node, spiders}
-      end)
 
     generic_spiders = Enum.map(Manager.list_spiders(page_size: 10), fn spider -> spider.name end)
 
-    all_spiders = available_spiders
-
     assign(socket,
       spider: spider,
-      available_spiders: all_spiders,
       generic_spiders: generic_spiders
     )
   end

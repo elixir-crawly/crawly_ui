@@ -1,36 +1,6 @@
 <%= if @spider == nil do %>
     <!-- Rendering a list of spiders -->
-    <h1>Spiders</h1>
-    <%= if @available_spiders != [] do %>
-    <h2>Available for schedule</h2>
-    <%= for {node, spiders} <- @available_spiders do %>
-        <%= if spiders == [] do %>
-        <% else %>
-        <table>
-           <tr>
-              <th colspan="2"><%= node %></th>
-           </tr>
-               <%= for spider <- spiders do %>
-               <tr>
-                  <td>
-                      <a href="#" phx-click=show_spider phx-value-spider=<%= spider %>>
-                          <%= raw render_spider_name(spider) %>
-                      </a>
-                  </td>
-                   <td class="w">
-                      <button phx-click="schedule_spider" phx-value-node=<%= node %> phx-value-spider=<%= spider%>>
-                          Schedule
-                      </button>
-                  </td>
-               </tr>
-               <% end %>
-        </table>
-        <br>
-        <br>
-        <% end %>
-    <% end %>
-    <% end %>
-    <h2> Generic spiders </h2>
+    <h1> Generic spiders </h1>
     <table>
     <%= for spider <- @generic_spiders do %>
         <tr>

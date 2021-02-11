@@ -20,6 +20,7 @@ defmodule CrawlyUIWeb.Router do
     live "/", JobLive, :index
     live "/all", JobLive, :show
 
+    live "/available_spiders", AvailableSpiderLive, :available_spider
     live "/spider", SpiderLive, :spider
     live "/spider/new", NewSpiderLive, :spider
 
