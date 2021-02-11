@@ -10,6 +10,10 @@ defmodule CrawlyUI.Manager.Job do
     field :items_count, :integer, default: 0
     field :crawl_speed, :integer, default: 0
     field :run_time, :integer, default: 0
+
+    has_many :items, CrawlyUI.Manager.Item, on_delete: :delete_all
+    has_many :logs, CrawlyUI.Manager.Log, on_delete: :delete_all
+
     timestamps()
   end
 

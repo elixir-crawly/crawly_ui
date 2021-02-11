@@ -4,7 +4,7 @@ defmodule CrawlyUI.Manager.Item do
 
   schema "items" do
     field :data, :map
-    field :job_id, :id
+    belongs_to :job, CrawlyUI.Manager.Job
 
     timestamps()
   end
