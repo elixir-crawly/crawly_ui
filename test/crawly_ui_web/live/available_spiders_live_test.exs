@@ -51,28 +51,28 @@ defmodule CrawlyUIWeb.AvailableSpidersLiveTest do
     end
   end
 
-  # test "pick node from list and render it's spiders", %{conn: conn} do
-  #   with_mocks([
-  #     {Node, [], list: fn -> ["example1@node", "example2@node"] end},
-  #     {SpiderManager, [], list_spiders: fn node -> conditionally_mocked(node) end}
-  #   ]) do
-  #     {:ok, view, _html} = live(conn, "/available_spiders")
+  test "pick node from list and render it's spiders", %{conn: conn} do
+    with_mock CrawlyUI.SpiderManager, [],
+      list_spiders: fn _ ->
+        ["Test.Spider3", "Test.Spider4"]
+      end do
+      {:ok, view, _html} = live(conn, "/available_spiders")
 
-  #     render_click(view, :pick_node, %{
-  #       "node" => "example2@node"
-  #     })
+      refute render(view) =~
+               "Test.Spider3"
 
-  #     assert render(view) =~
-  #       "Test.Spider3"
-  #     assert render(view) =~
-  #       "Test.Spider4"
-  #   end
-  # end
+      refute render(view) =~
+               "Test.Spider4"
 
-  # defp conditionally_mocked(node) do
-  #   case node do
-  #     "example1@node" -> ["Test.Spider1", "Test.Spider2"]
-  #     "example2@node" -> ["Test.Spider3", "Test.Spider4"]
-  #   end
-  # end
+      render_click(view, :pick_node, %{
+        "node" => "example2@node"
+      })
+
+      assert render(view) =~
+               "Test.Spider3"
+
+      assert render(view) =~
+               "Test.Spider4"
+    end
+  end
 end
