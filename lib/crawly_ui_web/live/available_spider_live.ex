@@ -9,17 +9,9 @@ defmodule CrawlyUIWeb.AvailableSpiderLive do
   end
 
   def mount(_params, _session, socket) do
-    socket = socket |> update_available_spiders()
-
-    if connected?(socket), do: Process.send_after(self(), :update_available_spiders, 10_000)
+    socket = socket |> assign(:nodes, Node.list()) |> update_available_spiders()
 
     {:ok, socket}
-  end
-
-  def handle_info(:update_available_spiders, socket) do
-    socket = update_available_spiders(socket)
-
-    {:noreply, socket}
   end
 
   def handle_event("schedule_spider", %{"node" => ""}, socket) do
@@ -41,41 +33,30 @@ defmodule CrawlyUIWeb.AvailableSpiderLive do
         {:noreply,
          socket
          |> put_flash(:error, "#{inspect(error)}")
-         |> redirect(to: CrawlyUIWeb.Router.Helpers.available_spider_path(socket, :available_spider))}
+         |> redirect(
+           to: CrawlyUIWeb.Router.Helpers.available_spider_path(socket, :available_spider)
+         )}
     end
   end
 
   def handle_event("pick_node", %{"node" => node_name}, socket) do
-    socket = socket |> assign(:current_node, node_name) |> update_available_spiders()
+    socket = socket |> assign(:current_node, node_name) |> show_spiders_for_current_node()
 
     {:noreply, socket}
   end
 
-  defp update_available_spiders(socket) do
-    nodes = Node.list()
+  defp show_spiders_for_current_node(socket) do
+    # Show available spiders for current node
+    node_name = Map.get(socket.assigns, :current_node, socket.assigns.nodes |> List.first())
+    available_spiders = SpiderManager.list_spiders(node_name)
 
-    case nodes do
-      [] -> assign(socket, available_spiders: [], nodes: [], current_node: nil)
-      [_node] -> filter_spiders(nodes, socket)
-    end
+    assign(socket, available_spiders: available_spiders, current_node: node_name)
   end
 
-  defp filter_spiders(nodes, socket) do
-    available_spiders = Enum.reduce(nodes, %{}, fn node_name, acc ->
-      spiders = SpiderManager.list_spiders(node_name)
-      Map.put(acc, node_name, spiders)
-    end)
-
-    {node_name, node_spiders} =
-      case Map.get(socket.assigns, :current_node, nil) do
-        nil ->
-          {node_name, spiders} = available_spiders |> Enum.at(0)
-        name ->
-          spiders_for_node = Map.get(available_spiders, name)
-
-          {name, spiders_for_node}
-      end
-
-    assign(socket, available_spiders: node_spiders, nodes: nodes, current_node: node_name)
+  defp update_available_spiders(socket) do
+    case Map.get(socket.assigns, :nodes, []) do
+      [] -> assign(socket, available_spiders: [], nodes: [], current_node: nil)
+      _ -> show_spiders_for_current_node(socket)
+    end
   end
 end
