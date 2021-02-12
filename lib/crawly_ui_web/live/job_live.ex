@@ -66,7 +66,6 @@ defmodule CrawlyUIWeb.JobLive do
   def handle_event("delete", %{"job" => job_id}, socket) do
     job = job_id |> String.to_integer() |> Manager.get_job!()
 
-    job |> Manager.delete_all_job_items()
     {:ok, _} = job |> Manager.delete_job()
 
     socket = update_socket(socket)

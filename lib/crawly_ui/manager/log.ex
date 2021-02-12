@@ -4,9 +4,10 @@ defmodule CrawlyUI.Manager.Log do
 
   schema "logs" do
     field :message, :string
-    field :job_id, :id
     field :mod, :string
     field :category, Ecto.Enum, values: [:manager, :worker, :requests, :items, :other]
+
+    belongs_to :job, CrawlyUI.Manager.Job
 
     timestamps()
   end
