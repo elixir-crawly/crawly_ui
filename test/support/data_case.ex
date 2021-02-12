@@ -75,6 +75,14 @@ defmodule CrawlyUI.DataCase do
     })
   end
 
+  def insert_log(job_id) do
+    CrawlyUI.Repo.insert!(%CrawlyUI.Manager.Log{
+      job_id: job_id,
+      mod: "undefined",
+      message: "Dropping request: \"\" (domain filter)"
+    })
+  end
+
   def inserted_at_valid(), do: inserted_at(0)
 
   @job_abandoned_timeout 60 * 30 + 10

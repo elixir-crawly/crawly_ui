@@ -169,6 +169,8 @@ defmodule CrawlyUIWeb.JobLiveTest do
     insert_item(job_2.id, inserted_at(50))
     insert_item(job_2.id, inserted_at(10))
 
+    insert_log(job_2.id)
+
     {:ok, view, _html} = live(conn, "/all")
 
     assert render(view) =~
