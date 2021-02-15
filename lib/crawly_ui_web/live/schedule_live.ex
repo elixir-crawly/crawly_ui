@@ -9,7 +9,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
   end
 
   def mount(%{"node" => node}, _session, socket) do
-    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10000)
+    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10_000)
 
     generic_spiders =
       Enum.map(
@@ -38,7 +38,7 @@ defmodule CrawlyUIWeb.ScheduleLive do
         fn spider -> spider.name end
       )
 
-    if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
+    if connected?(socket), do: Process.send_after(self(), :pick_node, 10_000)
 
     {:ok,
      assign(socket, generic_spiders: generic_spiders, template: "pick_node.html", nodes: nodes)}
@@ -46,12 +46,12 @@ defmodule CrawlyUIWeb.ScheduleLive do
 
   def handle_info(:pick_node, socket) do
     nodes = Node.list()
-    if connected?(socket), do: Process.send_after(self(), :pick_node, 10000)
+    if connected?(socket), do: Process.send_after(self(), :pick_node, 10_000)
     {:noreply, assign(socket, nodes: nodes)}
   end
 
   def handle_info(:pick_spider, socket) do
-    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10000)
+    if connected?(socket), do: Process.send_after(self(), :pick_spider, 10_000)
 
     node = socket.assigns.node
     spiders = SpiderManager.list_spiders(node)
