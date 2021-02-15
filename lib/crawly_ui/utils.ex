@@ -1,4 +1,7 @@
 defmodule CrawlyUI.Utils do
+  @moduledoc """
+  Extract data with complex selector.
+  """
   def extract_data_with_complex_selector(document, selector) do
     case String.split(selector, "//") do
       [selector] ->

@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.PaginationHelpers do
+  @moduledoc """
+  Uses for pages pagination.
+  """
+
   def simple_pagination(page, total_pages, link_params \\ nil) do
     min =
       case page - 5 <= 0 do

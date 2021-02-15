@@ -1,4 +1,8 @@
 defmodule CrawlyUI.Manager.Item do
+  @moduledoc """
+  Schema for items table.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

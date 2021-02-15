@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.ScheduleLive do
+  @moduledoc """
+  Live view module to display Running and Recent Jobs by pre-selecting worker and spider.
+  """
+
   use Phoenix.LiveView
 
   alias CrawlyUI.SpiderManager

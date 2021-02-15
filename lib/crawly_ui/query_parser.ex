@@ -1,4 +1,8 @@
 defmodule CrawlyUI.QueryParser do
+  @moduledoc """
+  Implementing efficient parser combinators.
+  """
+
   import NimbleParsec
 
   key = ascii_string([?a..?z, ?A..?Z, ?\s, ?\t], min: 1)

@@ -1,4 +1,6 @@
 defmodule CrawlyUI.ReleaseTasks do
+  @moduledoc false
+
   alias Ecto.Migrator
 
   @otp_app :crawly_ui

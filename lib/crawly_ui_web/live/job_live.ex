@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.JobLive do
+  @moduledoc """
+  Live view module to display a list of jobs with information about them and various statuses.
+  """
+
   use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
 
   alias CrawlyUI.Manager

@@ -1,4 +1,8 @@
 defmodule CrawlyUI.Manager.Spider do
+  @moduledoc """
+  Schema for spiders table.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

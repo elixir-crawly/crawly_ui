@@ -1,4 +1,8 @@
 defmodule CrawlyUI.Manager.Job do
+  @moduledoc """
+  Schema for jobs table.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
