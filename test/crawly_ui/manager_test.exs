@@ -389,9 +389,10 @@ defmodule CrawlyUi.ManagerTest do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
 
       # Inserting items
-      insert_item(job.id, inserted_at(60 * 1), %{"id" => 1, "title" => "chair", "color" => "blue"})
+      insert_item(job.id, inserted_at(60), %{"id" => 1, "title" => "chair", "color" => "blue"})
 
       insert_item(job.id, inserted_at(60 * 2), %{"id" => 2, "title" => "chair", "color" => "red"})
+
       insert_item(job.id, inserted_at(60 * 3), %{"id" => 3, "title" => "sofa", "color" => "red"})
 
       assert %{entries: [%Item{data: %{"id" => 1}}]} = Manager.list_items(job.id, search: "id:1")
@@ -407,7 +408,7 @@ defmodule CrawlyUi.ManagerTest do
       job = insert_job(%{inserted_at: inserted_at(6 * 60)})
 
       # Inserting items
-      insert_item(job.id, inserted_at(60 * 1), %{"id" => 1, "title" => "chair", "color" => "blue"})
+      insert_item(job.id, inserted_at(60), %{"id" => 1, "title" => "chair", "color" => "blue"})
 
       insert_item(job.id, inserted_at(60 * 2), %{"id" => 2, "title" => "chair2", "color" => "red"})
 
