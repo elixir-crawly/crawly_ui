@@ -1,10 +1,6 @@
 defmodule CrawlyUIWeb.AvailableSpidersLiveTest do
-  import CrawlyUI.DataCase
-
   use CrawlyUIWeb.ConnCase
   import Phoenix.LiveViewTest
-
-  alias CrawlyUI.SpiderManager
   import Mock
 
   test "mount spider view to show all available spider", %{conn: conn} do

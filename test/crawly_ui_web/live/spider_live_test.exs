@@ -6,12 +6,6 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
 
   import Mock
 
-  test "mount spider view to show all available spider", %{conn: conn} do
-    {:ok, _view, html} = live(conn, "/spider")
-
-    assert html =~ "Spiders"
-  end
-
   test "mount spider view for showing all jobs of a spider", %{conn: conn} do
     job_1 = insert_job(%{spider: "TestSpider"})
     job_2 = insert_job(%{spider: "TestSpider"})
@@ -36,10 +30,10 @@ defmodule CrawlyUIWeb.SpiderLiveTest do
            |> follow_redirect(conn, "/spider?page=2&spider=TestSpider")
   end
 
-  test "redirect to a spider's jobs", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/spider")
-    render_click(view, :show_spider, %{"spider" => "TestSpider"})
-    assert_redirect(view, "/spider?spider=TestSpider")
+  test "redirect to a spider's list if spider name not provided in params", %{conn: conn} do
+    {:error, {:live_redirect, %{to: to}}} = live(conn, "/spider")
+
+    assert to == "/spiders"
   end
 
   #  test "update job list when view jobs belong to a spider", %{conn: conn} do

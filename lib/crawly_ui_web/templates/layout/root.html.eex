@@ -107,7 +107,7 @@
                     <nav class="Navigation">
                         <a href="/">Home</a>
                         <a href="/all">Jobs</a>
-                        <a href="/spider">Generic Spiders</a>
+                        <a href="/spiders">Visual Spiders</a>
                         <a href="/available_spiders">Available Spiders</a>
                         <a href="/spider/new">Create spider<sup style="color: red; font-weight: bold;">Try it!</sup></a>
                         <a href="/schedule">Schedule</a>

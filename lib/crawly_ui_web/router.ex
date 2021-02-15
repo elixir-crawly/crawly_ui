@@ -22,6 +22,7 @@ defmodule CrawlyUIWeb.Router do
 
     live "/available_spiders", AvailableSpiderLive, :available_spider
     live "/spider", SpiderLive, :spider
+    live "/spiders", SpidersLive, :spiders
     live "/spider/new", NewSpiderLive, :spider
 
     live "/schedule", ScheduleLive, :pick_node

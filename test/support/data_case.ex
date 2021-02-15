@@ -83,6 +83,12 @@ defmodule CrawlyUI.DataCase do
     })
   end
 
+  def insert_spider(name \\ "Crawly") do
+    CrawlyUI.Repo.insert!(%CrawlyUI.Manager.Spider{
+      name: name
+    })
+  end
+
   def inserted_at_valid(), do: inserted_at(0)
 
   @job_abandoned_timeout 60 * 30 + 10
