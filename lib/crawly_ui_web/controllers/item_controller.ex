@@ -19,23 +19,21 @@ defmodule CrawlyUIWeb.ItemController do
 
     {:ok, conn} =
       Repo.transaction(fn ->
-        Enum.reduce_while(
-          stream,
-          conn,
-          fn data, conn ->
-            data = Jason.encode!(data)
-
-            case chunk(conn, data) do
-              {:ok, conn} ->
-                {:cont, conn}
-
-              {:error, :closed} ->
-                {:halt, conn}
-            end
-          end
-        )
+        Enum.reduce_while(stream, conn, &process_stream/2)
       end)
 
     conn
+  end
+
+  def process_stream(data, conn) do
+    data = Jason.encode!(data)
+
+    case chunk(conn, data) do
+      {:ok, conn} ->
+        {:cont, conn}
+
+      {:error, :closed} ->
+        {:halt, conn}
+    end
   end
 end
