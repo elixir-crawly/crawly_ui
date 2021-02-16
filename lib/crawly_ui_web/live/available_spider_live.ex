@@ -45,6 +45,13 @@ defmodule CrawlyUIWeb.AvailableSpiderLive do
     {:noreply, socket}
   end
 
+  def handle_event("show_spider", %{"spider" => spider}, socket) do
+    {:noreply,
+     push_redirect(socket,
+       to: CrawlyUIWeb.Router.Helpers.spider_path(socket, :spider, spider: spider)
+     )}
+  end
+
   defp show_spiders_for_current_node(socket) do
     # Show available spiders for current node
     node_name = Map.get(socket.assigns, :current_node, socket.assigns.nodes |> List.first())
