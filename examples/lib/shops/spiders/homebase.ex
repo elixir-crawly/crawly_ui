@@ -1,7 +1,11 @@
 defmodule Spiders.Homebase do
+  @moduledoc """
+  Spider implementation for website homebase.co.uk.
+  """
+
   use Crawly.Spider
 
-  @image_folder Application.get_env(:crawly, :image_folder, "/tmp")
+  @image_folder Application.compile_env(:crawly, :image_folder, "/tmp")
 
   def override_settings() do
     ui_node = System.get_env("UI_NODE") || "ui@127.0.0.1"

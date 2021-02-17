@@ -77,7 +77,6 @@ defmodule CrawlyUI.Utils do
     end
   end
 
-
   defp do_extract_data_with_complex_selector(_, _document) do
     ""
   end

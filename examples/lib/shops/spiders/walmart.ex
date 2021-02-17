@@ -1,4 +1,8 @@
 defmodule Spiders.Walmart do
+  @moduledoc """
+  Spider implementation for website walmart.com.
+  """
+
   use Crawly.Spider
 
   @impl Crawly.Spider

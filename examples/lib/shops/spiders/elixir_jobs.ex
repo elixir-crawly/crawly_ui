@@ -1,4 +1,8 @@
 defmodule Spiders.ElixirJobs do
+  @moduledoc """
+  Spider implementation for website elixir-radar.com.
+  """
+
   use Crawly.Spider
 
   def override_settings() do

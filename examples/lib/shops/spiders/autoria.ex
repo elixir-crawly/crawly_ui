@@ -1,4 +1,8 @@
 defmodule Spiders.Autoria do
+  @moduledoc """
+  Spider implementation for website auto.ria.com.
+  """
+
   use Crawly.Spider
 
   alias Crawly.Utils
@@ -31,7 +35,7 @@ defmodule Spiders.Autoria do
   def parse_item(response) do
     {:ok, document} = Floki.parse_document(response.body)
 
-    hrefs = 
+    hrefs =
       document
       |> Floki.find(".content-bar a.m-link-ticket")
       |> Enum.map(fn link -> Floki.attribute(link, "href") end)
@@ -71,7 +75,7 @@ defmodule Spiders.Autoria do
   end
 
   defp start_urls() do
-    Enum.map(0..8, fn page_number -> 
+    Enum.map(0..8, fn page_number ->
       "https://auto.ria.com/uk/search/?indexName=auto,order_auto,newauto_search&paintCondition=1&technicalCondition=1&plateNumber.length.gte=1&verified.VIN=1&body.id[0]=3&body.id[3]=4&body.id[4]=2&year[0].gte=2011&year[0].lte=2021&categories.main.id=1&country.origin.id[0].not=804&country.origin.id[1].not=643&country.origin.id[2].not=158&country.origin.id[3].not=860&country.origin.id[4].not=356&country.origin.id[5].not=364&country.import.usa.not=-1&price.USD.gte=6000&price.USD.lte=9500&price.currency=1&mileage.gte=1&mileage.lte=150&abroad.not=0&custom.not=1&damage.not=1&page=#{page_number}&size=20"
     end)
   end
