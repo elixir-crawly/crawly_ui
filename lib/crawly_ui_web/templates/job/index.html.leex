@@ -6,12 +6,12 @@ No jobs are currently running. You can schedule a new one by hitting Schedule bu
 </p>
 <a href="/schedule" class="button button-black">Schedule</a>
 <% else %>
-<%= raw render_jobs_table(@rows, @live_action) %>
+<%= raw render_jobs_table(@rows, :spider) %>
 <%= raw pagination_links(@page, @total_pages) %>
 
 <% end %>
 <br>
 <br>
 <h1>Recent Jobs</h1>
-<%= raw render_jobs_table(@recent_rows, @live_action) %>
+<%= raw render_jobs_table(@recent_rows, :spider) %>
 <a href="/all" class="button button-black">See more</a>

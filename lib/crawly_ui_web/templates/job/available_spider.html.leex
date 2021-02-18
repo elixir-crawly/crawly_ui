@@ -1,0 +1,29 @@
+<h2>Available for schedule</h2>
+<%= if @nodes != [] do %>
+  <form action="#" phx-change="pick_node">
+    <input type="hidden" name="spider" value="<%= @current_node %>" />
+    <select name="node">
+      <%= for node <- @nodes do %>
+        <option value="<%= node %>"><%= node %></option>
+      <% end %>
+    </select>
+  </form>
+<% end %>
+<%= if @available_spiders != [] do %>
+  <table>
+    <%= for spider <- @available_spiders do %>
+      <tr>
+        <td>
+          <a href="#" phx-click=show_spider phx-value-spider=<%= spider %>>
+            <%= raw render_spider_name(spider) %>
+          </a>
+        </td>
+          <td class="w">
+            <button phx-click="schedule_spider" phx-value-node=<%= @current_node %> phx-value-spider=<%= spider %>>
+              Schedule
+            </button>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
