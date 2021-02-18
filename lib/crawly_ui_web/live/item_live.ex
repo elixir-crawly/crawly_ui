@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.ItemLive do
+  @moduledoc """
+  Live view module to display information about items with searchable by fields of items and export the file of result to JSON.
+  """
+
   use Phoenix.LiveView
 
   alias CrawlyUI.Manager

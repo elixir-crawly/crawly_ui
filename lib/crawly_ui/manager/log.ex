@@ -1,4 +1,8 @@
 defmodule CrawlyUI.Manager.Log do
+  @moduledoc """
+  Schema for logs table.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

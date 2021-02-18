@@ -392,8 +392,8 @@ defmodule CrawlyUI.Manager do
 
   # Return an ECTO fragement for the given search query
   def search(search_string) do
-    with {:ok, tokens} <- parse_search_string(search_string),
-         tokens = Enum.map(tokens, &String.trim(&1)) do
+    with {:ok, tokens} <- parse_search_string(search_string) do
+      tokens = Enum.map(tokens, &String.trim(&1))
       # take first two elements from the list
       [key, value | rest] = tokens
 

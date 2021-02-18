@@ -59,7 +59,8 @@ defmodule CrawlyUI.MixProject do
       {:floki, "~> 0.29.0"},
       {:logger_file_backend, "~> 0.0.11"},
       {:excoveralls, "~> 0.10", only: :test},
-      {:mock, "~> 0.3.0", only: :test}
+      {:mock, "~> 0.3.0", only: :test},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 

@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.NewSpiderLive do
+  @moduledoc """
+  Live view module for starting a new spider with specific crawling rules.
+  """
+
   use Phoenix.LiveView
 
   alias CrawlyUI.Utils

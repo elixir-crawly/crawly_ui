@@ -1,4 +1,8 @@
 defmodule Spiders.AlloUa do
+  @moduledoc """
+  Spider implementation for website allo.ua.
+  """
+
   use Crawly.Spider
 
   def override_settings() do

@@ -1,4 +1,8 @@
 defmodule Spiders.OregonRegs do
+  @moduledoc """
+  Spider implementation for website state.or.us.
+  """
+
   use Crawly.Spider
 
   @impl Crawly.Spider

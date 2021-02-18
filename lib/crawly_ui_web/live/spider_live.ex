@@ -1,4 +1,8 @@
 defmodule CrawlyUIWeb.SpiderLive do
+  @moduledoc """
+  Live view module to display available spiders.
+  """
+
   use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
 
   alias CrawlyUI.Manager

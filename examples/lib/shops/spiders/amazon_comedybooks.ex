@@ -1,4 +1,8 @@
 defmodule Spiders.AmazonComedyBooks do
+  @moduledoc """
+  Spider implementation for website amazon.de.
+  """
+  
   use Crawly.Spider
 
   def override_settings() do
