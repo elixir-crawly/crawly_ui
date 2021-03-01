@@ -30,6 +30,26 @@ defmodule CrawlyUI.Queries.Log do
     |> Repo.all()
   end
 
+  def paginate(%Log{id: id, inserted_at: inserted_at}, job_id, opts \\ [items_per_page: 5, filter: "all"]) do
+    maybe_extra_filter =
+      case opts[:filter] do
+        "all" -> ""
+        f -> "and category = ''#{f}''"
+      end
+
+    %{columns: columns, rows: rows} =
+      CrawlyUI.Repo.query!("""
+        select * from logs
+        where job_id = #{job_id}
+        and row (id, inserted_at) < (#{id}, '#{inserted_at}'::timestamp)
+        #{maybe_extra_filter}
+        order by inserted_at desc, id desc
+        fetch first #{opts[:items_per_page]} rows only
+      """)
+
+    Enum.map(rows, fn row -> CrawlyUI.Repo.load(Log, Enum.zip(columns, row)) end)
+  end
+
   defp maybe_apply_category_filters(query, "all"), do: query
 
   defp maybe_apply_category_filters(query, filter) do

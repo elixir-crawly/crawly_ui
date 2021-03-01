@@ -54,4 +54,12 @@ defmodule CrawlyUIWeb.PaginationHelpersTest do
   defp match_page(pagination, page) do
     assert String.contains?(pagination, Integer.to_string(page))
   end
+
+  test "id_based pagination" do
+    pagination = PaginationHelpers.id_based(last_id: 1, first_id: 50, previous_page: false, next_page: true)
+
+    assert String.contains?(pagination, "?last_id=50")
+    assert String.contains?(pagination, "?first_id=1")
+    assert String.contains?(pagination, "?first_id=1")
+  end
 end

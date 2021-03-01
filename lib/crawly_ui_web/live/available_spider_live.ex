@@ -1,5 +1,5 @@
 defmodule CrawlyUIWeb.AvailableSpiderLive do
-    @moduledoc """
+  @moduledoc """
   Live view module to display a list of coded (opposite to visual) spiders from all nodes.
   """
   use Phoenix.LiveView, layout: {CrawlyUIWeb.LayoutView, "live.html"}
